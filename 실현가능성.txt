@@ -1,0 +1,20 @@
+1. 타임라인 사진앨범
+
+   * 필요 라이브러리: 없음
+
+   * 구현: 
+
+     i. 변경될 ViewController 클래스들: 
+        a. VLOTimeLineViewController - 타임라인 전체를 
+        b. VLOTimeLineTableViewController - VLOTImeLineViewController 속에서, heading과 footer을 제외 한 
+               유저의 엔트리(포토/굵은 글씨/지도/경로/텍스트 중 한 가지)를 테이블로 표시하는 view.
+
+     ii. 구현 방법:
+        a. 현재 VLOTimeLineTableViewController는 VLOTimeLineViewController의 subview 지만, 그 사이에 UIScrollView 클래스를 
+           추가해 VLOTimeLineViewController - UIScrollView - VLOTimeLineTableViewController의 hierarchy로 만든다.
+        b. UIScrollView속 VLOTimeLineTableViewController와 동등한 레벨로 VLOAlbumView를 추가한다. 
+        c. VLOAlbumView는 UICollectionView 혹은 UITableView의 subclass로, 서버와 VLOTimeLineTableView sync가 끝난 후 
+           VLOTimeLineTableView를 traverse하며 타임라인의 사진을 로드한다.
+
+
+
