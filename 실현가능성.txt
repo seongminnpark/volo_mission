@@ -1,0 +1,24 @@
+- 경로 지도
+1. 필요 API
+
+1) Google Static Maps API
+   (1) 사용자가 등록하는 첫번째 사진에서 위도, 경도 정보를 받아옴 (exif metadata 이용)
+   (2) https://maps.googleapis.com/maps/api/staticmap?parameters를 통해 static map 요청
+   (2-1) parameters - center : 사진에서 얻어온 위도 및 경도
+		       size : 모바일 환경에 맞게 임의의 사이즈 설정
+		       zoom : 출발위치와 도착위치의 위도, 경도를 파악하여 zoom 수치 조절(범위가 넓은 경우 
+                             zoom 수치를 작게, 범위가 좁은 경우 zoom 수치를 크게)
+                      map type : roadmap (일반 google map)
+		       marker : 사용자가 등록하는 사진의 위도, 경도 값으로 지정.
+  			         label 속성을 사용하여 숫자 입력
+
+2. 그 외 구현
+1) 사진으로부터 위도, 경도 추출 // 어떤 객체, 함수 사용할지 적어야함
+
+
+3. 문제점
+1) 사진이 없는 글의 경우 경로를 파악하기 어렵다.
+2) exif metadata가 없는 경우 위도, 경도를 파악할 수 없다.
+
+4. 보완점
+1) 사진의 없는 글의 경우 KONLP를 사용하여 명사형 단어 중 여행지를 뽑아내 경로를 추측
