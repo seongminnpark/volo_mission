@@ -5,7 +5,7 @@
    * 구현: 
 
      i. 변경될 ViewController 클래스들: 
-        a. VLOTimeLineViewController - 타임라인 전체를 
+        a. VLOTimeLineViewController - 타임라인 전체
         b. VLOTimeLineTableViewController - VLOTImeLineViewController 속에서, heading과 footer을 제외 한 
                유저의 엔트리(포토/굵은 글씨/지도/경로/텍스트 중 한 가지)를 테이블로 표시하는 view.
 
