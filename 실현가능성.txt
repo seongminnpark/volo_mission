@@ -6,7 +6,7 @@
 
      i. 변경될 ViewController 클래스들: 
         (1) VLOTimeLineViewController - 타임라인 전체
-        (2) VLOTimeLineTableViewController - VLOTImeLineViewController 속에서, heading과 footer을 제외 한 
+        (2) VLOTimeLineTableViewController - VLOTImeLineViewController 속에서, header과 footer을 제외 한 
                유저의 엔트리(포토/굵은 글씨/지도/경로/텍스트 중 한 가지)를 테이블로 표시하는 view.
 
      ii. 구현 방법:
@@ -17,4 +17,24 @@
             VLOTimeLineTableView를 traverse하며 타임라인의 사진을 로드한다.
 
 
+
+3. 목차
+
+   * 필요 라이브러리: 없음
+
+   * 구현: 
+
+     i. 변경될 ViewController 클래스들: 
+        (1) VLOTimeLineViewController - 타임라인 전체
+        (2) VLOTimeLineTableViewController - VLOTImeLineViewController 속에서, header과 footer을 제외 한 
+               유저의 엔트리(포토/굵은 글씨/지도/경로/텍스트 중 한 가지)를 테이블로 표시하는 view. 
+        (3) VLOTimelineTableHeaderView - VLOTimeLineTableViewController의 상단 header의 레이아웃을 결정한다.
+        (4) VLOTextEditorViewController - 키보드에 부착돼 스티커와 키보드 내리기 버튼을 보여주는 ViewController
+        (5) 5가지 Log Editor들의 NavigationBarViewController
+
+
+     ii. 구현 방법:
+        (1) 태그는 VLOTextEditorViewController에 추가된 UIButton으로, 카테고리는 NavigationBarViewController에 추가된
+            UIButton으로 구현한다.
+        (2) 작성자가 생성한 링크는 타임라인 정보와 함께 저장 돼 VLOTimelineTableHeaderView의 UIButton으로 표시된다. 
 
