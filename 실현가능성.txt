@@ -6,16 +6,46 @@
 
      i. 변경될 ViewController 클래스들: 
         (1) VLOTimeLineViewController - 타임라인 전체
+        (2) VLOTimeLineTableViewController - VLOTImeLineViewController 속에서, heading과 footer을 제외 한 
         (2) VLOTimeLineTableViewController - VLOTImeLineViewController 속에서, header과 footer을 제외 한 
                유저의 엔트리(포토/굵은 글씨/지도/경로/텍스트 중 한 가지)를 테이블로 표시하는 view.
 
      ii. 구현 방법:
         (1) 현재 VLOTimeLineTableViewController는 VLOTimeLineViewController의 subview 지만, 그 사이에 UIScrollView 클래스를 
+           추가해 VLOTimeLineViewController - UIScrollView - VLOTimeLineTableViewController의 hierarchy로 만든다.
+        (2) UIScrollView속 VLOTimeLineTableViewController와 동등한 레벨로 VLOAlbumView를 추가한다. 
+        (3) VLOAlbumView는 UICollectionView 혹은 UITableView의 subclass로, 서버와 VLOTimeLineTableView sync가 끝난 후 
+           VLOTimeLineTableView를 traverse하며 타임라인의 사진을 로드한다.
             추가해 VLOTimeLineViewController - UIScrollView - VLOTimeLineTableViewController의 hierarchy로 만든다.
         (2) UIScrollView속 VLOTimeLineTableViewController와 동등한 레벨로 VLOAlbumView를 추가한다. 
         (3) VLOAlbumView는 UICollectionView 혹은 UITableView의 subclass로, 서버와 VLOTimeLineTableView sync가 끝난 후 
             VLOTimeLineTableView를 traverse하며 타임라인의 사진을 로드한다.
 
+
+2.  경로 지도
+   * 필요 API
+
+      i. Google Static Maps API
+         (1) 사용자가 등록하는 첫번째 사진에서 위도, 경도 정보를 받아옴 (exif metadata 이용)
+         (2) https://maps.googleapis.com/maps/api/staticmap?parameters를 통해 static map 요청
+         (2-1) parameters - center : 사진에서 얻어온 위도 및 경도
+		       size : 모바일 환경에 맞게 임의의 사이즈 설정
+		       zoom : 출발위치와 도착위치의 위도, 경도를 파악하여 zoom 수치 조절(범위가 넓은 경우 
+                             zoom 수치를 작게, 범위가 좁은 경우 zoom 수치를 크게)
+                      map type : roadmap (일반 google map)
+		       marker : 사용자가 등록하는 사진의 위도, 경도 값으로 지정.
+  			         label 속성을 사용하여 숫자 입력
+
+   * 그 외 구현
+      i. 사진으로부터 위도, 경도 추출 (등록할 사진을 선택 후, 완료버튼 클릭함과 동시에 위치정보를 타임라인에 표시. VLOSyncManger.m)
+      ii. 단순하게 경로만 표시할 경우, 사진에서 얻어온 exif metadata를 사용해 사용자의 위치를 표시.
+
+   * 문제점
+      i.  사진이 없는 글의 경우 경로를 파악하기 어렵다.
+      ii. exif metadata가 없는 경우 위도, 경도를 파악할 수 없다. (현재 사진을 추가할 때 exif값이 NULL인데, 이 값의 유무가 중요)
+
+   * 보완점
+      i. 사진의 없는 글의 경우 KONLP를 사용하여 명사형 단어 중 여행지를 뽑아내 경로를 추측
 
 
 3. 목차
@@ -36,7 +66,27 @@
      ii. 구현 방법:
         (1) 태그는 VLOTextEditorViewController에 추가된 UIButton으로, 카테고리는 NavigationBarViewController에 추가된
             UIButton으로 구현한다.
-        (2) 작성자가 생성한 링크는 타임라인 정보와 함께 저장 돼 VLOTimelineTableHeaderView의 UIButton으로 표시된다. 
+        (2) 작성자가 생성한 링크는 타임라인 정보와 함께 저장 돼 VLOTimelineTableHeaderView의 UIButton으로 표시된다.
+
+
+4. 타임라인 커버포토 개선
+
+   * 필요 라이브러리: 없음
+
+   * 구현: 
+
+     i. 변경될 ViewController 클래스들: 
+        (1) VLOTravelListViewController - 타임라인을 테이블에 모아 정렬하는 ViewController. 
+        (2) VLOTravelListCell - VLOTravelListViewController속에서 하나의 여행기를 나타내는 cell.
+
+     ii. 구현 방법:
+        (1) 슬라이드쇼 - 타임라인의 사진을 표시하는 단순한 작업이지만, 한 타임라인의 사진들은 그 타임라인으르 선택한 후에야 서버에서 사진을 가져온다.
+                       따라서 타임라인 목록을 조작하는 동안에는 각 타임라인에 포함된 사진 데이터를 액세스할 수 없다.
+                       로컬에 저장된 사진을 사용하거나, 슬라이드쇼 용 사진을 서버에 업로드해야 한다.
+        (2) 드래그 - VLOTravelListCell에 UISwipeGestureRecognizer를 포함시켜, 슬라이드쇼와 같은 방식으로 구현한다.
+        (3) 포토 콜라주 - 여행기의 사진에 수정이 있을 때, 커버포토를 새로 만들어 서버의 커버포토를 교체한다.
+                        UIGraphicsBeginImageContext로 이미지 오브젝트를 생성하고, Photo들을 콜라주에 추가한다.
+                        콜라주 완성 후 UIImagePNGRepresentation() 메쏘드로 이미지 라이브러리에 새로 생성된 이미지를 저장한다. 
 
 
 4. 타임라인 커버포토 개선
