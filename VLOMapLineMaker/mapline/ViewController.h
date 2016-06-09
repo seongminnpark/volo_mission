@@ -16,12 +16,14 @@
 #define CURVE_HORIZONTAL_PADDING 40
 #define CURVE_VERTICAL_RATIO 0.45
 #define CURVE_VERTICAL_VARIATION 30
+#define SLIDER_VERTICAL_RATIO 0.65
 
 
 @interface ViewController : UIViewController
 
 @property (strong, nonatomic) VLOMapLineMaker *mapLineMaker;
 @property (strong, nonatomic) TestView *testView;
+@property (strong, nonatomic) UISlider *slider;
 @property () CGPoint start;
 @property () CGPoint end;
 @property () CGFloat screenWidth;
