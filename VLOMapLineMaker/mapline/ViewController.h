@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <Social/Social.h>
 #import "VLOMapLineMaker.h"
 #import "CurveView.h"
 #import "DotView.h"
@@ -30,11 +31,13 @@
 @property (strong, nonatomic) DotView *dotView;
 @property (strong, nonatomic) UISlider *slider;
 @property (strong, nonatomic) CAShapeLayer *shapeLayer;
+@property (strong, nonatomic) SLComposeViewController *shareController;
 @property () CGPoint start;
 @property () CGPoint end;
 @property () CGFloat screenWidth;
 @property () CGFloat screenHeight;
 @property () NSInteger curveLength;
+@property () BOOL shareable;
 
 @end
 
