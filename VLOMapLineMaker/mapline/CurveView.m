@@ -22,4 +22,12 @@
     [_path stroke];
 }
 
+-(UIImage *) curveIntoImage {
+    UIGraphicsBeginImageContextWithOptions(self.bounds.size, self.opaque, 0.0);
+    [self.layer renderInContext:UIGraphicsGetCurrentContext()];
+    UIImage *curveImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return curveImage;
+}
+
 @end
