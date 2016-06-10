@@ -24,6 +24,7 @@
 
 - (UIBezierPath *)mapLineBetweenPoint:(CGPoint)from point:(CGPoint)to {
     NSArray *pointList = [self createPointsBetweenPoint:from point:to];
+    NSLog(@"%@",pointList);
     return [self interpolatePoints:pointList];
 }
 
@@ -103,11 +104,12 @@
     }
     
     // 파티션 배열을 초기화 하고 남은 길이를 각 파티션에 랜덤으로 배분합니다.
+    NSInteger toAdd = 0;
     for (NSInteger i = 0; i < divisions; i++) {
-        NSInteger toAdd = randomSeed % leftover;
         if (leftover < 1) {
             break;
         } else {
+            toAdd = randomSeed % leftover;
             NSInteger updated_length = ((NSNumber *)partition_lengths[i]).integerValue + toAdd;
             NSNumber *ns_updated_length = [[NSNumber alloc] initWithInt:(int)updated_length];
             [partition_lengths replaceObjectAtIndex:i withObject:ns_updated_length];
@@ -145,8 +147,10 @@
                     secondPoint:p0 thirdPoint:p1 firstDistance:dist_p0p1 secondDistance:dist_p1p2];
             CGPoint control_point_2 = [self controlPointBetweenFirstPoint:p1
                     secondPoint:p3 thirdPoint:p2 firstDistance:dist_p2p3 secondDistance:dist_p1p2];
-            
-            [path addCurveToPoint:p2 controlPoint1:control_point_1 controlPoint2:control_point_2];
+            if (p2.x - p1.x > 2) {
+                [path addCurveToPoint:p2 controlPoint1:control_point_1 controlPoint2:control_point_2];
+            }
+
         }
     }
     path.lineWidth = LINE_WIDTH;

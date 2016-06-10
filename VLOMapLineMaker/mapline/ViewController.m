@@ -72,7 +72,10 @@
     _end.x = CURVE_HORIZONTAL_PADDING + _curveLength;
     _end.y = arc4random_uniform(CURVE_VERTICAL_VARIATION) + curveY;
     
-    _testView.path = [_mapLineMaker mapLineBetweenPoint:_start point:_end];
+    //_testView.path = [_mapLineMaker mapLineBetweenPoint:_start point:_end];
+    NSArray *pointList = [_mapLineMaker createPointsBetweenPoint:_start point:_end];
+    _testView.path = [_mapLineMaker interpolatePoints:pointList];
+    _testView.dots = pointList;
     
     [_testView setNeedsDisplay];
 }
