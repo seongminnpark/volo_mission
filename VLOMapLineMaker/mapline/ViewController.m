@@ -28,12 +28,19 @@
     
     _mapLineMaker = [[VLOMapLineMaker alloc] init];
     
-    _testView = [[TestView alloc] initWithFrame:CGRectMake(0, 0, _screenWidth, _screenHeight)];
-    [_testView setBackgroundColor:[UIColor whiteColor]];
-    [self.view addSubview:_testView];
+    _curveView = [[CurveView alloc] initWithFrame:
+                 CGRectMake(0, _screenHeight * CURVE_VERTICAL_RATIO - CURVE_VERTICAL_VARIATION,
+                            _screenWidth, CURVE_VERTICAL_VARIATION * 3)];
+    [_curveView setBackgroundColor:[UIColor whiteColor]];
+    
+    _dotView = [[DotView alloc] initWithFrame:
+                 CGRectMake(_curveView.frame.origin.x, _curveView.frame.origin.y - DOTVIEW_OFFSET,
+                            _curveView.frame.size.width, _curveView.frame.size.height)];
+    [_dotView setBackgroundColor:[UIColor whiteColor]];
     
     // 애니메이션 레이어 설정
     _shapeLayer = [CAShapeLayer layer];
+    _shapeLayer.position = CGPointMake(_curveView.frame.origin.x, _curveView.frame.origin.y);
     _shapeLayer.strokeColor = [[UIColor blackColor] CGColor];
     _shapeLayer.fillColor = nil;
     _shapeLayer.lineWidth = LINE_WIDTH;
@@ -79,36 +86,40 @@
     
     [self testMapLineMaker];
     
-    // 애니메이션 버튼의 콜백은 path가 필요하기 때문에 제일 마지막에 호출합니다.
+    // 애니메이션 버튼의 콜백은 path가 필요하기 때문에 testMapLineMaker 후에 호출합니다.
     [self.view addSubview:smallButton];
     
+    // 제일 윗 레이어로 만들기 위해 나중에 추가합니다.
+    [self.view addSubview:_curveView];
+    [self.view addSubview:_dotView];
 }
 
 - (void)testMapLineMaker {
     [_shapeLayer setHidden:YES];
-    [_testView setHidden:NO];
+    [_curveView setHidden:NO];
     
     // Create random starting points.
     _curveLength = _slider.value;
     
-    CGFloat curveY = _screenHeight * CURVE_VERTICAL_RATIO;
-    _start.y = arc4random_uniform(CURVE_VERTICAL_VARIATION) + curveY;
+    CGFloat curveY = 0;
+    _start.y = arc4random_uniform(CURVE_VERTICAL_VARIATION);
     _end.x = CURVE_HORIZONTAL_PADDING + _curveLength;
     _end.y = arc4random_uniform(CURVE_VERTICAL_VARIATION) + curveY;
     
     //_testView.path = [_mapLineMaker mapLineBetweenPoint:_start point:_end];
     NSArray *pointList = [_mapLineMaker createPointsBetweenPoint:_start point:_end];
-    _testView.path = [_mapLineMaker interpolatePoints:pointList];
-    _testView.dots = pointList;
+    _dotView.dots = pointList;
+    _curveView.path = [_mapLineMaker interpolatePoints:pointList];
     
-    [_testView setNeedsDisplay];
+    [_dotView setNeedsDisplay];
+    [_curveView setNeedsDisplay];
 }
 
 - (void) animateCurve {
-    [_testView setHidden:YES];
+    [_curveView setHidden:YES];
     [_shapeLayer setHidden:NO];
     
-    _shapeLayer.path = _testView.path.CGPath;
+    _shapeLayer.path = _curveView.path.CGPath;
     CABasicAnimation *pathAnimation = [CABasicAnimation animationWithKeyPath:@"strokeEnd"];
     pathAnimation.duration = 0.7;
     pathAnimation.fromValue = @(0.0f);

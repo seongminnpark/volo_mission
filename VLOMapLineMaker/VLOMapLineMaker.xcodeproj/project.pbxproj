@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3E374E0F1D0AB524001871D8 /* DotView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3E374E0E1D0AB524001871D8 /* DotView.m */; };
 		3E3F15C61D06748200D5CC4F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 3E3F15C51D06748200D5CC4F /* main.m */; };
 		3E3F15C91D06748200D5CC4F /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3E3F15C81D06748200D5CC4F /* AppDelegate.m */; };
 		3E3F15CC1D06748200D5CC4F /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3E3F15CB1D06748200D5CC4F /* ViewController.m */; };
@@ -16,7 +17,7 @@
 		3E3F15DF1D06748200D5CC4F /* maplineTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3E3F15DE1D06748200D5CC4F /* maplineTests.m */; };
 		3E3F15EA1D06748200D5CC4F /* maplineUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3E3F15E91D06748200D5CC4F /* maplineUITests.m */; };
 		3E3F16021D06ABBE00D5CC4F /* VLOMapLineMaker.m in Sources */ = {isa = PBXBuildFile; fileRef = 3E3F16011D06ABBE00D5CC4F /* VLOMapLineMaker.m */; };
-		3E3F16091D06D1B600D5CC4F /* TestView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3E3F16081D06D1B600D5CC4F /* TestView.m */; };
+		3E3F16091D06D1B600D5CC4F /* CurveView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3E3F16081D06D1B600D5CC4F /* CurveView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -37,6 +38,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		3E374E0D1D0AB524001871D8 /* DotView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DotView.h; sourceTree = "<group>"; };
+		3E374E0E1D0AB524001871D8 /* DotView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DotView.m; sourceTree = "<group>"; };
 		3E3F15C11D06748200D5CC4F /* VLOMapLineManager.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VLOMapLineManager.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3E3F15C51D06748200D5CC4F /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		3E3F15C71D06748200D5CC4F /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -55,8 +58,8 @@
 		3E3F15EB1D06748200D5CC4F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3E3F16001D06ABA000D5CC4F /* VLOMapLineMaker.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLOMapLineMaker.h; sourceTree = "<group>"; };
 		3E3F16011D06ABBE00D5CC4F /* VLOMapLineMaker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLOMapLineMaker.m; sourceTree = "<group>"; };
-		3E3F16071D06D1B600D5CC4F /* TestView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestView.h; sourceTree = "<group>"; };
-		3E3F16081D06D1B600D5CC4F /* TestView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestView.m; sourceTree = "<group>"; };
+		3E3F16071D06D1B600D5CC4F /* CurveView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CurveView.h; sourceTree = "<group>"; };
+		3E3F16081D06D1B600D5CC4F /* CurveView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CurveView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -118,8 +121,10 @@
 				3E3F15D21D06748200D5CC4F /* LaunchScreen.storyboard */,
 				3E3F15D51D06748200D5CC4F /* Info.plist */,
 				3E3F15C41D06748200D5CC4F /* Supporting Files */,
-				3E3F16071D06D1B600D5CC4F /* TestView.h */,
-				3E3F16081D06D1B600D5CC4F /* TestView.m */,
+				3E3F16071D06D1B600D5CC4F /* CurveView.h */,
+				3E3F16081D06D1B600D5CC4F /* CurveView.m */,
+				3E374E0D1D0AB524001871D8 /* DotView.h */,
+				3E374E0E1D0AB524001871D8 /* DotView.m */,
 			);
 			path = mapline;
 			sourceTree = "<group>";
@@ -282,8 +287,9 @@
 			files = (
 				3E3F16021D06ABBE00D5CC4F /* VLOMapLineMaker.m in Sources */,
 				3E3F15CC1D06748200D5CC4F /* ViewController.m in Sources */,
+				3E374E0F1D0AB524001871D8 /* DotView.m in Sources */,
 				3E3F15C91D06748200D5CC4F /* AppDelegate.m in Sources */,
-				3E3F16091D06D1B600D5CC4F /* TestView.m in Sources */,
+				3E3F16091D06D1B600D5CC4F /* CurveView.m in Sources */,
 				3E3F15C61D06748200D5CC4F /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
