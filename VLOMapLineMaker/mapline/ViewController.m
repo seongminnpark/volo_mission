@@ -28,28 +28,55 @@
     
     _mapLineMaker = [[VLOMapLineMaker alloc] init];
     
-    _testView = [[TestView alloc] initWithFrame:CGRectMake(0, 0, _screenWidth, _screenHeight)];
-    [_testView setBackgroundColor:[UIColor whiteColor]];
-    [self.view addSubview:_testView];
+    // 커브 뷰 생성.
+    _curveView = [[CurveView alloc] initWithFrame:
+                 CGRectMake(0, _screenHeight * CURVE_VERTICAL_RATIO,
+                            _screenWidth, CURVE_VERTICAL_VARIATION * 3)];
+    [_curveView setBackgroundColor:[UIColor whiteColor]];
     
-    // Create button.
-    CGFloat buttonLeft = BUTTON_PADDING;
-    CGFloat buttonTop = _screenHeight * BUTTON_TOP_RATIO;
-    CGFloat buttonWidth = _screenWidth - BUTTON_PADDING * 2;
-    CGFloat buttonHeight = _screenHeight * BUTTON_HEIGHT_RATIO;
-    UIButton *testPointsButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    [testPointsButton setFrame:CGRectMake(buttonLeft, buttonTop, buttonWidth, buttonHeight)];
-    [testPointsButton setTitle:@"New random points" forState:UIControlStateNormal];
-    [testPointsButton addTarget:self action:@selector(testMapLineMaker)
+    // 점선 뷰 생성.
+    _dotView = [[DotView alloc] initWithFrame:
+                 CGRectMake(_curveView.frame.origin.x, _curveView.frame.origin.y - DOTVIEW_OFFSET,
+                            _curveView.frame.size.width, _curveView.frame.size.height)];
+    [_dotView setBackgroundColor:[UIColor whiteColor]];
+    
+    // 애니메이션 레이어 설정
+    _shapeLayer = [CAShapeLayer layer];
+    _shapeLayer.position = CGPointMake(_curveView.frame.origin.x, _curveView.frame.origin.y);
+    _shapeLayer.strokeColor = [[UIColor blackColor] CGColor];
+    _shapeLayer.fillColor = nil;
+    _shapeLayer.lineWidth = LINE_WIDTH;
+    _shapeLayer.lineJoin = kCALineJoinBevel;
+    [self.view.layer addSublayer:_shapeLayer];
+    
+    // Add new random curve button.
+    CGFloat bigButtonLeft = BUTTON_PADDING;
+    CGFloat bigButtonTop = _screenHeight * BUTTON_TOP_RATIO;
+    CGFloat bigButtonWidth = (_screenWidth - BUTTON_PADDING * 2.5) / GOLDEN_RATIO;
+    CGFloat bigButtonHeight = _screenHeight * BUTTON_HEIGHT_RATIO;
+    UIButton *bigButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [bigButton setFrame:CGRectMake(bigButtonLeft, bigButtonTop, bigButtonWidth, bigButtonHeight)];
+    [bigButton setTitle:@"New curve" forState:UIControlStateNormal];
+    [bigButton addTarget:self action:@selector(testMapLineMaker)
                forControlEvents:UIControlEventTouchUpInside];
-    testPointsButton.backgroundColor=[UIColor grayColor];
-    [self.view addSubview:testPointsButton];
+    bigButton.backgroundColor=[UIColor grayColor];
+    [self.view addSubview:bigButton];
+    
+    // Add animate button.
+    CGFloat smallButtonLeft = BUTTON_PADDING + bigButtonWidth + BUTTON_PADDING/2;
+    CGFloat smallButtonWidth = _screenWidth - BUTTON_PADDING * 2.5 - bigButtonWidth;
+    UIButton *smallButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [smallButton setFrame:CGRectMake(smallButtonLeft, bigButtonTop, smallButtonWidth, bigButtonHeight)];
+    [smallButton setTitle:@"Animate" forState:UIControlStateNormal];
+    [smallButton addTarget:self action:@selector(animateCurve)
+               forControlEvents:UIControlEventTouchUpInside];
+    smallButton.backgroundColor=[UIColor lightGrayColor];
     
     // Add slider.
     CGFloat sliderLeft = CURVE_HORIZONTAL_PADDING;
     CGFloat sliderTop = _screenHeight * SLIDER_VERTICAL_RATIO;
     CGRect sliderFrame = CGRectMake(sliderLeft, sliderTop,
-                                    _screenWidth - CURVE_HORIZONTAL_PADDING*2,buttonHeight);
+                                    _screenWidth - CURVE_HORIZONTAL_PADDING*2,bigButtonHeight);
     _slider = [[UISlider alloc] initWithFrame:sliderFrame];
     _slider.minimumTrackTintColor = [UIColor grayColor];
     _slider.minimumValue = 0;
@@ -60,24 +87,46 @@
     [self.view addSubview:_slider];
     
     [self testMapLineMaker];
+    
+    // 애니메이션 버튼의 콜백은 path가 필요하기 때문에 testMapLineMaker 후에 호출합니다.
+    [self.view addSubview:smallButton];
+    
+    // 제일 윗 레이어로 만들기 위해 나중에 추가합니다.
+    [self.view addSubview:_curveView];
+    [self.view addSubview:_dotView];
 }
 
 - (void)testMapLineMaker {
-    // Create random starting points.
+    [_shapeLayer setHidden:YES];
+    [_curveView setHidden:NO];
     
+    // Create random starting points.
     _curveLength = _slider.value;
     
-    CGFloat curveY = _screenHeight * CURVE_VERTICAL_RATIO;
-    _start.y = arc4random_uniform(CURVE_VERTICAL_VARIATION) + curveY;
+    CGFloat curveY = 0;
+    _start.y = arc4random_uniform(CURVE_VERTICAL_VARIATION);
     _end.x = CURVE_HORIZONTAL_PADDING + _curveLength;
     _end.y = arc4random_uniform(CURVE_VERTICAL_VARIATION) + curveY;
     
     //_testView.path = [_mapLineMaker mapLineBetweenPoint:_start point:_end];
     NSArray *pointList = [_mapLineMaker createPointsBetweenPoint:_start point:_end];
-    _testView.path = [_mapLineMaker interpolatePoints:pointList];
-    _testView.dots = pointList;
+    _dotView.dots = pointList;
+    _curveView.path = [_mapLineMaker interpolatePoints:pointList];
     
-    [_testView setNeedsDisplay];
+    [_dotView setNeedsDisplay];
+    [_curveView setNeedsDisplay];
+}
+
+- (void) animateCurve {
+    [_curveView setHidden:YES];
+    [_shapeLayer setHidden:NO];
+    
+    _shapeLayer.path = _curveView.path.CGPath;
+    CABasicAnimation *pathAnimation = [CABasicAnimation animationWithKeyPath:@"strokeEnd"];
+    pathAnimation.duration = ANIMATION_DURATION * (_slider.value / _slider.maximumValue);
+    pathAnimation.fromValue = @(0.0f);
+    pathAnimation.toValue = @(1.0f);
+    [_shapeLayer addAnimation:pathAnimation forKey:@"strokeEnd"];
 }
 
 - (void)didReceiveMemoryWarning {

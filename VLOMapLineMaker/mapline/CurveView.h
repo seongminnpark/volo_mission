@@ -1,5 +1,5 @@
 //
-//  PointTestView.h
+//  CurveView.h
 //  mapline
 //
 //  Created by Seongmin on 6/7/16.
@@ -8,9 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
-@interface TestView : UIView
+@interface CurveView : UIView
 
 @property (strong, nonatomic) UIBezierPath *path;
-@property (strong, nonatomic) NSArray *dots;
 
 @end
