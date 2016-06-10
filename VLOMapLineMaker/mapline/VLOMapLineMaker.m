@@ -147,6 +147,8 @@
                     secondPoint:p0 thirdPoint:p1 firstDistance:dist_p0p1 secondDistance:dist_p1p2];
             CGPoint control_point_2 = [self controlPointBetweenFirstPoint:p1
                     secondPoint:p3 thirdPoint:p2 firstDistance:dist_p2p3 secondDistance:dist_p1p2];
+            
+            // 점들이 집중된 구간은 커브를 추가하지 않습니다.
             if (p2.x - p1.x > 2) {
                 [path addCurveToPoint:p2 controlPoint1:control_point_1 controlPoint2:control_point_2];
             }
@@ -161,7 +163,7 @@
 /**
  * 세 개의 점과 그 사이 길이가 주어질 때, bezier curve를 그리기 위한 control point를 생성합니다.
  * Cem Yukesi의 <On the Parameterization of Catmull-Rom curves> 챕터 3 CUSPS AND SELF-INTERACTIONS를
- * 참고했습니다.
+ * 참고했습니다. (Equation 2를 코드로 그대로 옮겼습니다).
  */
 - (CGPoint) controlPointBetweenFirstPoint:(CGPoint)first
                               secondPoint:(CGPoint)second
