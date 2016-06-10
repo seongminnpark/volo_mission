@@ -11,6 +11,7 @@
 #import "VLOMapLineMaker.h"
 #import "CurveView.h"
 #import "DotView.h"
+#import "ImageMixView.h"
 
 #define BUTTON_PADDING 10
 #define BUTTON_TOP_RATIO 0.75
@@ -24,20 +25,25 @@
 #define GOLDEN_RATIO 1.4
 
 
-@interface ViewController : UIViewController
+@interface ViewController : UIViewController <UINavigationControllerDelegate, UIImagePickerControllerDelegate>
 
 @property (strong, nonatomic) VLOMapLineMaker *mapLineMaker;
 @property (strong, nonatomic) CurveView *curveView;
 @property (strong, nonatomic) DotView *dotView;
+@property (strong, nonatomic) ImageMixView *imageMixView;
 @property (strong, nonatomic) UISlider *slider;
 @property (strong, nonatomic) CAShapeLayer *shapeLayer;
 @property (strong, nonatomic) SLComposeViewController *shareController;
+@property (strong, nonatomic) UIImagePickerController *imagePickerController;
+
 @property () CGPoint start;
 @property () CGPoint end;
 @property () CGFloat screenWidth;
 @property () CGFloat screenHeight;
 @property () NSInteger curveLength;
 @property () BOOL shareable;
+@property () UIImage *pickedImage;
+@property () UIImage *curveImage;
 
 @end
 
