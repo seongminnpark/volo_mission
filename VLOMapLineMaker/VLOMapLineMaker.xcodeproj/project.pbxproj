@@ -18,6 +18,7 @@
 		3E3F15EA1D06748200D5CC4F /* maplineUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3E3F15E91D06748200D5CC4F /* maplineUITests.m */; };
 		3E3F16021D06ABBE00D5CC4F /* VLOMapLineMaker.m in Sources */ = {isa = PBXBuildFile; fileRef = 3E3F16011D06ABBE00D5CC4F /* VLOMapLineMaker.m */; };
 		3E3F16091D06D1B600D5CC4F /* CurveView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3E3F16081D06D1B600D5CC4F /* CurveView.m */; };
+		3EBD7DB21D0B4B0D0050CBEA /* ImageMixView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3EBD7DB11D0B4B0D0050CBEA /* ImageMixView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -60,6 +61,8 @@
 		3E3F16011D06ABBE00D5CC4F /* VLOMapLineMaker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLOMapLineMaker.m; sourceTree = "<group>"; };
 		3E3F16071D06D1B600D5CC4F /* CurveView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CurveView.h; sourceTree = "<group>"; };
 		3E3F16081D06D1B600D5CC4F /* CurveView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CurveView.m; sourceTree = "<group>"; };
+		3EBD7DB01D0B4B0D0050CBEA /* ImageMixView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageMixView.h; sourceTree = "<group>"; };
+		3EBD7DB11D0B4B0D0050CBEA /* ImageMixView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageMixView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -125,6 +128,8 @@
 				3E3F16081D06D1B600D5CC4F /* CurveView.m */,
 				3E374E0D1D0AB524001871D8 /* DotView.h */,
 				3E374E0E1D0AB524001871D8 /* DotView.m */,
+				3EBD7DB01D0B4B0D0050CBEA /* ImageMixView.h */,
+				3EBD7DB11D0B4B0D0050CBEA /* ImageMixView.m */,
 			);
 			path = mapline;
 			sourceTree = "<group>";
@@ -290,6 +295,7 @@
 				3E374E0F1D0AB524001871D8 /* DotView.m in Sources */,
 				3E3F15C91D06748200D5CC4F /* AppDelegate.m in Sources */,
 				3E3F16091D06D1B600D5CC4F /* CurveView.m in Sources */,
+				3EBD7DB21D0B4B0D0050CBEA /* ImageMixView.m in Sources */,
 				3E3F15C61D06748200D5CC4F /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

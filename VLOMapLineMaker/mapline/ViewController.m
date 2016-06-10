@@ -27,8 +27,15 @@
     _end = CGPointMake(CURVE_HORIZONTAL_PADDING + _curveLength, initialCurveY);
     
     _mapLineMaker = [[VLOMapLineMaker alloc] init];
+    _imageMixView = [[ImageMixView alloc] initWithFrame:CGRectMake(0, 0, _screenWidth, _screenHeight)];
     
-    // 페이스북 쉐어 컨트롤러 셋업
+    // 포토 라이브러리 띄우는 뷰컨트롤러 생성.
+    _imagePickerController = [[UIImagePickerController alloc] init];
+    _imagePickerController.modalPresentationStyle = UIModalPresentationCurrentContext;
+    _imagePickerController.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+    _imagePickerController.delegate = self;
+    
+    // 페이스북 쉐어 컨트롤러 셋업.
     if ([SLComposeViewController isAvailableForServiceType:SLServiceTypeFacebook]) {
         _shareable = YES;
         _shareController =
@@ -37,12 +44,12 @@
         _shareable = NO;
     }
     
-    
     // 커브 뷰 생성.
     _curveView = [[CurveView alloc] initWithFrame:
                  CGRectMake(0, _screenHeight * CURVE_VERTICAL_RATIO,
-                            _screenWidth, CURVE_VERTICAL_VARIATION * 3)];
-    [_curveView setBackgroundColor:[UIColor whiteColor]];
+                            _screenWidth, CURVE_VERTICAL_VARIATION * 2.5)];
+    [_curveView setBackgroundColor:[UIColor colorWithWhite:0.0 alpha:0.0]];
+    _curveView.opaque = NO;
     
     // 점선 뷰 생성.
     _dotView = [[DotView alloc] initWithFrame:
@@ -155,12 +162,41 @@
 }
 
 - (void) sharePhoto {
-    UIImage *shareImage = [_curveView curveIntoImage];
-    
     if (_shareable) {
-        [_shareController addImage:shareImage];
+        // 페이스북에 공유 할 이미지를 생성합니다. - 현재 처음 곡선이 계속 나오는 오류 있음.
+        _curveImage = [_curveView curveIntoImage];
+        
+        // 커브와 합칠 타임라인 커버를 고릅니다.
+        [self presentViewController:self.imagePickerController animated:YES completion:nil];
+        
+    } else {
+        // 쉐어 가능하지 않다고 표시.
+    }
+}
+
+- (void) makeShareImage {
+    [self dismissViewControllerAnimated:YES completion:NULL];
+    
+    if (_curveImage && _pickedImage) {
+        UIImage *imageToShare = [_imageMixView mixImage:_curveImage image:_pickedImage];
+        //UIImageWriteToSavedPhotosAlbum(imageToShare, nil, nil, nil);
+        [_shareController addImage:imageToShare];
         [self presentViewController:_shareController animated:YES completion:Nil];
     }
+}
+
+
+#pragma mark - UIImagePickerControllerDelegate
+
+- (void)imagePickerController:(UIImagePickerController *)picker
+        didFinishPickingMediaWithInfo:(NSDictionary *)info {
+    _pickedImage = [info valueForKey:UIImagePickerControllerOriginalImage];
+    [self makeShareImage];
+}
+
+
+- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
+    [self dismissViewControllerAnimated:YES completion:NULL];
 }
 
 - (void)didReceiveMemoryWarning {
