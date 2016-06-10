@@ -40,7 +40,7 @@
                             _curveView.frame.size.width, _curveView.frame.size.height)];
     [_dotView setBackgroundColor:[UIColor whiteColor]];
     
-    // 애니메이션 레이어 설정
+    // 애니메이션 레이어 설정.
     _shapeLayer = [CAShapeLayer layer];
     _shapeLayer.position = CGPointMake(_curveView.frame.origin.x, _curveView.frame.origin.y);
     _shapeLayer.strokeColor = [[UIColor blackColor] CGColor];
@@ -49,7 +49,7 @@
     _shapeLayer.lineJoin = kCALineJoinBevel;
     [self.view.layer addSublayer:_shapeLayer];
     
-    // Add new random curve button.
+    // "새로운 커브" 버튼 추가.
     CGFloat bigButtonLeft = BUTTON_PADDING;
     CGFloat bigButtonTop = _screenHeight * BUTTON_TOP_RATIO;
     CGFloat bigButtonWidth = (_screenWidth - BUTTON_PADDING * 2.5) / GOLDEN_RATIO;
@@ -62,7 +62,7 @@
     bigButton.backgroundColor=[UIColor grayColor];
     [self.view addSubview:bigButton];
     
-    // Add animate button.
+    // 애니메이션 버튼 추가.
     CGFloat smallButtonLeft = BUTTON_PADDING + bigButtonWidth + BUTTON_PADDING/2;
     CGFloat smallButtonWidth = _screenWidth - BUTTON_PADDING * 2.5 - bigButtonWidth;
     UIButton *smallButton = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -72,7 +72,7 @@
                forControlEvents:UIControlEventTouchUpInside];
     smallButton.backgroundColor=[UIColor lightGrayColor];
     
-    // Add slider.
+    // 슬라이더 추가.
     CGFloat sliderLeft = CURVE_HORIZONTAL_PADDING;
     CGFloat sliderTop = _screenHeight * SLIDER_VERTICAL_RATIO;
     CGRect sliderFrame = CGRectMake(sliderLeft, sliderTop,
@@ -86,6 +86,17 @@
       forControlEvents:UIControlEventValueChanged];
     [self.view addSubview:_slider];
     
+    // 페이스북 쉐어 버튼 추가.
+    UIButton *shareButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [shareButton setFrame:CGRectMake(bigButtonLeft, bigButtonTop + bigButtonHeight + BUTTON_PADDING/2,
+                                      _screenWidth - BUTTON_PADDING * 2, bigButtonHeight)];
+    [shareButton setTitle:@"Share on Facebook" forState:UIControlStateNormal];
+    [shareButton addTarget:self action:@selector(sharePhoto)
+          forControlEvents:UIControlEventTouchUpInside];
+    shareButton.backgroundColor=[UIColor blueColor];
+    [self.view addSubview:shareButton];
+    
+    // 커브 만들어서 초기화.
     [self testMapLineMaker];
     
     // 애니메이션 버튼의 콜백은 path가 필요하기 때문에 testMapLineMaker 후에 호출합니다.
@@ -127,6 +138,11 @@
     pathAnimation.fromValue = @(0.0f);
     pathAnimation.toValue = @(1.0f);
     [_shapeLayer addAnimation:pathAnimation forKey:@"strokeEnd"];
+}
+
+- (void) sharePhoto {
+    UIImage *shareImage = [_curveView curveIntoImage];
+    UIImageWriteToSavedPhotosAlbum(shareImage,nil,nil,nil);
 }
 
 - (void)didReceiveMemoryWarning {

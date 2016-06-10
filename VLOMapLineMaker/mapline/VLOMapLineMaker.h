@@ -7,6 +7,8 @@
 //
 
 #import <math.h>
+#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
 #ifndef VLOMapLineManager_h
 #define VLOMapLineManager_h
@@ -18,6 +20,7 @@
 #define ANGLE_DEVIATION 15
 
 #define ALPHA 1
+//#define LINE_WIDTH 3
 #define LINE_WIDTH 5
 #define MITERLIM -10
 #define RAD(degrees) (degrees / 180.0 * M_PI)

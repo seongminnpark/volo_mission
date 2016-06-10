@@ -6,8 +6,6 @@
 //  Copyright © 2016 Seongmin. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
-#import <UIKit/UIKit.h>
 #import "VLOMapLineMaker.h"
 
 @interface VLOMapLineMaker()

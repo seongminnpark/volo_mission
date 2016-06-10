@@ -12,4 +12,6 @@
 
 @property (strong, nonatomic) UIBezierPath *path;
 
+- (UIImage *) curveIntoImage;
+
 @end
