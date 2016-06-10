@@ -28,11 +28,13 @@
     
     _mapLineMaker = [[VLOMapLineMaker alloc] init];
     
+    // 커브 뷰 생성.
     _curveView = [[CurveView alloc] initWithFrame:
-                 CGRectMake(0, _screenHeight * CURVE_VERTICAL_RATIO - CURVE_VERTICAL_VARIATION,
+                 CGRectMake(0, _screenHeight * CURVE_VERTICAL_RATIO,
                             _screenWidth, CURVE_VERTICAL_VARIATION * 3)];
     [_curveView setBackgroundColor:[UIColor whiteColor]];
     
+    // 점선 뷰 생성.
     _dotView = [[DotView alloc] initWithFrame:
                  CGRectMake(_curveView.frame.origin.x, _curveView.frame.origin.y - DOTVIEW_OFFSET,
                             _curveView.frame.size.width, _curveView.frame.size.height)];
