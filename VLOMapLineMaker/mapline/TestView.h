@@ -11,5 +11,6 @@
 @interface TestView : UIView
 
 @property (strong, nonatomic) UIBezierPath *path;
+@property (strong, nonatomic) NSArray *dots;
 
 @end
