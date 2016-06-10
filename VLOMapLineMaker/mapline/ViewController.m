@@ -123,7 +123,7 @@
     
     _shapeLayer.path = _curveView.path.CGPath;
     CABasicAnimation *pathAnimation = [CABasicAnimation animationWithKeyPath:@"strokeEnd"];
-    pathAnimation.duration = 0.7;
+    pathAnimation.duration = ANIMATION_DURATION * (_slider.value / _slider.maximumValue);
     pathAnimation.fromValue = @(0.0f);
     pathAnimation.toValue = @(1.0f);
     [_shapeLayer addAnimation:pathAnimation forKey:@"strokeEnd"];
