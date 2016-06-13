@@ -11,12 +11,19 @@
 
 #ifndef Marker_h
 #define Marker_h
+#import <CoreGraphics/CGBase.h>
+#import <UIKit/UIKit.h>
+
 
 @interface Marker : NSObject
 
+/*
 @property (nonatomic) NSInteger x;
 @property (nonatomic) NSInteger y;
+*/
 
+@property (nonatomic)CGFloat x;
+@property (nonatomic)CGFloat y;
 
 @end
 

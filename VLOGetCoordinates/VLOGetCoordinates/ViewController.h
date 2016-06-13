@@ -8,14 +8,18 @@
 
 #import <UIKit/UIKit.h>
 
-@class Location;
+//@class Location;
+//@class VLOLocationCoordinate;
 @class Marker;
+@class GetCoordinates;
+
 @interface ViewController : UIViewController
 {
-    UITextView * tv1;
-    UITextView * tv2;
-    UITextView * tv3;
-    Location * start_location;
+    UIImageView * im1;
+    UIImageView * im2;
+    UIImageView * im3;
+    UIImage * image;
+    GetCoordinates * start_location;
     
     Marker * print_marker;
     NSString * str;

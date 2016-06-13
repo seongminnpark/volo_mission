@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "Marker.h"
+#import <CoreGraphics/CGBase.h>
 
 @implementation Marker
 @synthesize x;

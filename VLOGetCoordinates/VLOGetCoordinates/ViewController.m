@@ -8,7 +8,9 @@
 
 #import "ViewController.h"
 #import "ViewController.h"
-#import "Location.h"
+//#import "Location.h"
+//#import "VLOLocationCoordinate.h"
+#import "getCoordinates.h"
 #import "Marker.h"
 
 @interface ViewController ()
@@ -20,35 +22,33 @@
 
 - (void)viewDidLoad {
     
-    tv1=[[UITextView alloc]initWithFrame:CGRectMake(10, 10, 300, 100)];
-    tv2=[[UITextView alloc]initWithFrame:CGRectMake(10, 100, 300, 100)];
-    tv3=[[UITextView alloc]initWithFrame:CGRectMake(10, 200, 300, 100)];
+    
+
     print_coordinates=[NSArray array];
-    
     print_marker=[[Marker alloc]init];
+    start_location=[[GetCoordinates alloc]init];
     
-    start_location=[[Location alloc]init];
-    print_coordinates=[start_location set_coordinates];
+    print_coordinates=[start_location set_location];
     
-    
+
     print_marker=[print_coordinates objectAtIndex:0];
-    str=[NSString stringWithFormat:@"%ld, %ld",(long)print_marker.x,(long)print_marker.y];
-    tv1.text=str;
-    
-    [self.view insertSubview:tv1 atIndex:0];
+
+    im1=[[UIImageView alloc]initWithFrame:CGRectMake(print_marker.x, print_marker.y, 30, 30)];
+    im1.image=[UIImage imageNamed:@"location-placemark-gradient.png"];
+    [self.view addSubview:im1];
     
     print_marker=[print_coordinates objectAtIndex:1];
-    str=[NSString stringWithFormat:@"%ld, %ld",(long)print_marker.x,(long)print_marker.y];
-    tv2.text=str;
     
-    [self.view insertSubview:tv2 atIndex:0];
+    im2=[[UIImageView alloc]initWithFrame:CGRectMake(print_marker.x,print_marker.y, 30, 30)];
+    im2.image=[UIImage imageNamed:@"location-placemark-gradient.png"];
+    [self.view addSubview:im2];
+    
     
     print_marker=[print_coordinates objectAtIndex:2];
-    str=[NSString stringWithFormat:@"%ld, %ld",(long)print_marker.x,(long)print_marker.y];
-    tv3.text=str;
     
-    [self.view insertSubview:tv3 atIndex:0];
-    
+    im3=[[UIImageView alloc]initWithFrame:CGRectMake(print_marker.x, print_marker.y, 30, 30)];
+    im3.image=[UIImage imageNamed:@"location-placemark-gradient.png"];
+    [self.view addSubview:im3];
     
     
     

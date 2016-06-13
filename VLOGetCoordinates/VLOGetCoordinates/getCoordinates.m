@@ -8,8 +8,10 @@
 
 #import <Foundation/Foundation.h>
 #import "getCoordinates.h"
-#import "Location.h"
+//#import "Location.h"
 #import "Marker.h"
+#import "VLOLocationCoordinate.h"
+#import <CoreGraphics/CGBase.h>
 
 @implementation GetCoordinates
 @synthesize x_y_coordinate;
@@ -17,6 +19,9 @@
 @synthesize longitude;
 @synthesize latitude;
 @synthesize x_y_increment;
+@synthesize user_cor_list;
+@synthesize _final_coordinates;
+
 
 
 -(id)_init
@@ -33,13 +38,17 @@
 
 // 두 지점 사이의 거리를 계산하는 함수
 
-- (NSInteger)get_distance:(Location *)location1 :(Location *)location2
+- (double)get_distance:(VLOLocationCoordinate *)location1 :(VLOLocationCoordinate *)location2
 {
     
     
-    distance=round(sqrt(([location1.latitude doubleValue]-[location2.latitude doubleValue])*([location1.latitude doubleValue]-[location2.latitude doubleValue])+([location1.longitude doubleValue]-[location2.longitude doubleValue])*([location1.longitude doubleValue]-[location2.longitude doubleValue])));
+   /* distance=round(sqrt(([location1.latitude doubleValue]-[location2.latitude doubleValue])*([location1.latitude doubleValue]-[location2.latitude doubleValue])+([location1.longitude doubleValue]-[location2.longitude doubleValue])*([location1.longitude doubleValue]-[location2.longitude doubleValue])));*/
     
-    return (NSInteger)distance;
+    distance=sqrt(([location1.latitude doubleValue]-[location2.latitude doubleValue])*([location1.latitude doubleValue]-[location2.latitude doubleValue])+([location1.longitude doubleValue]-[location2.longitude doubleValue])*([location1.longitude doubleValue]-[location2.longitude doubleValue]));
+    
+    
+    
+    return distance;
 }
 
 
@@ -66,7 +75,9 @@
         tmp2=lo[i+1];
         
         x_diff=[self get_distance:lo[i] :lo[i+1]]; //x좌표 증가량 구함
-        y_diff=round(([tmp1.latitude doubleValue]-[tmp2.latitude doubleValue])*10); //y좌표 증가량 구함
+      //  y_diff=round(([tmp1.latitude doubleValue]-[tmp2.latitude doubleValue])*10); //y좌표 증가량 구함
+        
+        y_diff=([tmp1.latitude doubleValue]-[tmp2.latitude doubleValue])*10;
         
         x_y_increment=[[Marker alloc]init];
         
@@ -140,6 +151,32 @@
     
     
 }
+
+
+//add
+- (NSArray *) set_location
+{
+    lo1=[[VLOLocationCoordinate alloc]init];
+    lo2=[[VLOLocationCoordinate alloc]init];
+    lo3=[[VLOLocationCoordinate alloc]init];
+    _final_coordinates=[NSArray array];
+
+    
+    
+    lo1.latitude=[NSNumber numberWithDouble:37.460195];
+    lo1.longitude=[NSNumber numberWithDouble:126.438507];
+    lo2.latitude=[NSNumber numberWithDouble:33.9415933];
+    lo2.longitude=[NSNumber numberWithDouble:-118.4107187];
+    lo3.latitude=[NSNumber numberWithDouble:37.8199328];
+    lo3.longitude=[NSNumber numberWithDouble:-122.4804438];
+    
+    user_cor_list=[[NSArray alloc] initWithObjects:lo1,lo2,lo3, nil];
+    
+    _final_coordinates=[self get_coordinates:user_cor_list];
+    return _final_coordinates;
+    
+}
+//add
 
 
 
