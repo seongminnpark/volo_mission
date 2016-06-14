@@ -147,7 +147,7 @@
                     secondPoint:p3 thirdPoint:p2 firstDistance:dist_p2p3 secondDistance:dist_p1p2];
             
             // 점들이 집중된 구간은 커브를 추가하지 않습니다.
-            if (p2.x - p1.x > 2) {
+            if (fabs(p2.x - p1.x) > 2) {
                 [path addCurveToPoint:p2 controlPoint1:control_point_1 controlPoint2:control_point_2];
             }
 
@@ -169,7 +169,7 @@
                             firstDistance:(NSInteger)first_dist
                            secondDistance:(NSInteger)second_dist {
     
-    if (first_dist <= 1) {
+    if (labs(first_dist) <= 1) {
         return first;
     }
     

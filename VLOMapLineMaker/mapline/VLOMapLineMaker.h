@@ -22,7 +22,7 @@
 #define ALPHA 1
 //#define LINE_WIDTH 3
 #define LINE_WIDTH 5
-#define MITERLIM -10
+#define MITERLIM 5
 #define RAD(degrees) (degrees / 180.0 * M_PI)
 #define DEG(radians) (radians * (180.0 / M_PI))
 
