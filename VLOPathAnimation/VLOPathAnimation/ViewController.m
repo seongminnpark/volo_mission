@@ -113,9 +113,10 @@
 
 - (void) addMarkerAnimation:(Marker *)marker delay:(CGFloat)delay {
     // 마커 생성.
-    UIImageView *markerImageView = [[UIImageView alloc] initWithImage: [UIImage imageNamed:@"marker.png"]];
+    UIImageView *markerImageView = [[UIImageView alloc]
+                                    initWithImage: [UIImage imageNamed:@"marker5.png"]];
     CGFloat markerLeft = marker.x - MARKER_SIZE/2;
-    CGFloat markerTop = marker.y - MARKER_SIZE - 8;
+    CGFloat markerTop = marker.y - MARKER_SIZE - 10;
     [markerImageView setFrame:CGRectMake(markerLeft, markerTop, MARKER_SIZE, MARKER_SIZE)];
     
     // 마커 애니메이션.
