@@ -18,7 +18,7 @@
     [super viewDidLoad];
     
     _screenWidth = [[UIScreen mainScreen] bounds].size.width;;
-    _screenHeight = [[UIScreen mainScreen] bounds].size.height;;
+    _screenHeight = [[UIScreen mainScreen] bounds].size.height;
     
     _curveLength = _screenWidth - CURVE_HORIZONTAL_PADDING * 2;
 
@@ -142,6 +142,7 @@
     
     //_testView.path = [_mapLineMaker mapLineBetweenPoint:_start point:_end];
     NSArray *pointList = [_mapLineMaker createPointsBetweenPoint:_start point:_end];
+    //NSArray *pointList = [_mapLineMaker createPointsBetweenPoint:_end point:_start];
     _dotView.dots = pointList;
     _curveView.path = [_mapLineMaker interpolatePoints:pointList];
     
