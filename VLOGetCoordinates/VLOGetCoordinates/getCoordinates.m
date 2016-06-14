@@ -134,7 +134,7 @@
 
     if(sum_distance>270)
     {
-        tmp.x=10;
+        tmp.x=20;
         tmp.y=50;
         [user_coordinates insertObject:tmp atIndex:0];
         
