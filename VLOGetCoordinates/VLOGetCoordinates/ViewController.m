@@ -22,34 +22,23 @@
 
 - (void)viewDidLoad {
     
-    
+    NSInteger cnt;
+    NSInteger i;
 
-    print_coordinates=[NSArray array];
     print_marker=[[Marker alloc]init];
     start_location=[[GetCoordinates alloc]init];
     
     print_coordinates=[start_location set_location];
     
-
-    print_marker=[print_coordinates objectAtIndex:0];
-
-    im1=[[UIImageView alloc]initWithFrame:CGRectMake(print_marker.x, print_marker.y, 30, 30)];
-    im1.image=[UIImage imageNamed:@"location-placemark-gradient.png"];
-    [self.view addSubview:im1];
+    cnt=[print_coordinates count];
     
-    print_marker=[print_coordinates objectAtIndex:1];
-    
-    im2=[[UIImageView alloc]initWithFrame:CGRectMake(print_marker.x,print_marker.y, 30, 30)];
-    im2.image=[UIImage imageNamed:@"location-placemark-gradient.png"];
-    [self.view addSubview:im2];
-    
-    
-    print_marker=[print_coordinates objectAtIndex:2];
-    
-    im3=[[UIImageView alloc]initWithFrame:CGRectMake(print_marker.x, print_marker.y, 30, 30)];
-    im3.image=[UIImage imageNamed:@"location-placemark-gradient.png"];
-    [self.view addSubview:im3];
-    
+    for(i=0;i<cnt-1;i++)
+    {
+        print_marker=[print_coordinates objectAtIndex:i];
+        UIImageView *iv=[[UIImageView alloc]initWithFrame:CGRectMake(print_marker.x, print_marker.y, 15, 20)];
+        iv.image=[UIImage imageNamed:@"location-placemark-gradient.png"];
+        [self.view addSubview:iv];
+    }
     
     
     [super viewDidLoad];

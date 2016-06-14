@@ -8,12 +8,12 @@
 
 #import <Foundation/Foundation.h>
 #import "getCoordinates.h"
-//#import "Location.h"
 #import "Marker.h"
 #import "VLOLocationCoordinate.h"
 #import <CoreGraphics/CGBase.h>
 
 @implementation GetCoordinates
+
 @synthesize x_y_coordinate;
 @synthesize user_coordinates;
 @synthesize longitude;
@@ -40,15 +40,49 @@
 
 - (double)get_distance:(VLOLocationCoordinate *)location1 :(VLOLocationCoordinate *)location2
 {
-    
-    
-   /* distance=round(sqrt(([location1.latitude doubleValue]-[location2.latitude doubleValue])*([location1.latitude doubleValue]-[location2.latitude doubleValue])+([location1.longitude doubleValue]-[location2.longitude doubleValue])*([location1.longitude doubleValue]-[location2.longitude doubleValue])));*/
-    
     distance=sqrt(([location1.latitude doubleValue]-[location2.latitude doubleValue])*([location1.latitude doubleValue]-[location2.latitude doubleValue])+([location1.longitude doubleValue]-[location2.longitude doubleValue])*([location1.longitude doubleValue]-[location2.longitude doubleValue]));
     
     
     
     return distance;
+}
+
+//총 경로의 길이가 한 화면을 넘어가는 경우 reset
+
+- (void) reset_x_y_increment: (NSInteger)n
+{
+    NSInteger j;
+    NSInteger max_location=0;
+    double max;
+    Marker * max_init;
+    NSInteger cnt=[user_coordinates count];
+    Marker * tmp_increment;
+    Marker * final_increment=[[Marker alloc]init];
+    
+    
+    max_init=[user_coordinates objectAtIndex:0];
+    max=max_init.x;
+    
+    
+    for(j=1;j<cnt-1;j++)
+    {
+        tmp_increment=[user_coordinates objectAtIndex:j];
+        
+        if(tmp_increment.x>max)
+        {
+            max=tmp_increment.x;
+            max_location=j;
+        }
+        
+    }
+    
+    final_increment.x=max-n;
+    [user_coordinates replaceObjectAtIndex:max_location withObject:final_increment];
+    
+    [final_increment release];
+    
+    
+    
 }
 
 
@@ -74,10 +108,8 @@
         tmp1=lo[i];
         tmp2=lo[i+1];
         
-        x_diff=[self get_distance:lo[i] :lo[i+1]]; //x좌표 증가량 구함
-      //  y_diff=round(([tmp1.latitude doubleValue]-[tmp2.latitude doubleValue])*10); //y좌표 증가량 구함
-        
-        y_diff=([tmp1.latitude doubleValue]-[tmp2.latitude doubleValue])*10;
+        x_diff=[self get_distance:lo[i] :lo[i+1]]; //x좌표 증가량
+        y_diff=([tmp1.latitude doubleValue]-[tmp2.latitude doubleValue])*10; //y좌표 증가량
         
         x_y_increment=[[Marker alloc]init];
         
@@ -95,25 +127,35 @@
         [x_y_increment release];
         
     }
-    if(sum_distance>300)
+    
+    
+
+    tmp=[[Marker alloc]init];
+
+    if(sum_distance>270)
     {
-        extra_distance=(sum_distance-300)/2;
+        tmp.x=10;
+        tmp.y=50;
+        [user_coordinates insertObject:tmp atIndex:0];
+        
+        [self reset_x_y_increment:(sum_distance-270)];
+
     }
     else
     {
-        extra_distance=(300-sum_distance)/2;
+        
+        extra_distance=(270-sum_distance)/2;
+        tmp.x=extra_distance;
+        tmp.y=50;
+        [user_coordinates insertObject:tmp atIndex:0];
+        
+        
     }
     //양쪽 여백 계산
     
-    tmp=[[Marker alloc]init];
-    tmp.x=extra_distance;
-    tmp.y=50;
-    [user_coordinates insertObject:tmp atIndex:0];
-    //첫 위치의 좌표 설정 후 user_coordinates[0]에 대입
-    
     [tmp release];
     
-    //이전 위치의 x,y값에 증가량 더함
+    
     n2=[user_coordinates count];
     
     for(i=1;i<n2-1;i++)
@@ -127,25 +169,22 @@
         {
             marker_tmp2.y=20;
         }
+        else if(marker_tmp2.y<-20)
+        {
+            marker_tmp2.y=-20;
+        }
         //y좌표의 경우 +-20이 가장 적당하기 때문에 증가값이 20이상인 경우 20으로 고정
         
         add_tmp.x=marker_tmp1.x+marker_tmp2.x;
         add_tmp.y=marker_tmp1.y+marker_tmp2.y;
-        
-   /*     if(add_tmp.x>300)
-        {
-            add_tmp.x=add_tmp.x-300;
-        } */
-        // x좌표가 300이상일 경우 다음줄로 넘어가게 하기 위한 if문 (고민필요)
         
         [user_coordinates replaceObjectAtIndex:i withObject:add_tmp];
         
         [add_tmp release];
         marker_tmp1=nil;
         marker_tmp2=nil;
-        
-        
     }
+
     
     return user_coordinates;
     
@@ -153,31 +192,43 @@
 }
 
 
-//add
+
 - (NSArray *) set_location
 {
     lo1=[[VLOLocationCoordinate alloc]init];
     lo2=[[VLOLocationCoordinate alloc]init];
     lo3=[[VLOLocationCoordinate alloc]init];
+    lo4=[[VLOLocationCoordinate alloc]init];
+    lo5=[[VLOLocationCoordinate alloc]init];
+    lo6=[[VLOLocationCoordinate alloc]init];
+    lo7=[[VLOLocationCoordinate alloc]init];
+    
     _final_coordinates=[NSArray array];
 
     
     
     lo1.latitude=[NSNumber numberWithDouble:37.460195];
     lo1.longitude=[NSNumber numberWithDouble:126.438507];
-    lo2.latitude=[NSNumber numberWithDouble:33.9415933];
-    lo2.longitude=[NSNumber numberWithDouble:-118.4107187];
-    lo3.latitude=[NSNumber numberWithDouble:37.8199328];
-    lo3.longitude=[NSNumber numberWithDouble:-122.4804438];
+    lo2.latitude=[NSNumber numberWithDouble:1.3644256];
+    lo2.longitude=[NSNumber numberWithDouble:103.9893421];
+    lo3.latitude=[NSNumber numberWithDouble:1.2821166];
+    lo3.longitude=[NSNumber numberWithDouble:103.8432716];
+    lo4.latitude=[NSNumber numberWithDouble:1.2908879];
+    lo4.longitude=[NSNumber numberWithDouble:103.8422545];
+    lo5.latitude=[NSNumber numberWithDouble:1.2973126];
+    lo5.longitude=[NSNumber numberWithDouble:103.8488728];
+    lo6.latitude=[NSNumber numberWithDouble:1.3010655];
+    lo6.longitude=[NSNumber numberWithDouble:103.8538013];
+    lo7.latitude=[NSNumber numberWithDouble:1.2843235];
+    lo7.longitude=[NSNumber numberWithDouble:103.8421236];
     
-    user_cor_list=[[NSArray alloc] initWithObjects:lo1,lo2,lo3, nil];
+    
+    user_cor_list=[[NSArray alloc] initWithObjects:lo1,lo2,lo3,lo4,lo5,lo6,lo7,nil];
     
     _final_coordinates=[self get_coordinates:user_cor_list];
     return _final_coordinates;
     
 }
-//add
-
 
 
 
