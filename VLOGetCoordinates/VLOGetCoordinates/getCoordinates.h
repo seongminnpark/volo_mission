@@ -20,10 +20,6 @@
 {
     NSInteger i;
     
-    /*
-    NSInteger x_diff;
-    NSInteger y_diff;
-     */
     
     CGFloat x_diff;
     CGFloat y_diff;
@@ -32,9 +28,6 @@
     NSInteger extra_distance;
     NSInteger distance;
     
-    
-    /*Location * tmp1;
-    Location * tmp2;*/
     
     VLOLocationCoordinate * tmp1;
     VLOLocationCoordinate * tmp2;
@@ -49,6 +42,10 @@
     VLOLocationCoordinate * lo1;
     VLOLocationCoordinate * lo2;
     VLOLocationCoordinate * lo3;
+    VLOLocationCoordinate * lo4;
+    VLOLocationCoordinate * lo5;
+    VLOLocationCoordinate * lo6;
+    VLOLocationCoordinate * lo7;
    
     
 }
@@ -58,17 +55,14 @@
 @property (strong,nonatomic) NSNumber * latitude;
 @property (strong,nonatomic) NSMutableArray * user_coordinates;
 @property (strong,nonatomic) Marker * x_y_increment;
-- (id)_init;
-- (double)get_distance:(VLOLocationCoordinate *)location1 :(VLOLocationCoordinate *)location2;
-- (NSMutableArray *)get_coordinates: (NSArray *)lo;
-
-
-//add
 @property (strong,nonatomic) NSArray * user_cor_list;
 @property (strong,nonatomic) NSArray * _final_coordinates;
 
+- (id)_init;
+- (double)get_distance:(VLOLocationCoordinate *)location1 :(VLOLocationCoordinate *)location2;
+- (NSMutableArray *)get_coordinates: (NSArray *)lo;
 - (NSArray *) set_location;
-//add
+- (void) reset_x_y_increment: (NSInteger)n;
 
 
 @end

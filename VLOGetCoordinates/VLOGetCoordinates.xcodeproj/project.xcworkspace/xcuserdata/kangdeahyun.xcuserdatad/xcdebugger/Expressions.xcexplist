@@ -3,10 +3,16 @@
    version = "1.0">
    <ContextStates>
       <ContextState
+         contextName = "-[GetCoordinates reduce_distance:]:getCoordinates.m">
+      </ContextState>
+      <ContextState
          contextName = "-[GetCoordinates get_coordinates:]:getCoordinates.m">
          <PersistentStrings>
             <PersistentString
                value = "lo">
+            </PersistentString>
+            <PersistentString
+               value = "user_coordinates">
             </PersistentString>
          </PersistentStrings>
       </ContextState>

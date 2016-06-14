@@ -18,7 +18,14 @@
     UIImageView * im1;
     UIImageView * im2;
     UIImageView * im3;
-    UIImage * image;
+    UIImageView * im4;
+    UIImageView * im5;
+    UIImageView * im6;
+    UIImageView * im7;
+    
+    
+    
+    
     GetCoordinates * start_location;
     
     Marker * print_marker;
