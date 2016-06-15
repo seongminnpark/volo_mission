@@ -11,21 +11,24 @@
 @implementation VLOTimelineSummary
 
 
-- (id)_init
+- (id)init
 {
     self=[super init];
     _gc=[[GetCoordinates alloc]init];
-    _animationMaker = [[VLOPathAnimationMaker alloc] init];
     
     return self;
 
 }
 
-- (UIView *)makeSummary:(NSArray *)location_list
+- (void) summaryInView:(UIView *)view locations:(NSArray *)location_list
 {
     NSArray *coordinate_list=[_gc set_location:location_list];
-    
-    return [_animationMaker pathViewFromMarkers: coordinate_list];
+    _animationMaker = [[VLOPathAnimationMaker alloc] initWithView:view];
+    _animationMaker.markerList = coordinate_list;
+}
+
+- (void) animate {
+    [_animationMaker animatePath];
 }
 
 @end

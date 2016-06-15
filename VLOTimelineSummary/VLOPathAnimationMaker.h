@@ -22,13 +22,17 @@
 @interface VLOPathAnimationMaker : UIViewController
 
 /**
- *  `[[VLOPathAnimationMaker alloc] init]`으로 VLOPathAnimationMaker의 객채를 생성합니다.
+ *  Summary가 담길 UIView를 인자로 받습니다.
  */
-- (id) init;
+- (id) initWithView:(UIView *)view;
 
 /**
- *  마커와 경로가 만나는 애니메이션이 담긴 UIView를 리턴합니다.
+ *  셋업이 끝난 후 애니메이션을 실행합니다.
  */
-- (UIView *) pathViewFromMarkers:(NSArray *)markerList;
+- (void) animatePath;
+
+
+@property (strong, nonatomic) UIView *receivedView;
+@property (strong, nonatomic) NSArray *markerList;
 
 @end

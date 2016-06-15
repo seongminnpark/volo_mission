@@ -6,7 +6,6 @@
 
 @interface VLOPathAnimationMaker()
 
-@property (strong, nonatomic) UIView *pathAnimationView;
 @property (strong, nonatomic) CALayer *animationLayer;
 @property (strong, nonatomic) VLOPathMaker *pathMaker;
 
@@ -17,19 +16,20 @@
 
 @implementation VLOPathAnimationMaker
 
-- init {
+- initWithView:(UIView *)view {
     self = [super init];
-    _pathAnimationView = [[UIView alloc] init];
+    _receivedView = view;
     _animationLayer = [[CALayer alloc] init];
     _pathMaker = [[VLOPathMaker alloc] init];
-    
-    [_pathAnimationView.layer addSublayer:_animationLayer];
+    [_receivedView.layer addSublayer:_animationLayer];
+    _screenWidth = [[UIScreen mainScreen] bounds].size.width;
+    _screenHeight = [[UIScreen mainScreen] bounds].size.height;
     return self;
 }
 
-- (UIView *) pathViewFromMarkers:(NSArray *)markerList {
-    [self drawFromMarkerArray:markerList];
-    return _pathAnimationView;
+- (void) animatePath {
+    [self eraseAll];
+    [self drawFromMarkerArray:_markerList];
 }
 
 - (void) drawFromMarkerArray:(NSArray *)markerList {
@@ -98,7 +98,18 @@
                           CGRectMake(markerLeft,markerTop + MARKER_TRAVEL,MARKER_SIZE,MARKER_SIZE)];
                      } completion: nil];
     
-    [self.view addSubview: markerImageView];
+    [_receivedView addSubview: markerImageView];
+}
+
+- (void) eraseAll {
+    _animationLayer.sublayers = nil;
+    
+    // 마커 제거
+    for (UIView *imageView in _receivedView.subviews) {
+        if ([imageView isKindOfClass:[UIImageView class]]) {
+            [imageView removeFromSuperview];
+        }
+    }
 }
 
 @end

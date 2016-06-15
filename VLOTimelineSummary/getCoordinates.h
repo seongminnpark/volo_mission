@@ -9,6 +9,7 @@
 #ifndef getCoordinates_h
 #define getCoordinates_h
 #import <CoreGraphics/CGBase.h>
+#import "VLODevicemodel.h"
 
 
 // 받아온 위치 정보를 기반으로 화면상의 좌표를 계산하는 클래스
