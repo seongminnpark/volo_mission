@@ -21,7 +21,7 @@
 @property (strong,nonatomic) VLOPathAnimationMaker * animationMaker;
 
 - (id)_init;
-- (UIView *)MakeSummary: (NSArray *)location_list;
+- (UIView *)makeSummary: (NSArray *)location_list;
 
 @end
 

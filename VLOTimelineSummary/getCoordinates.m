@@ -223,7 +223,6 @@
         cl.longitude=input_coordinates.longitude;
         
         [user_coordinates addObject:cl];
-        [cl release];
         
     }
     
