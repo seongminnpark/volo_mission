@@ -23,7 +23,6 @@
 @synthesize _final_coordinates;
 
 
-
 -(id)_init
 {
     self=[super init];
@@ -193,39 +192,30 @@
 
 
 
-- (NSArray *) set_location
+- (NSArray *) set_location: (NSArray *)location_list
 {
-    lo1=[[VLOLocationCoordinate alloc]init];
-    lo2=[[VLOLocationCoordinate alloc]init];
-    lo3=[[VLOLocationCoordinate alloc]init];
-    lo4=[[VLOLocationCoordinate alloc]init];
-    lo5=[[VLOLocationCoordinate alloc]init];
-    lo6=[[VLOLocationCoordinate alloc]init];
-    lo7=[[VLOLocationCoordinate alloc]init];
+    NSInteger i;
+    NSInteger cnt;
+    VLOLocationCoordinate * input_coordinates=location_list;
+    user_coordinates=[[NSArray] array];
     
-    _final_coordinates=[NSArray array];
-
+    cnt=[location_list count];
     
+    for(i=0;i<cnt;i++)
+    {
+        VLOLocationCoordinate * cl=[[VLOLocationCoordinate alloc]init];
+        cl.latitude=input_coordinates.latitude;
+        cl.longitude=input_coordinates.longitude;
+        
+        [user_coordinates addObject:cl];
+        [cl release];
+    }
     
-    lo1.latitude=[NSNumber numberWithDouble:37.460195];
-    lo1.longitude=[NSNumber numberWithDouble:126.438507];
-    lo2.latitude=[NSNumber numberWithDouble:1.3644256];
-    lo2.longitude=[NSNumber numberWithDouble:103.9893421];
-    lo3.latitude=[NSNumber numberWithDouble:1.2821166];
-    lo3.longitude=[NSNumber numberWithDouble:103.8432716];
-    lo4.latitude=[NSNumber numberWithDouble:1.2908879];
-    lo4.longitude=[NSNumber numberWithDouble:103.8422545];
-    lo5.latitude=[NSNumber numberWithDouble:1.2973126];
-    lo5.longitude=[NSNumber numberWithDouble:103.8488728];
-    lo6.latitude=[NSNumber numberWithDouble:1.3010655];
-    lo6.longitude=[NSNumber numberWithDouble:103.8538013];
-    lo7.latitude=[NSNumber numberWithDouble:1.2843235];
-    lo7.longitude=[NSNumber numberWithDouble:103.8421236];
-    
-    
-    user_cor_list=[[NSArray alloc] initWithObjects:lo1,lo2,lo3,lo4,lo5,lo6,lo7,nil];
+    [user_coordinates addObject:nil];
     
     _final_coordinates=[self get_coordinates:user_cor_list];
+    
+    
     return _final_coordinates;
     
 }

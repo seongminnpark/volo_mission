@@ -61,7 +61,7 @@
 - (id)_init;
 - (double)get_distance:(VLOLocationCoordinate *)location1 :(VLOLocationCoordinate *)location2;
 - (NSMutableArray *)get_coordinates: (NSArray *)lo;
-- (NSArray *) set_location;
+- (NSArray *) set_location: (NSArray *)location_list;
 - (void) reset_x_y_increment: (NSInteger)n;
 
 
