@@ -10,6 +10,7 @@
 #define getCoordinates_h
 #import <CoreGraphics/CGBase.h>
 
+
 // 받아온 위치 정보를 기반으로 화면상의 좌표를 계산하는 클래스
 
 //@class Location;
@@ -46,7 +47,7 @@
     VLOLocationCoordinate * lo5;
     VLOLocationCoordinate * lo6;
     VLOLocationCoordinate * lo7;
-   
+    
     
 }
 
@@ -68,4 +69,3 @@
 @end
 
 #endif /* getCoordinates_h */
-
