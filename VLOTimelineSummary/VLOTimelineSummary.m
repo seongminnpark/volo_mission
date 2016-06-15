@@ -6,7 +6,6 @@
 //  Copyright © 2016년 M. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
 #import "VLOTimelineSummary.h"
 
 @implementation VLOTimelineSummary
@@ -24,7 +23,7 @@
 
 - (UIView *)MakeSummary:(NSArray *)location_list
 {
-    NSArray * coordinate_list=[_gc set_location];
+    NSArray *coordinate_list=[_gc set_location:location_list];
     
     return [_animationMaker pathViewFromMarkers: coordinate_list];
 }

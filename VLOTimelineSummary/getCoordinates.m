@@ -10,7 +10,6 @@
 #import "getCoordinates.h"
 #import "Marker.h"
 #import "VLOLocationCoordinate.h"
-#import <CoreGraphics/CGBase.h>
 
 @implementation GetCoordinates
 
@@ -78,9 +77,6 @@
     final_increment.x=max-n;
     [user_coordinates replaceObjectAtIndex:max_location withObject:final_increment];
     
-    [final_increment release];
-    
-    
     
 }
 
@@ -123,14 +119,12 @@
         sum_distance+=tmp_x.x;
         //표시할 전체 경로의 길이 구함
         
-        [x_y_increment release];
-        
     }
     
     
-
+    
     tmp=[[Marker alloc]init];
-
+    
     if(sum_distance>270)
     {
         tmp.x=20;
@@ -138,7 +132,7 @@
         [user_coordinates insertObject:tmp atIndex:0];
         
         [self reset_x_y_increment:(sum_distance-270)];
-
+        
     }
     else
     {
@@ -151,8 +145,6 @@
         
     }
     //양쪽 여백 계산
-    
-    [tmp release];
     
     
     n2=[user_coordinates count];
@@ -179,11 +171,10 @@
         
         [user_coordinates replaceObjectAtIndex:i withObject:add_tmp];
         
-        [add_tmp release];
         marker_tmp1=nil;
         marker_tmp2=nil;
     }
-
+    
     
     return user_coordinates;
     
@@ -197,7 +188,7 @@
     NSInteger i;
     NSInteger cnt;
     VLOLocationCoordinate * input_coordinates=location_list;
-    user_coordinates=[[NSArray] array];
+    user_coordinates=[NSArray array];
     
     cnt=[location_list count];
     
@@ -208,7 +199,7 @@
         cl.longitude=input_coordinates.longitude;
         
         [user_coordinates addObject:cl];
-        [cl release];
+
     }
     
     [user_coordinates addObject:nil];

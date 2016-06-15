@@ -143,8 +143,13 @@
             CGPoint control_point_2 = [self controlPointBetweenFirstPoint:p1
                     secondPoint:p3 thirdPoint:p2 firstDistance:dist_p2p3 secondDistance:dist_p1p2];
             
+            /*  선을 더 부드럽게 만드는 로직. */
+            
             // 점들이 집중된 구간은 커브를 추가하지 않습니다.
-            if (fabs(p2.x - p1.x) > 2) {
+            BOOL far_enough = fabs(p2.x - p1.x) > 2;
+            BOOL last_point = CGPointEqualToPoint(
+                                p2,((NSValue *)mutablePointList.lastObject).CGPointValue);
+            if (far_enough || last_point) {
                 [path addCurveToPoint:p2 controlPoint1:control_point_1 controlPoint2:control_point_2];
             }
 
