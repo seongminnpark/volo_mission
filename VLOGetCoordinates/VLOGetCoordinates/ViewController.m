@@ -32,7 +32,7 @@
     
     cnt=[print_coordinates count];
     
-    for(i=0;i<cnt-1;i++)
+    for(i=0;i<cnt;i++)
     {
         print_marker=[print_coordinates objectAtIndex:i];
         UIImageView *iv=[[UIImageView alloc]initWithFrame:CGRectMake(print_marker.x, print_marker.y, 15, 20)];
