@@ -27,8 +27,6 @@
     self=[super init];
     
     user_coordinates=[NSMutableArray arrayWithCapacity:100]; //최종 좌표(x,y)를 담을 배열
-    [user_coordinates addObject:@"0"]; //get_coordinates에서 insert하기 위해 임의의 값 설정
-    
     
     return self;
     
@@ -112,7 +110,7 @@
         x_y_increment.y=5+y_diff;
         //생성된 x,y 증가량을 marker 클래스에 대입
         
-        [user_coordinates insertObject:x_y_increment atIndex:i];
+        [user_coordinates addObject:x_y_increment];
         
         
         tmp_x=[user_coordinates objectAtIndex:i];
@@ -125,19 +123,41 @@
     
     tmp=[[Marker alloc]init];
     
-    if(sum_distance>270)
+    //사용자 핸드폰 기종별로 기준을 다르기 하기 위해 구분
+    VLODevicemodel * vd=[[VLODevicemodel alloc]init];
+    NSString * device_model=[vd Get_Device_model];
+    
+    
+    if([device_model isEqualToString:@"iPhone 4"]||[device_model isEqualToString:@"iPhone 4S"]||[device_model isEqualToString:@"iPhone 5"]||[device_model isEqualToString:@"iPhone 5c"]||[device_model isEqualToString:@"iPhone 5s"])
     {
-        tmp.x=20;
+        _MAX=270;
+    }
+    else if([device_model isEqualToString:@"iPhone 6"]||[device_model isEqualToString:@"iPhone 6S"])
+    {
+        _MAX=330;
+    }
+    else if([device_model isEqualToString:@"iPhone 6 Plus"]||[device_model isEqualToString:@"iPhone 6S Plus"])
+    {
+        _MAX=360;
+    }
+    else if([device_model isEqualToString:@"iPad"]||[device_model isEqualToString:@"iPad 2"]||[device_model isEqualToString:@"iPad Mini"])
+    {
+        _MAX=720;
+    }
+    
+    if(sum_distance>_MAX)
+    {
+        tmp.x=10;
         tmp.y=50;
         [user_coordinates insertObject:tmp atIndex:0];
         
-        [self reset_x_y_increment:(sum_distance-270)];
+        [self reset_x_y_increment:(sum_distance-_MAX)];
         
     }
     else
     {
         
-        extra_distance=(270-sum_distance)/2;
+        extra_distance=(_MAX-sum_distance)/2;
         tmp.x=extra_distance;
         tmp.y=50;
         [user_coordinates insertObject:tmp atIndex:0];
@@ -149,7 +169,7 @@
     
     n2=[user_coordinates count];
     
-    for(i=1;i<n2-1;i++)
+    for(i=1;i<n2;i++)
     {
         add_tmp=[[Marker alloc]init];
         

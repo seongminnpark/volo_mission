@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9301BCF01D11181700E19834 /* VLODevicemodel.m in Sources */ = {isa = PBXBuildFile; fileRef = 9301BCEF1D11181700E19834 /* VLODevicemodel.m */; };
 		936635781D0E8EDD0039BAE4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 936635771D0E8EDD0039BAE4 /* main.m */; };
 		9366357B1D0E8EDD0039BAE4 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9366357A1D0E8EDD0039BAE4 /* AppDelegate.m */; };
 		9366357E1D0E8EDD0039BAE4 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9366357D1D0E8EDD0039BAE4 /* ViewController.m */; };
@@ -40,6 +41,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		9301BCEE1D1117F700E19834 /* VLODevicemodel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLODevicemodel.h; sourceTree = "<group>"; };
+		9301BCEF1D11181700E19834 /* VLODevicemodel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLODevicemodel.m; sourceTree = "<group>"; };
 		936635731D0E8EDD0039BAE4 /* VLOGetCoordinates.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VLOGetCoordinates.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		936635771D0E8EDD0039BAE4 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		936635791D0E8EDD0039BAE4 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -133,6 +136,8 @@
 				936635841D0E8EDD0039BAE4 /* LaunchScreen.storyboard */,
 				936635871D0E8EDD0039BAE4 /* Info.plist */,
 				936635761D0E8EDD0039BAE4 /* Supporting Files */,
+				9301BCEE1D1117F700E19834 /* VLODevicemodel.h */,
+				9301BCEF1D11181700E19834 /* VLODevicemodel.m */,
 			);
 			path = VLOGetCoordinates;
 			sourceTree = "<group>";
@@ -307,6 +312,7 @@
 				936635B01D0E8F730039BAE4 /* Location.m in Sources */,
 				9366357B1D0E8EDD0039BAE4 /* AppDelegate.m in Sources */,
 				936635AF1D0E8F730039BAE4 /* getCoordinates.m in Sources */,
+				9301BCF01D11181700E19834 /* VLODevicemodel.m in Sources */,
 				936635781D0E8EDD0039BAE4 /* main.m in Sources */,
 				936635B41D0E98D80039BAE4 /* VLOLocationCoordinate.m in Sources */,
 			);

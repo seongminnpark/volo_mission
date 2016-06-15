@@ -58,6 +58,8 @@
 @property (strong,nonatomic) Marker * x_y_increment;
 @property (strong,nonatomic) NSArray * user_cor_list;
 @property (strong,nonatomic) NSArray * _final_coordinates;
+@property (nonatomic) NSInteger MAX;
+
 
 - (id)_init;
 - (double)get_distance:(VLOLocationCoordinate *)location1 :(VLOLocationCoordinate *)location2;

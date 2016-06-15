@@ -58,6 +58,10 @@
 @property (strong,nonatomic) NSArray * user_cor_list;
 @property (strong,nonatomic) NSArray * _final_coordinates;
 
+//add
+@property (nonatomic) NSInteger MAX;
+
+
 - (id)_init;
 - (double)get_distance:(VLOLocationCoordinate *)location1 :(VLOLocationCoordinate *)location2;
 - (NSMutableArray *)get_coordinates: (NSArray *)lo;
