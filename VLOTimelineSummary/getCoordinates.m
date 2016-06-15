@@ -207,7 +207,7 @@
 {
     NSInteger i;
     NSInteger cnt;
-    VLOLocationCoordinate * input_coordinates=location_list;
+    VLOLocationCoordinate * input_coordinates;
     user_coordinates=[NSArray array];
     
     cnt=[location_list count];
@@ -215,14 +215,15 @@
     for(i=0;i<cnt;i++)
     {
         VLOLocationCoordinate * cl=[[VLOLocationCoordinate alloc]init];
-        cl.latitude=input_coordinates.latitude;
-        cl.longitude=input_coordinates.longitude;
+        input_coordinates=[user_coordinates objectAtIndex:cnt];
+        
+        cl.latitude=input_coordinates[cnt].latitude;
+        cl.longitude=input_coordinates[cnt].longitude;
         
         [user_coordinates addObject:cl];
 
     }
     
-    [user_coordinates addObject:nil];
     
     _final_coordinates=[self get_coordinates:user_cor_list];
     
