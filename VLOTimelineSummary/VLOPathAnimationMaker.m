@@ -8,6 +8,8 @@
 
 @property (strong, nonatomic) CALayer *animationLayer;
 @property (strong, nonatomic) VLOPathMaker *pathMaker;
+@property (strong, nonatomic) UIView *receivedView;
+@property (strong, nonatomic) NSArray *markerList;
 
 @property () CGFloat screenWidth;
 @property () CGFloat screenHeight;
@@ -16,9 +18,9 @@
 
 @implementation VLOPathAnimationMaker
 
-- initWithView:(UIView *)view {
+- (id) initWithView:(UIView *)summaryView andMarkerList:(NSArray *)markerList {
     self = [super init];
-    _receivedView = view;
+    _receivedView = summaryView;
     _animationLayer = [[CALayer alloc] init];
     _pathMaker = [[VLOPathMaker alloc] init];
     [_receivedView.layer addSublayer:_animationLayer];

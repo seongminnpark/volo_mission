@@ -8,26 +8,27 @@
 
 #import "VLOTimelineSummary.h"
 
+@interface VLOTimelineSummary()
+
+@property (strong, nonatomic) NSArray *location_list;
+
+@end
+
 @implementation VLOTimelineSummary
 
 
-- (id)init
+- (id)initWithView:(UIView *)summaryView andLocationList:(NSArray *)location_list
 {
-    self=[super init];
-    _gc=[[GetCoordinates alloc]init];
+    self = [super init];
+    _gc = [[GetCoordinates alloc]init];
+    NSArray *marker_list=[_gc set_location:_location_list];
     
+    _animationMaker = [[VLOPathAnimationMaker alloc] initWithView:summaryView andMarkerList:marker_list];
     return self;
 
 }
 
-- (void) summaryInView:(UIView *)view locations:(NSArray *)location_list
-{
-    NSArray *coordinate_list=[_gc set_location:location_list];
-    _animationMaker = [[VLOPathAnimationMaker alloc] initWithView:view];
-    _animationMaker.markerList = coordinate_list;
-}
-
-- (void) animate {
+- (void) animateSummary {
     [_animationMaker animatePath];
 }
 

@@ -24,15 +24,11 @@
 /**
  *  Summary가 담길 UIView를 인자로 받습니다.
  */
-- (id) initWithView:(UIView *)view;
+- (id) initWithView:(UIView *)summaryView andMarkerList:(NSArray *)markerList;
 
 /**
  *  셋업이 끝난 후 애니메이션을 실행합니다.
  */
 - (void) animatePath;
-
-
-@property (strong, nonatomic) UIView *receivedView;
-@property (strong, nonatomic) NSArray *markerList;
 
 @end
