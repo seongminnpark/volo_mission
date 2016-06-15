@@ -10,19 +10,14 @@
 #import "getCoordinates.h"
 #import "Marker.h"
 #import "VLOLocationCoordinate.h"
-#import <CoreGraphics/CGBase.h>
 #import "VLODevicemodel.h"
 
 @implementation GetCoordinates
 
 @synthesize x_y_coordinate;
 @synthesize user_coordinates;
-@synthesize longitude;
-@synthesize latitude;
 @synthesize x_y_increment;
-@synthesize user_cor_list;
 @synthesize _final_coordinates;
-
 
 
 -(id)_init
@@ -30,8 +25,6 @@
     self=[super init];
     
     user_coordinates=[NSMutableArray arrayWithCapacity:100]; //최종 좌표(x,y)를 담을 배열
-  //  [user_coordinates addObject:@"0"]; //get_coordinates에서 insert하기 위해 임의의 값 설정
-    
     
     return self;
     
@@ -54,7 +47,8 @@
 {
     NSInteger j;
     NSInteger max_location=0;
-    double max;
+    CGFloat max;
+    CGFloat max_y = 0.0;
     Marker * max_init;
     NSInteger cnt=[user_coordinates count];
     Marker * tmp_increment;
@@ -65,7 +59,7 @@
     max=max_init.x;
     
     
-    for(j=1;j<cnt-1;j++)
+    for(j=1;j<cnt;j++)
     {
         tmp_increment=[user_coordinates objectAtIndex:j];
         
@@ -73,15 +67,14 @@
         {
             max=tmp_increment.x;
             max_location=j;
+            max_y=tmp_increment.y;
         }
         
     }
     
     final_increment.x=max-n;
+    final_increment.y=max_y;
     [user_coordinates replaceObjectAtIndex:max_location withObject:final_increment];
-    
-    [final_increment release];
-    
     
     
 }
@@ -118,8 +111,6 @@
         x_y_increment.y=5+y_diff;
         //생성된 x,y 증가량을 marker 클래스에 대입
         
-  //      [user_coordinates insertObject:x_y_increment atIndex:i];
-        
         [user_coordinates addObject:x_y_increment];
         
         
@@ -127,16 +118,12 @@
         sum_distance+=tmp_x.x;
         //표시할 전체 경로의 길이 구함
         
-        [x_y_increment release];
-        
     }
     
     
-
-    tmp=[[Marker alloc]init];
-
-//add
     
+    
+    //사용자 핸드폰 기종별로 기준을 다르기 하기 위해 구분
     VLODevicemodel * vd=[[VLODevicemodel alloc]init];
     NSString * device_model=[vd Get_Device_model];
     
@@ -158,8 +145,8 @@
         _MAX=720;
     }
     
+    tmp=[[Marker alloc]init];
     
-
     if(sum_distance>_MAX)
     {
         tmp.x=10;
@@ -167,7 +154,7 @@
         [user_coordinates insertObject:tmp atIndex:0];
         
         [self reset_x_y_increment:(sum_distance-_MAX)];
-
+        
     }
     else
     {
@@ -179,11 +166,8 @@
         
         
     }
-    
-    //add
     //양쪽 여백 계산
     
-    [tmp release];
     
     
     n2=[user_coordinates count];
@@ -210,11 +194,10 @@
         
         [user_coordinates replaceObjectAtIndex:i withObject:add_tmp];
         
-        [add_tmp release];
         marker_tmp1=nil;
         marker_tmp2=nil;
     }
-
+    
     
     return user_coordinates;
     
@@ -223,39 +206,32 @@
 
 
 
-- (NSArray *) set_location
+- (NSArray *) set_location: (NSMutableArray *)location_list
 {
-    lo1=[[VLOLocationCoordinate alloc]init];
-    lo2=[[VLOLocationCoordinate alloc]init];
-    lo3=[[VLOLocationCoordinate alloc]init];
-    lo4=[[VLOLocationCoordinate alloc]init];
-    lo5=[[VLOLocationCoordinate alloc]init];
-    lo6=[[VLOLocationCoordinate alloc]init];
-    lo7=[[VLOLocationCoordinate alloc]init];
+   // NSInteger i;
+    NSInteger cnt;
+    VLOLocationCoordinate * input_coordinates;
+    user_coordinates=[NSMutableArray array];
     
-    _final_coordinates=[NSArray array];
-
+    cnt=[location_list count];
     
-    
-    lo1.latitude=[NSNumber numberWithDouble:37.460195];
-    lo1.longitude=[NSNumber numberWithDouble:126.438507];
-    lo2.latitude=[NSNumber numberWithDouble:1.3644256];
-    lo2.longitude=[NSNumber numberWithDouble:103.9893421];
-    lo3.latitude=[NSNumber numberWithDouble:1.2821166];
-    lo3.longitude=[NSNumber numberWithDouble:103.8432716];
-    lo4.latitude=[NSNumber numberWithDouble:1.2908879];
-    lo4.longitude=[NSNumber numberWithDouble:103.8422545];
-    lo5.latitude=[NSNumber numberWithDouble:1.2973126];
-    lo5.longitude=[NSNumber numberWithDouble:103.8488728];
-    lo6.latitude=[NSNumber numberWithDouble:1.3010655];
-    lo6.longitude=[NSNumber numberWithDouble:103.8538013];
-    lo7.latitude=[NSNumber numberWithDouble:1.2843235];
-    lo7.longitude=[NSNumber numberWithDouble:103.8421236];
+    for(i=0;i<cnt;i++)
+    {
+        VLOLocationCoordinate * cl=[[VLOLocationCoordinate alloc]init];
+        input_coordinates=[location_list objectAtIndex:i];
+        
+        cl.latitude=input_coordinates.latitude;
+        cl.longitude=input_coordinates.longitude;
+        
+        [user_coordinates addObject:cl];
+        [cl release];
+        
+    }
     
     
-    user_cor_list=[[NSArray alloc] initWithObjects:lo1,lo2,lo3,lo4,lo5,lo6,lo7,nil];
+    _final_coordinates=[self get_coordinates:user_coordinates];
     
-    _final_coordinates=[self get_coordinates:user_cor_list];
+    
     return _final_coordinates;
     
 }

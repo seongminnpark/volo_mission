@@ -9,7 +9,7 @@
 #import "ViewController.h"
 #import "ViewController.h"
 //#import "Location.h"
-//#import "VLOLocationCoordinate.h"
+#import "VLOLocationCoordinate.h"
 #import "getCoordinates.h"
 #import "Marker.h"
 
@@ -24,11 +24,32 @@
     
     NSInteger cnt;
     NSInteger i;
-
+    
+    VLOLocationCoordinate * vc1=[[VLOLocationCoordinate alloc]init];
+    VLOLocationCoordinate * vc2=[[VLOLocationCoordinate alloc]init];
+    VLOLocationCoordinate * vc3=[[VLOLocationCoordinate alloc]init];
+    
+    [vc1 setLatitude:[NSNumber numberWithDouble:37.460195]];
+    [vc1 setLongitude:[NSNumber numberWithDouble:126.438507]];
+    
+    [vc2 setLatitude:[NSNumber numberWithDouble:51.504847]];
+    [vc2 setLongitude:[NSNumber numberWithDouble:0.0473293]];
+    
+    [vc3 setLatitude:[NSNumber numberWithDouble:52.9541053]];
+    [vc3 setLongitude:[NSNumber numberWithDouble:-1.2401013]];
+    
+    NSMutableArray * location_list=[NSMutableArray array];
+    [location_list addObject:vc1];
+    [location_list addObject:vc2];
+    [location_list addObject:vc3];
+    
+    
+    
+    
     print_marker=[[Marker alloc]init];
     start_location=[[GetCoordinates alloc]init];
     
-    print_coordinates=[start_location set_location];
+    print_coordinates=[start_location set_location:location_list];
     
     cnt=[print_coordinates count];
     

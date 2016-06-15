@@ -39,24 +39,12 @@
     Marker * marker_tmp2;
     Marker * add_tmp;
     
-    //임시변수
-    VLOLocationCoordinate * lo1;
-    VLOLocationCoordinate * lo2;
-    VLOLocationCoordinate * lo3;
-    VLOLocationCoordinate * lo4;
-    VLOLocationCoordinate * lo5;
-    VLOLocationCoordinate * lo6;
-    VLOLocationCoordinate * lo7;
     
     
 }
 
-@property (strong,nonatomic) NSNumber * x_y_coordinate;
-@property (strong,nonatomic) NSNumber * longitude;
-@property (strong,nonatomic) NSNumber * latitude;
 @property (strong,nonatomic) NSMutableArray * user_coordinates;
 @property (strong,nonatomic) Marker * x_y_increment;
-@property (strong,nonatomic) NSArray * user_cor_list;
 @property (strong,nonatomic) NSArray * _final_coordinates;
 @property (nonatomic) NSInteger MAX;
 

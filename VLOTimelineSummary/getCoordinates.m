@@ -10,15 +10,12 @@
 #import "getCoordinates.h"
 #import "Marker.h"
 #import "VLOLocationCoordinate.h"
+#import "VLODevicemodel.h"
 
 @implementation GetCoordinates
 
-@synthesize x_y_coordinate;
 @synthesize user_coordinates;
-@synthesize longitude;
-@synthesize latitude;
 @synthesize x_y_increment;
-@synthesize user_cor_list;
 @synthesize _final_coordinates;
 
 
@@ -49,7 +46,8 @@
 {
     NSInteger j;
     NSInteger max_location=0;
-    double max;
+    CGFloat max;
+    CGFloat max_y = 0.0;
     Marker * max_init;
     NSInteger cnt=[user_coordinates count];
     Marker * tmp_increment;
@@ -60,7 +58,7 @@
     max=max_init.x;
     
     
-    for(j=1;j<cnt-1;j++)
+    for(j=1;j<cnt;j++)
     {
         tmp_increment=[user_coordinates objectAtIndex:j];
         
@@ -68,11 +66,13 @@
         {
             max=tmp_increment.x;
             max_location=j;
+            max_y=tmp_increment.y;
         }
         
     }
     
     final_increment.x=max-n;
+    final_increment.y=max_y;
     [user_coordinates replaceObjectAtIndex:max_location withObject:final_increment];
     
     
@@ -121,7 +121,6 @@
     
     
     
-    tmp=[[Marker alloc]init];
     
     //사용자 핸드폰 기종별로 기준을 다르기 하기 위해 구분
     VLODevicemodel * vd=[[VLODevicemodel alloc]init];
@@ -145,6 +144,8 @@
         _MAX=720;
     }
     
+    tmp=[[Marker alloc]init];
+    
     if(sum_distance>_MAX)
     {
         tmp.x=10;
@@ -164,9 +165,10 @@
         
         
     }
-    //양쪽 여백 계산
     
     
+    
+    //최종 좌표를 알아내기 위해 시작좌표부터 증가값 더함
     n2=[user_coordinates count];
     
     for(i=1;i<n2;i++)
@@ -203,29 +205,30 @@
 
 
 
-- (NSArray *) set_location: (NSArray *)location_list
+- (NSArray *) set_location: (NSMutableArray *)location_list
 {
-    NSInteger i;
+    
     NSInteger cnt;
     VLOLocationCoordinate * input_coordinates;
-    user_coordinates=[NSArray array];
+    user_coordinates=[NSMutableArray array];
     
     cnt=[location_list count];
     
     for(i=0;i<cnt;i++)
     {
         VLOLocationCoordinate * cl=[[VLOLocationCoordinate alloc]init];
-        input_coordinates=[user_coordinates objectAtIndex:cnt];
+        input_coordinates=[location_list objectAtIndex:i];
         
-        cl.latitude=input_coordinates[cnt].latitude;
-        cl.longitude=input_coordinates[cnt].longitude;
+        cl.latitude=input_coordinates.latitude;
+        cl.longitude=input_coordinates.longitude;
         
         [user_coordinates addObject:cl];
-
+        [cl release];
+        
     }
     
     
-    _final_coordinates=[self get_coordinates:user_cor_list];
+    _final_coordinates=[self get_coordinates:user_coordinates];
     
     
     return _final_coordinates;
