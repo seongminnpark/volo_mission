@@ -21,7 +21,7 @@
 
 }
 
-- (UIView *)MakeSummary:(NSArray *)location_list
+- (UIView *)makeSummary:(NSArray *)location_list
 {
     NSArray *coordinate_list=[_gc set_location:location_list];
     
