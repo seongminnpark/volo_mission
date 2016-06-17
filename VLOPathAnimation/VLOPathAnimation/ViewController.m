@@ -18,7 +18,7 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     
-    _screenWidth = [[UIScreen mainScreen] bounds].size.width;;
+    _screenWidth = [[UIScreen mainScreen] bounds].size.width;
     _screenHeight = [[UIScreen mainScreen] bounds].size.height;
     
     _mapLineMaker = [[VLOMapLineMaker alloc] init];

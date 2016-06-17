@@ -6,9 +6,10 @@
 
 @interface VLOPathAnimationMaker()
 
-@property (strong, nonatomic) UIView *pathAnimationView;
 @property (strong, nonatomic) CALayer *animationLayer;
 @property (strong, nonatomic) VLOPathMaker *pathMaker;
+@property (strong, nonatomic) UIView *receivedView;
+@property (strong, nonatomic) NSArray *markerList;
 
 @property () CGFloat screenWidth;
 @property () CGFloat screenHeight;
@@ -17,19 +18,21 @@
 
 @implementation VLOPathAnimationMaker
 
-- init {
+- (id) initWithView:(UIView *)summaryView andMarkerList:(NSArray *)markerList {
     self = [super init];
-    _pathAnimationView = [[UIView alloc] init];
+    _receivedView = summaryView;
     _animationLayer = [[CALayer alloc] init];
     _pathMaker = [[VLOPathMaker alloc] init];
-    
-    [_pathAnimationView.layer addSublayer:_animationLayer];
+    [_receivedView.layer addSublayer:_animationLayer];
+    _screenWidth = [[UIScreen mainScreen] bounds].size.width;
+    _screenHeight = [[UIScreen mainScreen] bounds].size.height;
+    _markerList = markerList;
     return self;
 }
 
-- (UIView *) pathViewFromMarkers:(NSArray *)markerList {
-    [self drawFromMarkerArray:markerList];
-    return _pathAnimationView;
+- (void) animatePath {
+    [self eraseAll];
+    [self drawFromMarkerArray:_markerList];
 }
 
 - (void) drawFromMarkerArray:(NSArray *)markerList {
@@ -80,25 +83,33 @@
 }
 
 - (void) addMarkerAnimation:(Marker *)marker delay:(CGFloat)delay {
-    // 마커 생성.
-    UIImageView *markerImageView = [[UIImageView alloc]
-                                    initWithImage: [UIImage imageNamed:@"marker5.png"]];
-    CGFloat markerLeft = marker.x - MARKER_SIZE/2;
-    CGFloat markerTop = marker.y - MARKER_SIZE - 10;
-    [markerImageView setFrame:CGRectMake(markerLeft, markerTop, MARKER_SIZE, MARKER_SIZE)];
+    UIView *markerView = [marker getMarkerView];
     
     // 마커 애니메이션.
-    markerImageView.alpha = 0;
-    markerImageView.hidden = NO;
+    markerView.alpha = 0;
+    markerView.hidden = NO;
     UIViewAnimationOptions options = UIViewAnimationOptionCurveEaseInOut;
     [UIView animateWithDuration:MARKER_ANIMATION_DURATION delay:delay options:options
                      animations:^{
-                         markerImageView.alpha = 1;
-                         [markerImageView setFrame:
-                          CGRectMake(markerLeft,markerTop + MARKER_TRAVEL,MARKER_SIZE,MARKER_SIZE)];
+                         markerView.alpha = 1;
+                         CGFloat markerLeft = markerView.frame.origin.x;
+                         CGFloat markerTop = markerView.frame.origin.y;
+                         CGFloat markerWidth = markerView.frame.size.width;
+                         CGFloat markerHeight = markerView.frame.size.height;
+                         [markerView setFrame:CGRectMake(markerLeft, markerTop + MARKER_TRAVEL, markerWidth, markerHeight)];
                      } completion: nil];
+    [_receivedView addSubview: markerView];
+}
+
+- (void) eraseAll {
+    _animationLayer.sublayers = nil;
     
-    [self.view addSubview: markerImageView];
+    // 마커 제거
+    for (UIView *subView in _receivedView.subviews) {
+        if (![subView isKindOfClass:[UIButton class]]) {
+            [subView removeFromSuperview];
+        }
+    }
 }
 
 @end

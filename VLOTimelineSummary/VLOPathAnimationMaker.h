@@ -11,7 +11,6 @@
 #define BUTTON_PADDING 10.0
 #define BUTTON_HEIGHT_RATIO 0.1
 #define WHOLE_DURATION 2
-#define MARKER_SIZE 50.0
 #define MARKER_ANIMATION_DURATION 0.3
 #define MARKER_TRAVEL 20.0
 
@@ -22,13 +21,13 @@
 @interface VLOPathAnimationMaker : UIViewController
 
 /**
- *  `[[VLOPathAnimationMaker alloc] init]`으로 VLOPathAnimationMaker의 객채를 생성합니다.
+ *  Summary가 담길 UIView를 인자로 받습니다.
  */
-- (id) init;
+- (id) initWithView:(UIView *)summaryView andMarkerList:(NSArray *)markerList;
 
 /**
- *  마커와 경로가 만나는 애니메이션이 담긴 UIView를 리턴합니다.
+ *  셋업이 끝난 후 애니메이션을 실행합니다.
  */
-- (UIView *) pathViewFromMarkers:(NSArray *)markerList;
+- (void) animatePath;
 
 @end
