@@ -26,6 +26,7 @@
     [_receivedView.layer addSublayer:_animationLayer];
     _screenWidth = [[UIScreen mainScreen] bounds].size.width;
     _screenHeight = [[UIScreen mainScreen] bounds].size.height;
+    _markerList = markerList;
     return self;
 }
 
