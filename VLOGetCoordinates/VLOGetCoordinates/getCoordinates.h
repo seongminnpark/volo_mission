@@ -19,46 +19,32 @@
 @interface GetCoordinates : NSObject
 {
     NSInteger i;
+    NSInteger j;
     
     
     CGFloat x_diff;
     CGFloat y_diff;
     
-    NSInteger sum_distance;
-    NSInteger extra_distance;
     NSInteger distance;
     
     
-    VLOLocationCoordinate * tmp1;
-    VLOLocationCoordinate * tmp2;
+    VLOLocationCoordinate * input_location1;
+    VLOLocationCoordinate * input_location2;
+    Marker * final_location;
     
-    Marker * tmp_x;
-    Marker * tmp;
-    Marker * marker_tmp1;
-    Marker * marker_tmp2;
-    Marker * add_tmp;
     
    
     
 }
 
-@property (strong,nonatomic) NSNumber * x_y_coordinate;
-//@property (strong,nonatomic) NSNumber * longitude;
-//@property (strong,nonatomic) NSNumber * latitude;
 @property (strong,nonatomic) NSMutableArray * user_coordinates;
-@property (strong,nonatomic) Marker * x_y_increment;
-@property (strong,nonatomic) NSArray * _final_coordinates;
-
-//add
 @property (nonatomic) NSInteger MAX;
 
 
 - (id)_init;
 - (double)get_distance:(VLOLocationCoordinate *)location1 :(VLOLocationCoordinate *)location2;
 - (NSMutableArray *)get_coordinates: (NSArray *)lo;
-- (NSArray *) set_location:(NSMutableArray *)location_list;
-- (void) reset_x_y_increment: (NSInteger)n;
-
+- (void)check_device_model;
 
 @end
 

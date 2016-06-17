@@ -49,7 +49,7 @@
     print_marker=[[Marker alloc]init];
     start_location=[[GetCoordinates alloc]init];
     
-    print_coordinates=[start_location set_location:location_list];
+    print_coordinates=[start_location get_coordinates:location_list];
     
     cnt=[print_coordinates count];
     
