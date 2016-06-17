@@ -15,6 +15,7 @@
 //@class Location;
 @class Marker;
 @class VLOLocationCoordinate;
+@class VLOPlace;
 
 @interface GetCoordinates : NSObject
 {
@@ -27,7 +28,8 @@
     
     NSInteger distance;
     
-    
+    VLOPlace * input_place1;
+    VLOPlace * input_place2;
     VLOLocationCoordinate * input_location1;
     VLOLocationCoordinate * input_location2;
     Marker * final_location;
@@ -41,7 +43,7 @@
 @property (nonatomic) NSInteger MAX;
 
 
-- (id)init;
+- (id)_init;
 - (double)get_distance:(VLOLocationCoordinate *)location1 :(VLOLocationCoordinate *)location2;
 - (NSMutableArray *)get_coordinates: (NSArray *)lo;
 - (void)check_device_model;
