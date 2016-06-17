@@ -18,7 +18,7 @@
 @synthesize user_coordinates;
 
 
--(id) _init:(NSArray *)pl
+-(id) init:(NSArray *)pl
 {
     self=[super init];
     final_location=[[Marker alloc]init];
@@ -79,7 +79,6 @@
 
 - (NSMutableArray *) get_coordinates: (NSArray *)lo
 {
-    [self _init:lo];
     
     NSInteger n=[lo count];
     double start_end_distance;
@@ -134,6 +133,12 @@
             final_location.x=tmp.x+x_diff;
             final_location.y=tmp.y+y_diff;
             final_location.name=input_place2.name;
+            
+            //add
+            if(final_location.y<0)
+            {
+                final_location.y=0;
+            }
 
             [user_coordinates addObject:final_location];
             
