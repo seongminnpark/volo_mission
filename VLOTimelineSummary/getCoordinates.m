@@ -17,7 +17,7 @@
 @synthesize user_coordinates;
 
 
--(id)_init
+-(id) init
 {
     self=[super init];
     final_location=[[Marker alloc]init];
@@ -30,8 +30,6 @@
     [user_coordinates addObject:final_location];
     
     //final_location은 get_coordinats함수에서 다시 사용할건데, release해주지 않으면 이전값을 그대로 적용하기때문에 release
-    [final_location release];
-    
     return self;
     
 }
@@ -78,7 +76,6 @@
 
 - (NSMutableArray *) get_coordinates: (NSArray *)lo
 {
-    [self _init];
     
     NSInteger n=[lo count];
     double start_end_distance;
@@ -128,7 +125,6 @@
             final_location.y=tmp.y+y_diff;
             
             [user_coordinates addObject:final_location];
-            [final_location release];
             
         }
         else if(_MAX<start_end_distance)
@@ -157,7 +153,6 @@
             
             
             [user_coordinates addObject:final_location];
-            [final_location release];
         }
         
     }
@@ -167,6 +162,5 @@
     
     
 }
-
 
 @end

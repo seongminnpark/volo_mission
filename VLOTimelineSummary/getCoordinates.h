@@ -6,9 +6,9 @@
 //  Copyright © 2016년 M. All rights reserved.
 //
 
-#ifndef getCoordinates_h
 #define getCoordinates_h
 #import <CoreGraphics/CGBase.h>
+#import "VLODevicemodel.h"
 
 // 받아온 위치 정보를 기반으로 화면상의 좌표를 계산하는 클래스
 
@@ -41,11 +41,9 @@
 @property (nonatomic) NSInteger MAX;
 
 
-- (id)_init;
+- (id)init;
 - (double)get_distance:(VLOLocationCoordinate *)location1 :(VLOLocationCoordinate *)location2;
 - (NSMutableArray *)get_coordinates: (NSArray *)lo;
 - (void)check_device_model;
 
 @end
-
-#endif /* getCoordinates_h */

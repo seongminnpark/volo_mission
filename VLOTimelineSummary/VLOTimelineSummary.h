@@ -20,8 +20,8 @@
 @property (strong,nonatomic) GetCoordinates * gc;
 @property (strong,nonatomic) VLOPathAnimationMaker * animationMaker;
 
-- (id)_init;
-- (UIView *)MakeSummary: (NSArray *)location_list;
+- (id)initWithView:(UIView *)summaryView andLocationList:(NSArray *)location_list;
+- (void) animateSummary;
 
 @end
 
