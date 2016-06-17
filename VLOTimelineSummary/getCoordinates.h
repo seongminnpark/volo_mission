@@ -15,6 +15,7 @@
 //@class Location;
 @class Marker;
 @class VLOLocationCoordinate;
+@class VLOPlace;
 
 @interface GetCoordinates : NSObject
 {
@@ -27,7 +28,8 @@
     
     NSInteger distance;
     
-    
+    VLOPlace * input_place1;
+    VLOPlace * input_place2;
     VLOLocationCoordinate * input_location1;
     VLOLocationCoordinate * input_location2;
     Marker * final_location;
