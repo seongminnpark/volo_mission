@@ -83,34 +83,31 @@
 }
 
 - (void) addMarkerAnimation:(Marker *)marker delay:(CGFloat)delay {
-    // 마커 생성.
-    UIImageView *markerImageView = [[UIImageView alloc]
-                                    initWithImage: [UIImage imageNamed:@"marker5.png"]];
-    CGFloat markerLeft = marker.x - MARKER_SIZE/2;
-    CGFloat markerTop = marker.y - MARKER_SIZE - 10;
-    [markerImageView setFrame:CGRectMake(markerLeft, markerTop, MARKER_SIZE, MARKER_SIZE)];
+    UIView *markerView = [marker getMarkerView];
     
     // 마커 애니메이션.
-    markerImageView.alpha = 0;
-    markerImageView.hidden = NO;
+    markerView.alpha = 0;
+    markerView.hidden = NO;
     UIViewAnimationOptions options = UIViewAnimationOptionCurveEaseInOut;
     [UIView animateWithDuration:MARKER_ANIMATION_DURATION delay:delay options:options
                      animations:^{
-                         markerImageView.alpha = 1;
-                         [markerImageView setFrame:
-                          CGRectMake(markerLeft,markerTop + MARKER_TRAVEL,MARKER_SIZE,MARKER_SIZE)];
+                         markerView.alpha = 1;
+                         CGFloat markerLeft = markerView.frame.origin.x;
+                         CGFloat markerTop = markerView.frame.origin.y;
+                         CGFloat markerWidth = markerView.frame.size.width;
+                         CGFloat markerHeight = markerView.frame.size.height;
+                         [markerView setFrame:CGRectMake(markerLeft, markerTop + MARKER_TRAVEL, markerWidth, markerHeight)];
                      } completion: nil];
-    
-    [_receivedView addSubview: markerImageView];
+    [_receivedView addSubview: markerView];
 }
 
 - (void) eraseAll {
     _animationLayer.sublayers = nil;
     
     // 마커 제거
-    for (UIView *imageView in _receivedView.subviews) {
-        if ([imageView isKindOfClass:[UIImageView class]]) {
-            [imageView removeFromSuperview];
+    for (UIView *subView in _receivedView.subviews) {
+        if (![subView isKindOfClass:[UIButton class]]) {
+            [subView removeFromSuperview];
         }
     }
 }

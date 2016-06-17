@@ -9,19 +9,21 @@
 
 // 화면상의 좌표값을 담을 클래스
 
-#ifndef Marker_h
-#define Marker_h
 #import <CoreGraphics/CGBase.h>
+#import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+
+#define MARKER_SIZE 50.0
+#define MARKER_LABEL_HEIGHT 10.0
+#define MARKER_IMAGE_NAME @"marker5.png"
 
 
 @interface Marker : NSObject
 
+- (UIView *) getMarkerView;
 
 @property (nonatomic)CGFloat x;
 @property (nonatomic)CGFloat y;
+@property (nonatomic)NSString *name;
 
 @end
-
-
-#endif /* Marker_h */
