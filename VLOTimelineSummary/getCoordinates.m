@@ -15,15 +15,22 @@
 @implementation GetCoordinates
 
 @synthesize user_coordinates;
-@synthesize x_y_increment;
-@synthesize _final_coordinates;
 
 
 -(id)_init
 {
     self=[super init];
-    
+    final_location=[[Marker alloc]init];
     user_coordinates=[NSMutableArray arrayWithCapacity:100]; //최종 좌표(x,y)를 담을 배열
+    
+    // 첫 위치의 좌표는 무조건 (10,100)으로 지정
+    final_location.x=10;
+    final_location.y=100;
+    
+    [user_coordinates addObject:final_location];
+    
+    //final_location은 get_coordinats함수에서 다시 사용할건데, release해주지 않으면 이전값을 그대로 적용하기때문에 release
+    [final_location release];
     
     return self;
     
@@ -40,89 +47,10 @@
     return distance;
 }
 
-//총 경로의 길이가 한 화면을 넘어가는 경우 reset
 
-- (void) reset_x_y_increment: (NSInteger)n
+// 핸드폰 기종을 확인하는 함수
+- (void) check_device_model
 {
-    NSInteger j;
-    NSInteger max_location=0;
-    CGFloat max;
-    CGFloat max_y = 0.0;
-    Marker * max_init;
-    NSInteger cnt=[user_coordinates count];
-    Marker * tmp_increment;
-    Marker * final_increment=[[Marker alloc]init];
-    
-    
-    max_init=[user_coordinates objectAtIndex:0];
-    max=max_init.x;
-    
-    
-    for(j=1;j<cnt;j++)
-    {
-        tmp_increment=[user_coordinates objectAtIndex:j];
-        
-        if(tmp_increment.x>max)
-        {
-            max=tmp_increment.x;
-            max_location=j;
-            max_y=tmp_increment.y;
-        }
-        
-    }
-    
-    final_increment.x=max-n;
-    final_increment.y=max_y;
-    [user_coordinates replaceObjectAtIndex:max_location withObject:final_increment];
-    
-    
-}
-
-
-
-// 화면상의 좌표 구하는 함수
-
-- (NSMutableArray *) get_coordinates: (NSArray *)lo
-{
-    [self _init];
-    
-    NSInteger n=[lo count];
-    NSInteger n2;
-    
-    
-    
-    for(i=0;i<n;i++)
-    {
-        if(i==n-1)
-        {
-            break;
-        }
-        
-        tmp1=lo[i];
-        tmp2=lo[i+1];
-        
-        x_diff=[self get_distance:lo[i] :lo[i+1]]; //x좌표 증가량
-        y_diff=([tmp1.latitude doubleValue]-[tmp2.latitude doubleValue])*10; //y좌표 증가량
-        
-        x_y_increment=[[Marker alloc]init];
-        
-        x_y_increment.x=30+x_diff;
-        x_y_increment.y=5+y_diff;
-        //생성된 x,y 증가량을 marker 클래스에 대입
-        
-        [user_coordinates addObject:x_y_increment];
-        
-        
-        tmp_x=[user_coordinates objectAtIndex:i];
-        sum_distance+=tmp_x.x;
-        //표시할 전체 경로의 길이 구함
-        
-    }
-    
-    
-    
-    
-    //사용자 핸드폰 기종별로 기준을 다르기 하기 위해 구분
     VLODevicemodel * vd=[[VLODevicemodel alloc]init];
     NSString * device_model=[vd Get_Device_model];
     
@@ -143,58 +71,95 @@
     {
         _MAX=720;
     }
+}
+
+
+// 화면상의 좌표 구하는 함수
+
+- (NSMutableArray *) get_coordinates: (NSArray *)lo
+{
+    [self _init];
     
-    tmp=[[Marker alloc]init];
+    NSInteger n=[lo count];
+    double start_end_distance;
     
-    if(sum_distance>_MAX)
+    [self check_device_model];
+    
+    
+    //첫 위치와 마지막 위치 사이의 거리 구함
+    VLOLocationCoordinate * start_location=lo[0];
+    VLOLocationCoordinate * end_location=lo[n-1];
+    start_end_distance=[self get_distance:start_location :end_location];
+    
+    
+    for(i=0;i<n-1;i++)
     {
-        tmp.x=10;
-        tmp.y=50;
-        [user_coordinates insertObject:tmp atIndex:0];
+        input_location1=lo[i];
+        input_location2=lo[i+1];
         
-        [self reset_x_y_increment:(sum_distance-_MAX)];
-        
-    }
-    else
-    {
-        
-        extra_distance=(_MAX-sum_distance)/2;
-        tmp.x=extra_distance;
-        tmp.y=50;
-        [user_coordinates insertObject:tmp atIndex:0];
-        
-        
-    }
-    
-    
-    
-    //최종 좌표를 알아내기 위해 시작좌표부터 증가값 더함
-    n2=[user_coordinates count];
-    
-    for(i=1;i<n2;i++)
-    {
-        add_tmp=[[Marker alloc]init];
-        
-        marker_tmp1=[user_coordinates objectAtIndex:i-1];
-        marker_tmp2=[user_coordinates objectAtIndex:i];
-        
-        if(marker_tmp2.y>20)
+        // x좌표의 최대값인 MAX에 맞추기 위하여 전체 이동길이가 MAX보다 큰 경우, 작은 경우로 나눠서 계산
+        if(_MAX>start_end_distance)
         {
-            marker_tmp2.y=20;
+            final_location=[[Marker alloc]init];
+            
+            x_diff=[self get_distance:input_location1 :input_location2];
+            x_diff=x_diff+((_MAX-start_end_distance)/n);
+            y_diff=([input_location1.latitude doubleValue]-[input_location2.latitude doubleValue])*10; //y좌표 증가량
+            
+            
+            // y좌푱의 증가/감소값은 20이 적당하므로 20보다 크거나 -20보다 작은경우 임의로 y 변화값 지정
+            if(y_diff>20)
+            {
+                y_diff=20;
+            }
+            else if(y_diff<-20)
+            {
+                y_diff=-20;
+            }
+            
+            // 여기까지는 x,y좌표의 변화값에 대해 구함
+            
+            
+            // 여기서부터 이전 좌표값을 가져와 변화값에 따라 증가 혹은 감소
+            NSInteger n2=[user_coordinates count];
+            Marker * tmp=[user_coordinates objectAtIndex:n2-1];
+            
+            final_location.x=tmp.x+x_diff;
+            final_location.y=tmp.y+y_diff;
+            
+            [user_coordinates addObject:final_location];
+            [final_location release];
+            
         }
-        else if(marker_tmp2.y<-20)
+        else if(_MAX<start_end_distance)
         {
-            marker_tmp2.y=-20;
+            final_location=[[Marker alloc]init];
+            
+            x_diff=[self get_distance:input_location1 :input_location2];
+            x_diff=x_diff-((start_end_distance-_MAX)/n);
+            y_diff=([input_location1.latitude doubleValue]-[input_location2.latitude doubleValue])*10;
+            
+            if(y_diff>0)
+            {
+                final_location.y=5+y_diff;
+            }
+            else
+            {
+                final_location.y=-5+y_diff;
+            }
+            
+            NSInteger n2=[user_coordinates count];
+            Marker * tmp=[user_coordinates objectAtIndex:n2-1];
+            
+            final_location.x=tmp.x+x_diff;
+            final_location.y=tmp.y+y_diff;
+            
+            
+            
+            [user_coordinates addObject:final_location];
+            [final_location release];
         }
-        //y좌표의 경우 +-20이 가장 적당하기 때문에 증가값이 20이상인 경우 20으로 고정
         
-        add_tmp.x=marker_tmp1.x+marker_tmp2.x;
-        add_tmp.y=marker_tmp1.y+marker_tmp2.y;
-        
-        [user_coordinates replaceObjectAtIndex:i withObject:add_tmp];
-        
-        marker_tmp1=nil;
-        marker_tmp2=nil;
     }
     
     
@@ -202,40 +167,6 @@
     
     
 }
-
-
-
-- (NSArray *) set_location: (NSMutableArray *)location_list
-{
-    
-    NSInteger cnt;
-    VLOLocationCoordinate * input_coordinates;
-    user_coordinates=[NSMutableArray array];
-    
-    cnt=[location_list count];
-    
-    for(i=0;i<cnt;i++)
-    {
-        VLOLocationCoordinate * cl=[[VLOLocationCoordinate alloc]init];
-        input_coordinates=[location_list objectAtIndex:i];
-        
-        cl.latitude=input_coordinates.latitude;
-        cl.longitude=input_coordinates.longitude;
-        
-        [user_coordinates addObject:cl];
-        [cl release];
-        
-    }
-    
-    
-    _final_coordinates=[self get_coordinates:user_coordinates];
-    
-    
-    return _final_coordinates;
-    
-}
-
-
 
 
 @end

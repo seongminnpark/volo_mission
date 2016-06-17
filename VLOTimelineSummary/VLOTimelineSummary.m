@@ -23,7 +23,7 @@
 
 - (UIView *)MakeSummary:(NSArray *)location_list
 {
-    NSArray *coordinate_list=[_gc set_location:location_list];
+    NSArray *coordinate_list=[_gc get_coordinates:location_list];
     
     return [_animationMaker pathViewFromMarkers: coordinate_list];
 }
