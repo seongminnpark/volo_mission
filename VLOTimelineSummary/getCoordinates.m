@@ -18,7 +18,7 @@
 @synthesize user_coordinates;
 
 
--(id) init:(NSArray *)pl
+-(id) initWithLocation:(NSArray *)pl
 {
     self=[super init];
     final_location=[[Marker alloc]init];

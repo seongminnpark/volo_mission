@@ -13,7 +13,7 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
-#define MARKER_SIZE 50.0
+#define MARKER_SIZE 30.0
 #define MARKER_LABEL_HEIGHT 10.0
 #define MARKER_IMAGE_NAME @"marker5.png"
 

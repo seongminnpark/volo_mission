@@ -17,8 +17,7 @@
     UIImageView *markerImageView = [[UIImageView alloc]
                                     initWithImage: [UIImage imageNamed:MARKER_IMAGE_NAME]];
     CGFloat markerLeft = x - MARKER_SIZE/2;
-    CGFloat markerTop = y - MARKER_SIZE - 10;
-    // (위의 10은 마커 이미지에 여백이 있어서 임의로 정한 vertical offset. 애샛 정리(trim)가 잘 된다면 0이 되어야함.)
+    CGFloat markerTop = y - MARKER_SIZE - 20; // 20은 마커 이미지에 따라 달라지는 임의의 숫자.
     [markerImageView setFrame:CGRectMake(0, 0, MARKER_SIZE, MARKER_SIZE)];
     
     // 마커 레이블 생성.
