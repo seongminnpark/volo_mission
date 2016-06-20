@@ -57,15 +57,20 @@
         totalDuration += duration;
         
     }
-    // 마지막 마커 추가.
-    Marker *marker = (Marker *) [markerList objectAtIndex:markerList.count-1];
-    [self addMarkerAnimation:marker delay:totalDuration];
+    
+    if (markerList.count > 0) {
+        // 마지막 마커 추가.
+        Marker *marker = (Marker *) [markerList objectAtIndex:markerList.count-1];
+        [self addMarkerAnimation:marker delay:totalDuration];
+    }
+    
 }
 
 - (void) addPathAnimation:(UIBezierPath *)path duration:(CGFloat)duration delay:(CGFloat)delay {
     CAShapeLayer *pathLayer = [[CAShapeLayer alloc] init];
     pathLayer.path = path.CGPath;
-    pathLayer.strokeColor = [UIColor blackColor].CGColor;
+    pathLayer.strokeColor = [UIColor colorWithRed:51.0/255.0 green:51.0/255.0 blue:51.0/255.0 alpha:1].CGColor;
+    //pathLayer.strokeColor = [UIColor blackColor].CGColor;
     pathLayer.fillColor = [UIColor clearColor].CGColor;
     pathLayer.lineWidth = LINE_WIDTH;
     pathLayer.strokeStart = 0.0;
@@ -106,9 +111,7 @@
     
     // 마커 제거
     for (UIView *subView in _receivedView.subviews) {
-        if (![subView isKindOfClass:[UIButton class]]) {
-            [subView removeFromSuperview];
-        }
+        [subView removeFromSuperview];
     }
 }
 

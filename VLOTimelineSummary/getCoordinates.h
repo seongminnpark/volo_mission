@@ -42,8 +42,7 @@
 @property (strong,nonatomic) NSMutableArray * user_coordinates;
 @property (nonatomic) NSInteger MAX;
 
-
-- (id) init:(NSArray *)pl;
+- (id) initWithLocation:(NSArray *)pl;
 - (double)get_distance:(VLOLocationCoordinate *)location1 :(VLOLocationCoordinate *)location2;
 - (NSMutableArray *)get_coordinates: (NSArray *)lo;
 - (void)check_device_model;
