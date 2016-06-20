@@ -11,24 +11,27 @@
 #import "Marker.h"
 #import "VLOLocationCoordinate.h"
 #import "VLODevicemodel.h"
+#import "VLOPlace.h"
 
 @implementation GetCoordinates
 
 @synthesize user_coordinates;
 
 
--(id)_init
+-(id)init:(NSArray *)pl
 {
     self=[super init];
     final_location=[[Marker alloc]init];
+    Marker * tmp_marker=pl[0];
     user_coordinates=[NSMutableArray arrayWithCapacity:100]; //최종 좌표(x,y)를 담을 배열
     
     final_location.x=10;
     final_location.y=100;
+    final_location.name=tmp_marker.name;
     
     [user_coordinates addObject:final_location];
-    
-    [final_location release];
+
+//    [final_location release];
     
     return self;
     
@@ -76,22 +79,27 @@
 
 - (NSMutableArray *) get_coordinates: (NSArray *)lo
 {
-    [self _init];
     
     NSInteger n=[lo count];
     double start_end_distance;
 
     [self check_device_model];
     
-    VLOLocationCoordinate * start_location=lo[0];
-    VLOLocationCoordinate * end_location=lo[n-1];
+    VLOPlace * start_place=lo[0];
+    VLOPlace * end_place=lo[n-1];
+    
+    VLOLocationCoordinate * start_location=start_place.coordinates;
+    VLOLocationCoordinate * end_location=end_place.coordinates;
     start_end_distance=[self get_distance:start_location :end_location];
     
     
     for(i=0;i<n-1;i++)
     {
-        input_location1=lo[i];
-        input_location2=lo[i+1];
+        input_place1=lo[i];
+        input_place2=lo[i+1];
+        
+        input_location1=input_place1.coordinates;
+        input_location2=input_place2.coordinates;
         
         if(_MAX>start_end_distance)
         {
@@ -116,9 +124,10 @@
             
             final_location.x=tmp.x+x_diff;
             final_location.y=tmp.y+y_diff;
+            final_location.name=input_place2.name;
             
             [user_coordinates addObject:final_location];
-            [final_location release];
+           // [final_location release];
             
         }
         else if(_MAX<start_end_distance+10)
@@ -129,13 +138,13 @@
             x_diff=x_diff-((start_end_distance-_MAX)/n);
             y_diff=([input_location1.latitude doubleValue]-[input_location2.latitude doubleValue])*10;
             
-            if(y_diff>0)
+            if(y_diff>20)
             {
-                final_location.y=5+y_diff;
+                y_diff=20;
             }
-            else
+            else if(y_diff<-20)
             {
-                final_location.y=-5+y_diff;
+                y_diff=-20;
             }
             
             NSInteger n2=[user_coordinates count];
@@ -143,11 +152,20 @@
             
             final_location.x=tmp.x+x_diff;
             final_location.y=tmp.y+y_diff;
+            final_location.name=input_place2.name;
             
-      
+            
+            if(final_location.x<10)
+            {
+                final_location.x=10;
+            }
+            if(final_location.y<0)
+            {
+                final_location.y=0;
+            }
             
             [user_coordinates addObject:final_location];
-            [final_location release];
+        //    [final_location release];
         }
         
     }
