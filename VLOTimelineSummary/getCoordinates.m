@@ -32,7 +32,6 @@
 
     [user_coordinates addObject:final_location];
     
-    //final_location은 get_coordinats함수에서 다시 사용할건데, release해주지 않으면 이전값을 그대로 적용하기때문에 release
     return self;
     
 }
