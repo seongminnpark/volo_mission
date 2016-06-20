@@ -24,6 +24,8 @@
 
 @property (nonatomic)CGFloat x;
 @property (nonatomic)CGFloat y;
+@property (nonatomic)NSString *name;
+
 
 @end
 

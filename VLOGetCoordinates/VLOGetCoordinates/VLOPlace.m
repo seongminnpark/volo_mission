@@ -6,9 +6,18 @@
 //  Copyright (c) 2015년 SK Planet. All rights reserved.
 //
 
+#import "VLOPlace.h"
+
+@implementation VLOPlace
+
+@synthesize name;
+@synthesize coordinates;
+
+
+@end
 
 // Library
-#import <GoogleMaps/GoogleMaps.h>
+/*#import <GoogleMaps/GoogleMaps.h>
 @import Foundation;
 
 
@@ -119,3 +128,4 @@
 }
 
 @end
+*/
