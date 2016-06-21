@@ -31,6 +31,45 @@
     return self;
 }
 
+- (NSArray *) getCoordinates:(NSArray *)placesList {
+    if (placesList.count < 1) {
+        return [NSArray array];
+    }
+    
+    NSMutableArray *longitudeDiffList = [NSMutableArray arrayWithCapacity:placesList.count - 1];
+    NSMutableArray *latitudeList = [[NSMutableArray alloc] initWithCapacity:placesList.count];
+    [self initializeLists:placesList :longitudeDiffList :latitudeList];
+    
+    NSMutableArray *markerList = [[NSMutableArray alloc] initWithCapacity:placesList.count];
+    
+    // First marker
+    Marker *firstMarker = [[Marker alloc] init];
+    CGFloat latitude = [[latitudeList objectAtIndex:0] floatValue];
+    firstMarker.x = (placesList.count == 1) ? _actualWidth/2 + MARKER_SIZE: MARKER_SIZE;
+    firstMarker.y = (placesList.count == 1) ? _actualHeight/2 + MARKER_VERTICAL_OFFSET: [self getYCoordinate:latitude];
+    firstMarker.name = ((VLOPlace *)[placesList objectAtIndex:0]).name;
+    [markerList addObject:firstMarker];
+    
+    for (NSInteger i = 1; i < placesList.count; i++) {
+        
+        VLOPlace *currPlace = [placesList objectAtIndex:i];
+        
+        CGFloat longitudeDiffFromPreviousPlace = [[longitudeDiffList objectAtIndex:i-1] floatValue];
+        CGFloat currentLatitude = [[latitudeList objectAtIndex:i] floatValue];
+        
+        Marker *prevMarker = [markerList objectAtIndex:i-1];
+        Marker *newMarker = [[Marker alloc] init];
+        
+        newMarker.x = [self getXCoordinate:longitudeDiffFromPreviousPlace :prevMarker.x];
+        newMarker.y = [self getYCoordinate:currentLatitude];
+        newMarker.name = currPlace.name;
+        
+        [markerList addObject:newMarker];
+    }
+    
+    return markerList;
+}
+
 - (void) initializeLists:(NSArray *)placesList :(NSMutableArray *)longitudeDiffList :(NSMutableArray *)latitudeList {
     
     for (NSInteger i = 0; i < placesList.count - 1; i++) {
@@ -57,45 +96,6 @@
     CGFloat minLatitude = [[latitudeList valueForKeyPath:@"@min.doubleValue"] floatValue];
     _latitudeMaxDiff = maxLatitude - minLatitude; // 마커가 하나일 땐 이 값이 0이므로 getYCoordinate애서 분모로 이용하지 않음.
     _latitudeMax = maxLatitude;
-}
-
-- (NSArray *) getCoordinates:(NSArray *)placesList {
-    if (placesList.count < 1) {
-        return [NSArray array];
-    }
-    
-    NSMutableArray *longitudeDiffList = [NSMutableArray arrayWithCapacity:placesList.count - 1];
-    NSMutableArray *latitudeList = [[NSMutableArray alloc] initWithCapacity:placesList.count];
-    [self initializeLists:placesList :longitudeDiffList :latitudeList];
-    
-    NSMutableArray *markerList = [[NSMutableArray alloc] initWithCapacity:placesList.count];
-
-    // First marker
-    Marker *firstMarker = [[Marker alloc] init];
-    CGFloat latitude = [[latitudeList objectAtIndex:0] floatValue];
-    firstMarker.x = (placesList.count == 1) ? _actualWidth/2 + MARKER_SIZE: MARKER_SIZE;
-    firstMarker.y = (placesList.count == 1) ? _actualHeight/2 + MARKER_VERTICAL_OFFSET: [self getYCoordinate:latitude];
-    firstMarker.name = ((VLOPlace *)[placesList objectAtIndex:0]).name;
-    [markerList addObject:firstMarker];
-    
-    for (NSInteger i = 1; i < placesList.count; i++) {
-        
-        VLOPlace *currPlace = [placesList objectAtIndex:i];
-
-        CGFloat longitudeDiffFromPreviousPlace = [[longitudeDiffList objectAtIndex:i-1] floatValue];
-        CGFloat currentLatitude = [[latitudeList objectAtIndex:i] floatValue];
-
-        Marker *prevMarker = [markerList objectAtIndex:i-1];
-        Marker *newMarker = [[Marker alloc] init];
-
-        newMarker.x = [self getXCoordinate:longitudeDiffFromPreviousPlace :prevMarker.x];
-        newMarker.y = [self getYCoordinate:currentLatitude];
-        newMarker.name = currPlace.name;
-        
-        [markerList addObject:newMarker];
-    }
-    
-    return markerList;
 }
 
 - (CGFloat) getXCoordinate:(CGFloat)longitudeDiff :(CGFloat)previousX {
