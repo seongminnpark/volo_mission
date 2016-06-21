@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "VLOUtilities.h"
-#import "Marker.h"
+#import "VLOMarker.h"
 #import "VLOLocationCoordinate.h"
 #import "VLOPlace.h"
 #import "VLOTimeLineSummary.h"
