@@ -9,10 +9,6 @@
 @property (strong, nonatomic) VLOPathMaker *pathMaker;
 @property (strong, nonatomic) UIView *receivedView;
 @property (strong, nonatomic) NSArray *markerList;
-
-@property () CGFloat screenWidth;
-@property () CGFloat screenHeight;
-
 @end
 
 @implementation VLOPathAnimationMaker
@@ -23,8 +19,6 @@
     _animationLayer = [[CALayer alloc] init];
     _pathMaker = [[VLOPathMaker alloc] init];
     [_receivedView.layer addSublayer:_animationLayer];
-    _screenWidth = [[UIScreen mainScreen] bounds].size.width;
-    _screenHeight = [[UIScreen mainScreen] bounds].size.height;
     _markerList = markerList;
     return self;
 }
@@ -36,6 +30,8 @@
 
 - (void) drawFromMarkerArray:(NSArray *)markerList {
     CGFloat totalDuration = 0;
+    CGFloat actualWidth = [VLOUtilities screenWidth] - MARKER_SIZE * 2;
+    
     for (NSInteger i = 1; i < markerList.count; i++) {
         // 새로운 path 생성.
         VLOMarker *prevMarker = [markerList objectAtIndex:i-1];
@@ -43,8 +39,9 @@
         CGPoint prevPoint = CGPointMake(prevMarker.x, prevMarker.y);
         CGPoint currPoint = CGPointMake(currMarker.x, currMarker.y);
         UIBezierPath *newPath = [_pathMaker pathBetweenPoint:prevPoint point:currPoint];
-        
-        CGFloat duration = ANIMATION_DURATION * (currPoint.x - prevPoint.x) / _screenWidth;
+    
+        CGFloat durationFraction = [VLOMarker distanceBetweenMarker1:prevMarker Marker2:currMarker] / actualWidth;
+        CGFloat duration = ANIMATION_DURATION * durationFraction;
         
         // Path 애니메이션 추가.
         [self addPathAnimation:newPath duration:duration delay:totalDuration];
@@ -69,7 +66,6 @@
     CAShapeLayer *pathLayer = [[CAShapeLayer alloc] init];
     pathLayer.path = path.CGPath;
     pathLayer.strokeColor = [UIColor colorWithRed:51.0/255.0 green:51.0/255.0 blue:51.0/255.0 alpha:1].CGColor;
-    //pathLayer.strokeColor = [UIColor blackColor].CGColor;
     pathLayer.fillColor = [UIColor clearColor].CGColor;
     pathLayer.lineWidth = LINE_WIDTH;
     pathLayer.strokeStart = 0.0;
@@ -83,7 +79,7 @@
     pathDrawAnimation.fillMode = kCAFillModeBackwards;
     pathDrawAnimation.fromValue = [NSNumber numberWithFloat:0.0f];
     pathDrawAnimation.toValue   = [NSNumber numberWithFloat:1.0f];
-    [pathLayer addAnimation:pathDrawAnimation forKey:@"strokeEnd"];
+    [pathLayer addAnimation:pathDrawAnimation forKey:@"pathAnimation"];
 }
 
 - (void) addMarkerAnimation:(VLOMarker *)marker delay:(CGFloat)delay {

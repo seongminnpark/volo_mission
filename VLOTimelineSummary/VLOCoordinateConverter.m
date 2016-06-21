@@ -18,7 +18,7 @@
 - (id) init {
     self = [super init];
     _actualWidth = [VLOUtilities screenWidth] - MARKER_SIZE * 2;
-    _actualHeight = SUMMARY_HEIGHT - MARKER_VERTICAL_OFFSET * 2;
+    _actualHeight = SUMMARY_HEIGHT - VERTICAL_PADDING * 2;
     
     _longitudeDiffSum = 0;
     _latitudeMaxDiff = 0;
@@ -41,10 +41,11 @@
     VLOMarker *firstMarker = [[VLOMarker alloc] init];
     CGFloat latitude = [[latitudeList objectAtIndex:0] floatValue];
     firstMarker.x = (placesList.count == 1) ? _actualWidth/2 + MARKER_SIZE: MARKER_SIZE;
-    firstMarker.y = (placesList.count == 1) ? _actualHeight/2 + MARKER_VERTICAL_OFFSET: [self getYCoordinate:latitude];
+    firstMarker.y = (placesList.count == 1) ? _actualHeight/2 + VERTICAL_PADDING: [self getYCoordinate:latitude];
     firstMarker.name = ((VLOPlace *)[placesList objectAtIndex:0]).name;
     [markerList addObject:firstMarker];
     
+    // Every other markers (index 1 < )
     for (NSInteger i = 1; i < placesList.count; i++) {
         
         VLOPlace *currPlace = [placesList objectAtIndex:i];
@@ -102,7 +103,7 @@
 
 - (CGFloat) getYCoordinate:(CGFloat)currentLatutude {
     CGFloat latitudeRatio = (_latitudeMax - currentLatutude) / _latitudeMaxDiff;
-    CGFloat newY = latitudeRatio * _actualHeight + MARKER_VERTICAL_OFFSET;
+    CGFloat newY = latitudeRatio * _actualHeight + VERTICAL_PADDING;
     return newY;
 }
 

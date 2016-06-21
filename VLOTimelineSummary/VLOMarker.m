@@ -7,6 +7,13 @@
 @synthesize x;
 @synthesize y;
 
++ (CGFloat) distanceBetweenMarker1:(VLOMarker *)marker1 Marker2:(VLOMarker *)marker2 {
+    CGFloat xDelta = marker2.x - marker1.x;
+    CGFloat yDelta = marker2.y - marker1.y;
+    CGFloat distance = sqrt(xDelta * xDelta + yDelta * yDelta);
+    return distance;
+}
+
 - (UIView *) getMarkerView {
     // 마커 생성.
     UIImageView *markerImageView = [[UIImageView alloc]
