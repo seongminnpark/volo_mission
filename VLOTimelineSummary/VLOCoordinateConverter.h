@@ -1,10 +1,6 @@
-//
+
 //  VLOCoordinateConverter.h
-//  Volo
-//
-//  Created by Seongmin on 6/20/16.
-//  Copyright © 2016 SK Planet. All rights reserved.
-//
+
 
 #import <Foundation/Foundation.h>
 #import "VLOUtilities.h"

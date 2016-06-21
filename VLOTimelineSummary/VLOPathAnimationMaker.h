@@ -1,6 +1,4 @@
-//
 //  VLOPathAnimationMaker.h
-//
 
 
 #import <UIKit/UIKit.h>

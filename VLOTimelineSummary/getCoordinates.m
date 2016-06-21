@@ -1,14 +1,9 @@
-//
 //  getCoordinates.m
-//  getCoordinates(ios)
-//
-//  Created by M on 2016. 6. 8..
-//  Copyright © 2016년 M. All rights reserved.
-//
+
 
 #import <Foundation/Foundation.h>
 #import "getCoordinates.h"
-#import "Marker.h"
+#import "VLOMarker.h"
 #import "VLOLocationCoordinate.h"
 #import "VLOPlace.h"
 
@@ -20,8 +15,8 @@
 -(id) initWithLocation:(NSArray *)pl
 {
     self=[super init];
-    final_location=[[Marker alloc]init];
-    Marker * tmp_marker=pl[0];
+    final_location=[[VLOMarker alloc]init];
+    VLOMarker * tmp_marker=pl[0];
     user_coordinates=[NSMutableArray arrayWithCapacity:100]; //최종 좌표(x,y)를 담을 배열
     
     // 첫 위치의 좌표는 무조건 (10,100)으로 지정
@@ -129,7 +124,7 @@
             // x좌표의 최대값인 MAX에 맞추기 위하여 전체 이동길이가 MAX보다 큰 경우, 작은 경우로 나눠서 계산
             if(_MAX>start_end_distance)
             {
-                final_location=[[Marker alloc]init];
+                final_location=[[VLOMarker alloc]init];
                 
                 x_diff=[self get_distance:input_location1 :input_location2];
                 
@@ -153,7 +148,7 @@
                 
                 // 여기서부터 이전 좌표값을 가져와 변화값에 따라 증가 혹은 감소
                 NSInteger n2=[user_coordinates count];
-                Marker * tmp=[user_coordinates objectAtIndex:n2-1];
+                VLOMarker * tmp=[user_coordinates objectAtIndex:n2-1];
                 
                 final_location.x=tmp.x+x_diff;
                 final_location.y=tmp.y+y_diff;
@@ -170,7 +165,7 @@
             }
             else if(_MAX<start_end_distance)
             {
-                final_location=[[Marker alloc]init];
+                final_location=[[VLOMarker alloc]init];
                 
                 x_diff=[self get_distance:input_location1 :input_location2];
                 x_diff=x_diff-((start_end_distance-_MAX)/n);
@@ -186,7 +181,7 @@
                 }
                 
                 NSInteger n2=[user_coordinates count];
-                Marker * tmp=[user_coordinates objectAtIndex:n2-1];
+                VLOMarker * tmp=[user_coordinates objectAtIndex:n2-1];
                 
                 final_location.x=tmp.x+x_diff;
                 final_location.y=tmp.y+y_diff;
