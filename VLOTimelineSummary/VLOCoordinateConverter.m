@@ -26,29 +26,33 @@
     return self;
 }
 
-- (NSArray *) getCoordinates:(NSArray *)placesList {
-    if (placesList.count < 1) {
+- (NSArray *) getCoordinates:(NSArray *)originalPlaceList {
+    
+    if (originalPlaceList.count < 1) {
         return [NSArray array];
     }
     
-    NSMutableArray *longitudeDiffList = [NSMutableArray arrayWithCapacity:placesList.count - 1];
-    NSMutableArray *latitudeList = [[NSMutableArray alloc] initWithCapacity:placesList.count];
-    [self initializeLists:placesList :longitudeDiffList :latitudeList];
+    NSMutableArray *placeList = [originalPlaceList mutableCopy];
+    NSMutableArray *longitudeDiffList = [NSMutableArray arrayWithCapacity:placeList.count - 1];
+    NSMutableArray *latitudeList = [[NSMutableArray alloc] initWithCapacity:placeList.count];
+    [self initializeLists:placeList :longitudeDiffList :latitudeList];
     
-    NSMutableArray *markerList = [[NSMutableArray alloc] initWithCapacity:placesList.count];
+    NSLog(@"countt: %li", placeList.count);
+    
+    NSMutableArray *markerList = [[NSMutableArray alloc] initWithCapacity:placeList.count];
     
     // First marker
     VLOMarker *firstMarker = [[VLOMarker alloc] init];
     CGFloat latitude = [[latitudeList objectAtIndex:0] floatValue];
-    firstMarker.x = (placesList.count == 1) ? _actualWidth/2 + MARKER_SIZE : MARKER_SIZE;
-    firstMarker.y = (placesList.count == 1) ? _actualHeight/2 + VERTICAL_PADDING : [self getYCoordinate:latitude];
-    firstMarker.name = ((VLOPlace *)[placesList objectAtIndex:0]).name;
+    firstMarker.x = (placeList.count == 1) ? _actualWidth/2 + MARKER_SIZE : MARKER_SIZE;
+    firstMarker.y = (placeList.count == 1) ? _actualHeight/2 + VERTICAL_PADDING : [self getYCoordinate:latitude];
+    firstMarker.name = ((VLOPlace *)[placeList objectAtIndex:0]).name;
     [markerList addObject:firstMarker];
     
     // Every other markers (index 1 < )
-    for (NSInteger i = 1; i < placesList.count; i++) {
+    for (NSInteger i = 1; i < placeList.count; i++) {
         
-        VLOPlace *currPlace = [placesList objectAtIndex:i];
+        VLOPlace *currPlace = [placeList objectAtIndex:i];
         
         CGFloat longitudeDiffFromPreviousPlace = [[longitudeDiffList objectAtIndex:i-1] floatValue];
         CGFloat currentLatitude = [[latitudeList objectAtIndex:i] floatValue];
@@ -59,32 +63,47 @@
         newMarker.x = [self getXCoordinate:longitudeDiffFromPreviousPlace :prevMarker.x];
         newMarker.y = [self getYCoordinate:currentLatitude];
         newMarker.name = currPlace.name;
-
+        
         [markerList addObject:newMarker];
     }
 
     return markerList;
 }
 
-- (void) initializeLists:(NSArray *)placesList :(NSMutableArray *)longitudeDiffList :(NSMutableArray *)latitudeList {
+- (void) initializeLists:(NSMutableArray *)placeList :(NSMutableArray *)longitudeDiffList :(NSMutableArray *)latitudeList {
     
-    for (NSInteger i = 0; i < placesList.count - 1; i++) {
+    NSMutableArray *originalPlaceList = [placeList mutableCopy];
+    
+    for (NSInteger i = 0; i < originalPlaceList.count - 1; i++) {
         
-        VLOPlace *currPlace = [placesList objectAtIndex:i];
-        VLOPlace *nextPlace = [placesList objectAtIndex:i+1];
+        VLOPlace *currPlace = [originalPlaceList objectAtIndex:i];
+        VLOPlace *nextPlace = [originalPlaceList objectAtIndex:i+1];
         
-        // Longitude
-        CGFloat longitudeDiff = fabs([nextPlace.coordinates.longitude floatValue] - [currPlace.coordinates.longitude floatValue]);
-        [longitudeDiffList addObject:[NSNumber numberWithFloat:longitudeDiff]];
-        _longitudeDiffSum += longitudeDiff;
-        
-        // Latitude
-        CGFloat latitude = [nextPlace.coordinates.latitude floatValue];
-        [latitudeList addObject:[NSNumber numberWithFloat:latitude]];
+        BOOL sameLong = currPlace.coordinates.longitude.floatValue == nextPlace.coordinates.longitude.floatValue;
+        BOOL sameLat = currPlace.coordinates.latitude.floatValue == nextPlace.coordinates.latitude.floatValue;
+        BOOL sameName = [currPlace.name isEqualToString:nextPlace.name];
+
+        if (sameLong && sameLat && sameName) {
+
+            // 연속으로 동일한 마커 제거. removeObject 메쏘드는 같은 마커 모두 지움.
+            [placeList removeObjectAtIndex:i];
+
+        } else {
+            
+            // Longitude
+            CGFloat longitudeDiff = fabs(nextPlace.coordinates.longitude.floatValue - currPlace.coordinates.longitude.floatValue);
+            [longitudeDiffList addObject:[NSNumber numberWithFloat:longitudeDiff]];
+            _longitudeDiffSum += longitudeDiff;
+            
+            // Latitude
+            CGFloat latitude = nextPlace.coordinates.latitude.floatValue;
+            [latitudeList addObject:[NSNumber numberWithFloat:latitude]];
+
+        }
     }
     
     // Add last latitude.
-    VLOPlace *lastPlace = [placesList lastObject];
+    VLOPlace *lastPlace = [originalPlaceList lastObject];
     CGFloat lastLatitude = [lastPlace.coordinates.latitude floatValue];
     [latitudeList addObject:[NSNumber numberWithFloat:lastLatitude]];
     
