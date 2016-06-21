@@ -13,7 +13,6 @@
 #import <SDWebImage/UIImageView+WebCache.h>
 
 #import "VLOTimelineSummary.h"
-#define SUMMARY_HEIGHT 100
 
 
 @class VLOTravelListViewController;
