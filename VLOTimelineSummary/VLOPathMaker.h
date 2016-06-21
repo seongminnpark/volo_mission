@@ -8,7 +8,7 @@
 // 다음 세 상수들로 선의 복잡한 정도를 조절합니다.
 #define MAX_LINE_DIVISION 1
 #define MIN_DISTANCE 10.0
-#define ANGLE_DEVIATION 15
+#define ANGLE_DEVIATION 11
 
 #define LINE_WIDTH 4.0
 #define ALPHA 2.0

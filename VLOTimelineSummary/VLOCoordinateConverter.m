@@ -17,7 +17,7 @@
 
 - (id) init {
     self = [super init];
-    _actualWidth = [VLOUtilities screenWidth] - MARKER_SIZE * 2;
+    _actualWidth = [VLOUtilities screenWidth] - HORIZONTAL_PADDING * 2;
     _actualHeight = SUMMARY_HEIGHT - VERTICAL_PADDING * 2;
     
     _longitudeDiffSum = 0;
@@ -25,6 +25,7 @@
     _latitudeMax = 0;
     return self;
 }
+
 
 - (NSArray *) getCoordinates:(NSArray *)originalPlaceList {
     
@@ -36,15 +37,13 @@
     NSMutableArray *longitudeDiffList = [NSMutableArray arrayWithCapacity:placeList.count - 1];
     NSMutableArray *latitudeList = [[NSMutableArray alloc] initWithCapacity:placeList.count];
     [self initializeLists:placeList :longitudeDiffList :latitudeList];
-    
-    NSLog(@"countt: %li", placeList.count);
-    
+
     NSMutableArray *markerList = [[NSMutableArray alloc] initWithCapacity:placeList.count];
     
     // First marker
     VLOMarker *firstMarker = [[VLOMarker alloc] init];
     CGFloat latitude = [[latitudeList objectAtIndex:0] floatValue];
-    firstMarker.x = (placeList.count == 1) ? _actualWidth/2 + MARKER_SIZE : MARKER_SIZE;
+    firstMarker.x = (placeList.count == 1) ? _actualWidth/2 + HORIZONTAL_PADDING : HORIZONTAL_PADDING;
     firstMarker.y = (placeList.count == 1) ? _actualHeight/2 + VERTICAL_PADDING : [self getYCoordinate:latitude];
     firstMarker.name = ((VLOPlace *)[placeList objectAtIndex:0]).name;
     [markerList addObject:firstMarker];
@@ -69,6 +68,7 @@
 
     return markerList;
 }
+
 
 - (void) initializeLists:(NSMutableArray *)placeList :(NSMutableArray *)longitudeDiffList :(NSMutableArray *)latitudeList {
     
@@ -113,18 +113,39 @@
     _latitudeMax = maxLatitude;
 }
 
+
 - (CGFloat) getXCoordinate:(CGFloat)longitudeDiff :(CGFloat)previousX {
+    
     // 모든 마커의 x좌표가 같은 경우 모든 마커는 써머리 뷰 중간에 놓음.
     CGFloat longitudeRatio = (_longitudeDiffSum == 0) ? 0.5 : longitudeDiff / _longitudeDiffSum;
     CGFloat xIncrement = longitudeRatio * _actualWidth;
     CGFloat newX = previousX + xIncrement;
+    
+//    // 가로 variation을 줄이기 위해 newX의 중앙(_actualWidth/2 + HORIZONTAL_PADDING)과의 거리는 반으로 줄인다.
+//    if (HORIZONTAL_SQUASH != 0) {
+//        NSLog(@"newx: %f", newX);
+//        CGFloat distFromMiddle = _actualWidth/2 + HORIZONTAL_PADDING - newX;
+//        newX = newX + distFromMiddle/HORIZONTAL_SQUASH;
+//        NSLog(@"    dist: %f", distFromMiddle);
+//        NSLog(@"    newxDone: %f", newX);
+//    }
+    
     return newX;
 }
 
+
 - (CGFloat) getYCoordinate:(CGFloat)currentLatutude {
+    
     // 모든 마커의 y좌표가 같은 경우 모든 마커는 써머리 뷰 중간에 놓음.
     CGFloat latitudeRatio = (_latitudeMaxDiff == 0) ? 0.5 : (_latitudeMax - currentLatutude) / _latitudeMaxDiff;
     CGFloat newY = latitudeRatio * _actualHeight + VERTICAL_PADDING;
+    
+    // 세로 variation을 줄이기 위해 newY의 중앙(_actualHeight/2 + VERTICAL_PADDING)과의 거리는 반으로 줄인다.
+    if (VERTICAL_SQUASH != 0) {
+        CGFloat distFromMiddle = _actualHeight/2 + VERTICAL_PADDING - newY;
+        newY = newY + distFromMiddle/VERTICAL_SQUASH;
+    }
+    
     return newY;
 }
 
