@@ -113,6 +113,7 @@
 #pragma mark - Interpolation
 
 - (UIBezierPath *) interpolatePoints:(NSArray *)pointList {
+
     UIBezierPath *path = [UIBezierPath bezierPath];
     if (pointList.count < 2) {
         return path;
@@ -141,7 +142,7 @@
             /*  선을 더 부드럽게 만드는 로직. */
             
             // 점들이 집중된 구간은 커브를 추가하지 않습니다.
-            BOOL far_enough = fabs(p2.x - p1.x) > 2;
+            BOOL far_enough = fabs(p2.x - p1.x) > FAR_ENOUGH;
             BOOL last_point = CGPointEqualToPoint(
                                                   p2,((NSValue *)mutablePointList.lastObject).CGPointValue);
             if (far_enough || last_point) {
@@ -150,8 +151,7 @@
             
         }
     }
-    path.lineWidth = LINE_WIDTH;
-    path.miterLimit = MITERLIM;
+    
     return path;
 }
 

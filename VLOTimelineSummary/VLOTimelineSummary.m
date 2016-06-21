@@ -18,6 +18,7 @@
     NSArray *markerList = [converter getCoordinates:placeList];
 
     _animationMaker = [[VLOPathAnimationMaker alloc] initWithView:summaryView andMarkerList:markerList];
+    
     return self;
     
 }
