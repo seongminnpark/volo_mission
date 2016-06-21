@@ -1,6 +1,5 @@
-//
 //  VLOPathAnimationMaker.m
-//
+
 
 #import "VLOPathAnimationMaker.h"
 
@@ -39,8 +38,8 @@
     CGFloat totalDuration = 0;
     for (NSInteger i = 1; i < markerList.count; i++) {
         // 새로운 path 생성.
-        Marker *prevMarker = [markerList objectAtIndex:i-1];
-        Marker *currMarker = [markerList objectAtIndex:i];
+        VLOMarker *prevMarker = [markerList objectAtIndex:i-1];
+        VLOMarker *currMarker = [markerList objectAtIndex:i];
         CGPoint prevPoint = CGPointMake(prevMarker.x, prevMarker.y);
         CGPoint currPoint = CGPointMake(currMarker.x, currMarker.y);
         UIBezierPath *newPath = [_pathMaker pathBetweenPoint:prevPoint point:currPoint];
@@ -51,7 +50,7 @@
         [self addPathAnimation:newPath duration:duration delay:totalDuration];
         
         // 마커 애니메이션 추가.
-        Marker *marker = (Marker *) [markerList objectAtIndex:i-1];
+        VLOMarker *marker = (VLOMarker *) [markerList objectAtIndex:i-1];
         [self addMarkerAnimation:marker delay:totalDuration];
         
         totalDuration += duration;
@@ -60,7 +59,7 @@
     
     if (markerList.count > 0) {
         // 마지막 마커 추가.
-        Marker *marker = (Marker *) [markerList objectAtIndex:markerList.count-1];
+        VLOMarker *marker = (VLOMarker *) [markerList objectAtIndex:markerList.count-1];
         [self addMarkerAnimation:marker delay:totalDuration];
     }
     
@@ -87,7 +86,7 @@
     [pathLayer addAnimation:pathDrawAnimation forKey:@"strokeEnd"];
 }
 
-- (void) addMarkerAnimation:(Marker *)marker delay:(CGFloat)delay {
+- (void) addMarkerAnimation:(VLOMarker *)marker delay:(CGFloat)delay {
     UIView *markerView = [marker getMarkerView];
     
     // 마커 애니메이션.

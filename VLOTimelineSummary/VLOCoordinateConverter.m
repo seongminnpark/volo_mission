@@ -1,10 +1,5 @@
-//
 //  VLOCoordinateConverter.m
-//  Volo
-//
-//  Created by Seongmin on 6/20/16.
-//  Copyright © 2016 SK Planet. All rights reserved.
-//
+
 
 #import "VLOCoordinateConverter.h"
 
@@ -43,7 +38,7 @@
     NSMutableArray *markerList = [[NSMutableArray alloc] initWithCapacity:placesList.count];
     
     // First marker
-    Marker *firstMarker = [[Marker alloc] init];
+    VLOMarker *firstMarker = [[VLOMarker alloc] init];
     CGFloat latitude = [[latitudeList objectAtIndex:0] floatValue];
     firstMarker.x = (placesList.count == 1) ? _actualWidth/2 + MARKER_SIZE: MARKER_SIZE;
     firstMarker.y = (placesList.count == 1) ? _actualHeight/2 + MARKER_VERTICAL_OFFSET: [self getYCoordinate:latitude];
@@ -57,8 +52,8 @@
         CGFloat longitudeDiffFromPreviousPlace = [[longitudeDiffList objectAtIndex:i-1] floatValue];
         CGFloat currentLatitude = [[latitudeList objectAtIndex:i] floatValue];
         
-        Marker *prevMarker = [markerList objectAtIndex:i-1];
-        Marker *newMarker = [[Marker alloc] init];
+        VLOMarker *prevMarker = [markerList objectAtIndex:i-1];
+        VLOMarker *newMarker = [[VLOMarker alloc] init];
         
         newMarker.x = [self getXCoordinate:longitudeDiffFromPreviousPlace :prevMarker.x];
         newMarker.y = [self getYCoordinate:currentLatitude];

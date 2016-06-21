@@ -1,10 +1,5 @@
-//
-//  Header.h
-//  VLOTimelineSummary
-//
-//  Created by M on 2016. 6. 14..
-//  Copyright © 2016년 M. All rights reserved.
-//
+// VLOTimelineSummary.h
+
 
 #import <UIKit/UIKit.h>
 #import "getCoordinates.h"
@@ -20,7 +15,7 @@
 @property (strong,nonatomic) GetCoordinates * gc;
 @property (strong,nonatomic) VLOPathAnimationMaker * animationMaker;
 
-- (id)initWithView:(UIView *)summaryView andPlaceList:(NSArray *)place_list;
+- (id)initWithView:(UIView *)summaryView andPlaceList:(NSArray *)placeList;
 - (void) animateSummary;
 
 @end

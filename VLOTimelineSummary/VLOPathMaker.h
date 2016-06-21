@@ -1,6 +1,5 @@
-//
 //  VLOPathMaker.h
-//
+
 
 #import <math.h>
 #import <Foundation/Foundation.h>

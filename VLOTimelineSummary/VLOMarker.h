@@ -1,15 +1,9 @@
-//
 //  Marker.h
-//  getCoordinates(ios)
-//
-//  Created by M on 2016. 6. 10..
-//  Copyright © 2016년 M. All rights reserved.
-//
+
 
 
 // 화면상의 좌표값을 담을 클래스
 
-#import <CoreGraphics/CGBase.h>
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
@@ -25,8 +19,8 @@
 
 - (UIView *) getMarkerView;
 
-@property (nonatomic)CGFloat x;
-@property (nonatomic)CGFloat y;
-@property (nonatomic)NSString *name;
+@property (nonatomic) CGFloat x;
+@property (nonatomic) CGFloat y;
+@property (nonatomic) NSString *name;
 
 @end

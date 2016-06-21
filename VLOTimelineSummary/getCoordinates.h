@@ -1,10 +1,5 @@
-//
 //  getCoordinates.h
-//  getCoordinates(ios)
-//
-//  Created by M on 2016. 6. 8..
-//  Copyright © 2016년 M. All rights reserved.
-//
+
 
 #define getCoordinates_h
 #import <CoreGraphics/CGBase.h>
@@ -12,7 +7,7 @@
 // 받아온 위치 정보를 기반으로 화면상의 좌표를 계산하는 클래스
 
 //@class Location;
-@class Marker;
+@class VLOMarker;
 @class VLOLocationCoordinate;
 @class VLOPlace;
 
@@ -31,7 +26,7 @@
     VLOPlace * input_place2;
     VLOLocationCoordinate * input_location1;
     VLOLocationCoordinate * input_location2;
-    Marker * final_location;
+    VLOMarker * final_location;
     
     
     
