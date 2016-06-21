@@ -14,8 +14,8 @@
 {
     self = [super init];
     
-    VLOCoordinateConverter *conv = [[VLOCoordinateConverter alloc] init];
-    NSArray *markerList = [conv getCoordinates:placeList];
+    VLOCoordinateConverter *converter = [[VLOCoordinateConverter alloc] init];
+    NSArray *markerList = [converter getCoordinates:placeList];
 
     _animationMaker = [[VLOPathAnimationMaker alloc] initWithView:summaryView andMarkerList:markerList];
     return self;

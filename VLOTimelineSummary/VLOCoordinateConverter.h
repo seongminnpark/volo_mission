@@ -9,7 +9,7 @@
 #import "VLOPlace.h"
 #import "VLOTimeLineSummary.h"
 
-#define MARKER_VERTICAL_OFFSET MARKER_SIZE + MARKER_LABEL_HEIGHT
+#define VERTICAL_PADDING MARKER_SIZE + MARKER_LABEL_HEIGHT
 
 @interface VLOCoordinateConverter : NSObject
 

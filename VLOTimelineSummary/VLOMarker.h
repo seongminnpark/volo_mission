@@ -17,6 +17,7 @@
 
 @interface VLOMarker : NSObject
 
++ (CGFloat) distanceBetweenMarker1:(VLOMarker *)marker1 Marker2:(VLOMarker *)marker2;
 - (UIView *) getMarkerView;
 
 @property (nonatomic) CGFloat x;

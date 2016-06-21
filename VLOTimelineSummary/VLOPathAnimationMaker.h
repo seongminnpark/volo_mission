@@ -2,6 +2,7 @@
 
 
 #import <UIKit/UIKit.h>
+#import "VLOUtilities.h"
 #import "VLOPathMaker.h"
 #import "VLOMarker.h"
 
