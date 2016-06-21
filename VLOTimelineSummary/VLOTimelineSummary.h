@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "getCoordinates.h"
 #import "VLOPathAnimationMaker.h"
-#import "Marker.h"
+#import "VLOMarker.h"
 #import "VLOCoordinateConverter.h"
 #define SUMMARY_HEIGHT 100
 

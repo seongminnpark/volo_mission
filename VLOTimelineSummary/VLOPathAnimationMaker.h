@@ -5,7 +5,7 @@
 
 #import <UIKit/UIKit.h>
 #import "VLOPathMaker.h"
-#import "Marker.h"
+#import "VLOMarker.h"
 
 #define ANIMATION_DURATION 2
 

@@ -21,7 +21,7 @@
 #define MARKER_IMAGE_NAME @"marker5.png"
 
 
-@interface Marker : NSObject
+@interface VLOMarker : NSObject
 
 - (UIView *) getMarkerView;
 

@@ -6,9 +6,9 @@
 //  Copyright © 2016년 M. All rights reserved.
 //
 
-#import "Marker.h"
+#import "VLOMarker.h"
 
-@implementation Marker
+@implementation VLOMarker
 @synthesize x;
 @synthesize y;
 
