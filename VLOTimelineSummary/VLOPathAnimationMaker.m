@@ -45,7 +45,7 @@
         CGPoint currPoint = CGPointMake(currMarker.x, currMarker.y);
         UIBezierPath *newPath = [_pathMaker pathBetweenPoint:prevPoint point:currPoint];
         
-        CGFloat duration = WHOLE_DURATION * (currPoint.x - prevPoint.x) / _screenWidth;
+        CGFloat duration = ANIMATION_DURATION * (currPoint.x - prevPoint.x) / _screenWidth;
         
         // Path 애니메이션 추가.
         [self addPathAnimation:newPath duration:duration delay:totalDuration];

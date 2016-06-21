@@ -15,11 +15,13 @@
 @implementation VLOTimelineSummary
 
 
-- (id)initWithView:(UIView *)summaryView andLocationList:(NSArray *)location_list
+- (id)initWithView:(UIView *)summaryView andPlaceList:(NSArray *)place_list
 {
     self = [super init];
-    _gc = [[GetCoordinates alloc] initWithLocation:location_list];
-    NSArray *marker_list=[_gc get_coordinates:location_list];
+//    _gc = [[GetCoordinates alloc] initWithLocation:location_list];
+//    NSArray *marker_list=[_gc get_coordinates:location_list];
+    VLOCoordinateConverter *conv = [[VLOCoordinateConverter alloc] init];
+    NSArray *marker_list = [conv getCoordinates:place_list];
     
 //    NSMutableArray *marker_list=[NSMutableArray array];
 //    Marker * m1 = [[Marker alloc] init];

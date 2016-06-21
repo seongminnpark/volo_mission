@@ -7,12 +7,7 @@
 #import "VLOPathMaker.h"
 #import "Marker.h"
 
-#define ANIMATION_VERTICAL_LIMIT 0.7
-#define BUTTON_PADDING 10.0
-#define BUTTON_HEIGHT_RATIO 0.1
-#define WHOLE_DURATION 2
-#define MARKER_ANIMATION_DURATION 0.3
-#define MARKER_TRAVEL 20.0
+#define ANIMATION_DURATION 2
 
 /**
  *  `VLOPathAnimationMaker`는 주어진 Marker의 목록으로 지도 같이 구불구불한 길을 그리는 
