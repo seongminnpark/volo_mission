@@ -40,8 +40,8 @@
     // First marker
     VLOMarker *firstMarker = [[VLOMarker alloc] init];
     CGFloat latitude = [[latitudeList objectAtIndex:0] floatValue];
-    firstMarker.x = (placesList.count == 1) ? _actualWidth/2 + MARKER_SIZE: MARKER_SIZE;
-    firstMarker.y = (placesList.count == 1) ? _actualHeight/2 + VERTICAL_PADDING: [self getYCoordinate:latitude];
+    firstMarker.x = (placesList.count == 1) ? _actualWidth/2 + MARKER_SIZE : MARKER_SIZE;
+    firstMarker.y = (placesList.count == 1) ? _actualHeight/2 + VERTICAL_PADDING : [self getYCoordinate:latitude];
     firstMarker.name = ((VLOPlace *)[placesList objectAtIndex:0]).name;
     [markerList addObject:firstMarker];
     
@@ -59,10 +59,10 @@
         newMarker.x = [self getXCoordinate:longitudeDiffFromPreviousPlace :prevMarker.x];
         newMarker.y = [self getYCoordinate:currentLatitude];
         newMarker.name = currPlace.name;
-        
+
         [markerList addObject:newMarker];
     }
-    
+
     return markerList;
 }
 
@@ -95,14 +95,16 @@
 }
 
 - (CGFloat) getXCoordinate:(CGFloat)longitudeDiff :(CGFloat)previousX {
-    CGFloat longitudeRatio = longitudeDiff / _longitudeDiffSum;
+    // 모든 마커의 x좌표가 같은 경우 모든 마커는 써머리 뷰 중간에 놓음.
+    CGFloat longitudeRatio = (_longitudeDiffSum == 0) ? 0.5 : longitudeDiff / _longitudeDiffSum;
     CGFloat xIncrement = longitudeRatio * _actualWidth;
     CGFloat newX = previousX + xIncrement;
     return newX;
 }
 
 - (CGFloat) getYCoordinate:(CGFloat)currentLatutude {
-    CGFloat latitudeRatio = (_latitudeMax - currentLatutude) / _latitudeMaxDiff;
+    // 모든 마커의 y좌표가 같은 경우 모든 마커는 써머리 뷰 중간에 놓음.
+    CGFloat latitudeRatio = (_latitudeMaxDiff == 0) ? 0.5 : (_latitudeMax - currentLatutude) / _latitudeMaxDiff;
     CGFloat newY = latitudeRatio * _actualHeight + VERTICAL_PADDING;
     return newY;
 }

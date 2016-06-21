@@ -29,37 +29,40 @@
 }
 
 - (void) drawFromMarkerArray:(NSArray *)markerList {
+    
+    if (markerList.count < 1) {
+        return;
+    }
+    
     CGFloat totalDuration = 0;
     CGFloat actualWidth = [VLOUtilities screenWidth] - MARKER_SIZE * 2;
     
-    for (NSInteger i = 1; i < markerList.count; i++) {
+    for (NSInteger i = 0; i < markerList.count - 1; i++) {
+  
         // 새로운 path 생성.
-        VLOMarker *prevMarker = [markerList objectAtIndex:i-1];
         VLOMarker *currMarker = [markerList objectAtIndex:i];
-        CGPoint prevPoint = CGPointMake(prevMarker.x, prevMarker.y);
+        VLOMarker *nextMarker = [markerList objectAtIndex:i+1];
+        
         CGPoint currPoint = CGPointMake(currMarker.x, currMarker.y);
-        UIBezierPath *newPath = [_pathMaker pathBetweenPoint:prevPoint point:currPoint];
+        CGPoint nextPoint = CGPointMake(nextMarker.x, nextMarker.y);
+        UIBezierPath *newPath = [_pathMaker pathBetweenPoint:currPoint point:nextPoint];
     
-        CGFloat durationFraction = [VLOMarker distanceBetweenMarker1:prevMarker Marker2:currMarker] / actualWidth;
+        CGFloat durationFraction = [VLOMarker distanceBetweenMarker1:currMarker Marker2:nextMarker] / actualWidth;
         CGFloat duration = ANIMATION_DURATION * durationFraction;
         
         // Path 애니메이션 추가.
         [self addPathAnimation:newPath duration:duration delay:totalDuration];
         
         // 마커 애니메이션 추가.
-        VLOMarker *marker = (VLOMarker *) [markerList objectAtIndex:i-1];
+        VLOMarker *marker = (VLOMarker *) [markerList objectAtIndex:i];
         [self addMarkerAnimation:marker delay:totalDuration];
         
         totalDuration += duration;
-        
     }
-    
-    if (markerList.count > 0) {
-        // 마지막 마커 추가.
-        VLOMarker *marker = (VLOMarker *) [markerList objectAtIndex:markerList.count-1];
-        [self addMarkerAnimation:marker delay:totalDuration];
-    }
-    
+   
+    // 마지막 마커 추가.
+    VLOMarker *marker = (VLOMarker *) [markerList objectAtIndex:markerList.count-1];
+    [self addMarkerAnimation:marker delay:totalDuration];
 }
 
 - (void) addPathAnimation:(UIBezierPath *)path duration:(CGFloat)duration delay:(CGFloat)delay {
@@ -70,7 +73,9 @@
     pathLayer.lineWidth = LINE_WIDTH;
     pathLayer.strokeStart = 0.0;
     pathLayer.strokeEnd = 1.0;
-    pathLayer.lineJoin = kCALineJoinBevel;
+    pathLayer.lineJoin = LINEJOIN;
+    pathLayer.lineCap = LINECAP;
+    pathLayer.miterLimit = MITERLIM;
     [_animationLayer addSublayer:pathLayer];
     
     CABasicAnimation *pathDrawAnimation = [CABasicAnimation animationWithKeyPath:@"strokeEnd"];
