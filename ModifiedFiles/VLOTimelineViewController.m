@@ -424,7 +424,7 @@
     
 
     [_tableView addSubview:_summaryView];
-    VLOTimelineSummary *summaryMaker = [[VLOTimelineSummary alloc] initWithView:_summaryView andLocationList:placeList];
+    VLOTimelineSummary *summaryMaker = [[VLOTimelineSummary alloc] initWithView:_summaryView andPlaceList:placeList];
     [summaryMaker animateSummary];
 }
 
