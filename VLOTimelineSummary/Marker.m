@@ -22,7 +22,7 @@
     
     // 마커 레이블 생성.
     UILabel *markerLabel = [[UILabel alloc] initWithFrame:
-                            CGRectMake(0, -MARKER_LABEL_HEIGHT -MARKER_TRAVEL, MARKER_SIZE, MARKER_LABEL_HEIGHT)];
+                            CGRectMake(-MARKER_SIZE/2, -MARKER_LABEL_HEIGHT -MARKER_TRAVEL, MARKER_LABEL_WIDTH, MARKER_LABEL_HEIGHT)];
     markerLabel.text = _name;
     markerLabel.font = [markerLabel.font fontWithSize:10];
     markerLabel.textAlignment = NSTextAlignmentCenter;
