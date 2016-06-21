@@ -9,6 +9,9 @@
 #import "VLOPlace.h"
 #import "VLOTimeLineSummary.h"
 
+#define HORIZONTAL_SQUASH 4 // 0이면 적용 안 됨.
+#define VERTICAL_SQUASH   5   // 0이면 적용 안 됨.
+#define HORIZONTAL_PADDING MARKER_SIZE
 #define VERTICAL_PADDING MARKER_SIZE + MARKER_LABEL_HEIGHT
 
 @interface VLOCoordinateConverter : NSObject
