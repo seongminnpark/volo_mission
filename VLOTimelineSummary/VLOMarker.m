@@ -78,6 +78,23 @@
         markerLabel.textAlignment = NSTextAlignmentCenter;
     }
     
+    // 마커 레이블 생성. 띄어쓰기가 있으면 여러줄로 나눔.
+    NSMutableArray *label_arr = [NSMutableArray array];
+    NSArray *name_split = [_name componentsSeparatedByString:@" "];
+    
+    for (NSInteger i = 0; i < name_split.count; i++)
+    {
+        
+        CGFloat label_top = -((name_split.count - i) * MARKER_LABEL_HEIGHT + MARKER_TRAVEL);
+        
+        UILabel *markerLabel = [[UILabel alloc] initWithFrame:
+                       CGRectMake(-MARKER_SIZE/2, label_top, MARKER_LABEL_WIDTH, MARKER_LABEL_HEIGHT)];
+        markerLabel.text = [name_split objectAtIndex:i];
+        markerLabel.font = [markerLabel.font fontWithSize:10];
+        markerLabel.textAlignment = NSTextAlignmentCenter;
+        
+        [label_arr addObject:markerLabel];
+    }
     
     // 마커 레이블 + 마커를 담은 UIView 생성.
     UIView *markerView = [[UIView alloc] initWithFrame:
@@ -98,6 +115,11 @@
     
     
     
+    for (UILabel *label in label_arr)
+    {
+        [markerView addSubview:label];
+    }
+
     return markerView;
 }
 
