@@ -28,7 +28,7 @@
     NSArray *name_split = [_name componentsSeparatedByString:@" "];
     Boolean place_name_three = FALSE;
     NSInteger cnt;
-
+    
     if(name_split.count > 3)
     {
         cnt = 3;
@@ -45,9 +45,9 @@
         CGFloat label_top = -((cnt - i) * MARKER_LABEL_HEIGHT + MARKER_TRAVEL);
         
         UILabel *markerLabel = [[UILabel alloc] initWithFrame:
-                       CGRectMake(-MARKER_SIZE/2, label_top, MARKER_LABEL_WIDTH, MARKER_LABEL_HEIGHT)];
+                                CGRectMake(-MARKER_SIZE/2, label_top, MARKER_LABEL_WIDTH, MARKER_LABEL_HEIGHT)];
         
-        if(place_name_three)
+        if(place_name_three && i == cnt-1)
         {
             markerLabel.text = [[name_split objectAtIndex:i] stringByAppendingString:@"..."];
         }
@@ -55,7 +55,6 @@
         {
             markerLabel.text = [name_split objectAtIndex:i];
         }
-        
         markerLabel.font = [markerLabel.font fontWithSize:10];
         markerLabel.textAlignment = NSTextAlignmentCenter;
         
@@ -71,7 +70,7 @@
     {
         [markerView addSubview:label];
     }
-
+    
     return markerView;
 }
 
