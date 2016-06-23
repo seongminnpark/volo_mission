@@ -26,38 +26,25 @@
     // 마커 레이블 생성. 띄어쓰기가 있으면 여러줄로 나눔.
     NSMutableArray *label_arr = [NSMutableArray array];
     NSArray *name_split = [_name componentsSeparatedByString:@" "];
-    Boolean place_name_three = FALSE;
-    NSInteger cnt;
-    
-    if(name_split.count > 3)
+   
+    // 레이블은 최대 세 줄로 표시.
+    for (NSInteger i = 0; i < name_split.count; i++)
     {
-        cnt = 3;
-        place_name_three = TRUE;
-    }
-    else
-    {
-        cnt = name_split.count;
-    }
-    
-    for (NSInteger i = 0; i < cnt; i++)
-    {
+        // 마커 이름이 네 줄 이상일 경우, 세 번째 줄에 "..." 추가.
+        if (i > 2) {
+            UILabel *thirdLabel = [label_arr objectAtIndex:2];
+            thirdLabel.text = [thirdLabel.text stringByAppendingString:@"..."];
+            break;
+        }
         
-        CGFloat label_top = -((cnt - i) * MARKER_LABEL_HEIGHT + MARKER_TRAVEL);
+        CGFloat labelOffsetAbove = MARKER_LABEL_HEIGHT * (i + 1) + MARKER_TRAVEL;
+        CGFloat label_top = _nameAbove ? - labelOffsetAbove : labelOffsetAbove - MARKER_LABEL_HEIGHT;
         
         UILabel *markerLabel = [[UILabel alloc] initWithFrame:
                                 CGRectMake(-MARKER_SIZE/2, label_top, MARKER_LABEL_WIDTH, MARKER_LABEL_HEIGHT)];
-        
-        if(place_name_three && i == cnt-1)
-        {
-            markerLabel.text = [[name_split objectAtIndex:i] stringByAppendingString:@"..."];
-        }
-        else
-        {
-            markerLabel.text = [name_split objectAtIndex:i];
-        }
+        markerLabel.text = [name_split objectAtIndex:i];
         markerLabel.font = [markerLabel.font fontWithSize:10];
         markerLabel.textAlignment = NSTextAlignmentCenter;
-        
         [label_arr addObject:markerLabel];
     }
     
