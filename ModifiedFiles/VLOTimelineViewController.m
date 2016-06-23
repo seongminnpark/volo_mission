@@ -254,7 +254,7 @@
     
     [self.view addSubview:_timelineNavigationBar];
     _tableViewController.syncDelegate = _timelineNavigationBar;
-    
+
     
     /*
     _menu = [[VLOTimelineMenu alloc] init];
@@ -1282,6 +1282,11 @@
 //    }];
 }
 
+ - (void)timelineTableViewController:(VLOTimelineTableViewController *)controller didUserProfileSelected:(VLOUser*)user
+ {
+     [self showTravelListWithUser:user];
+ }
+
 - (void)timelineTableViewControllerDidShowEmptyView:(VLOTimelineTableViewController *)controller
 {
     if (!_addCellMenuButton.isHaloEmitting) {
@@ -1709,7 +1714,7 @@
     _isOpenView = YES;
 }
 
-- (void)tableFooterSelectedUser:(VLOUser *)user
+- (void)showTravelListWithUser:(VLOUser *)user
 {
     if (_isOpenView) {
         return;

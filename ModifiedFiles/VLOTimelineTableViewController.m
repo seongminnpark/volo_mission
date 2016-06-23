@@ -933,6 +933,10 @@ static BOOL isFailMessageOn = NO;
     } else {
         [self updateTimelineLayout];
     }
+    
+    if ([_delegate respondsToSelector:@selector(showSummary)]) {
+        [_delegate performSelector:@selector(showSummary)];
+    }
 }
 
 - (void)updateTimelineLayout
@@ -1424,6 +1428,17 @@ static BOOL isFailMessageOn = NO;
 
 #pragma mark - Timeline cell delegate
 
+- (void)timelineCellDidSelectUserProfileView:(VLOTimelineCell *)cell
+{
+    _editingCell = cell;
+
+    NSArray *userProfiles = [cell.footerView.userProfileView profileViews];
+    VLOActionSheet *userListActionSheet = [self showUserListActionSheetWithUsers:userProfiles];
+    userListActionSheet.dismissHandler = ^{
+        [cell.footerView highlightUserProfile:NO];
+    };
+}
+
 - (void)timelineCellDidSelectMoreButton:(VLOTimelineCell *)cell
 {
     _editingCell = cell;
@@ -1436,7 +1451,6 @@ static BOOL isFailMessageOn = NO;
     };
 
 }
-
 
 - (void)timelineCellDidSelectShareButton:(VLOTimelineCell *)cell
 {
@@ -1511,7 +1525,7 @@ static BOOL isFailMessageOn = NO;
     else {
         
         if ([cell.footerView isMyCell]) {
-            [cell.footerView.likeView shake];
+            [cell.footerView.cellLikeButton shake];
             return;
         }
         
@@ -1533,7 +1547,7 @@ static BOOL isFailMessageOn = NO;
     VLOLog *log = cell.log;
     log.likeCount = log.likeCount + 1;
     log.isLiked = YES;
-    cell.log = log;
+    [cell updateLikeInfoWithLog:log];
     _travel.likeCount += 1;
     [self applyUILikeInfoChangedCell:cell];
 }
@@ -1543,7 +1557,7 @@ static BOOL isFailMessageOn = NO;
     VLOLog *log = cell.log;
     log.likeCount = log.likeCount - 1;
     log.isLiked = NO;
-    cell.log = log;
+    [cell updateLikeInfoWithLog:log];
     _travel.likeCount -= 1;
     [self applyUILikeInfoChangedCell:cell];
 }
@@ -1573,6 +1587,39 @@ static BOOL isFailMessageOn = NO;
     _travel.likeCount += diff;
 }
 
+# pragma mark - action sheet
+
+- (VLOActionSheet*)showUserListActionSheetWithUsers:(NSArray *)userProfiles
+{
+    VLOActionSheet *actionSheet = [[VLOActionSheet alloc] init];
+
+    if ( userProfiles.count > 0 ) {
+        UIFont *itemFont = [UIFont museoSans500WithSize:15.0f];
+        VLOActionSheetSection *userListSection = [[VLOActionSheetSection alloc] init];
+
+        for (VLOProfileImageView *userProfile in userProfiles) {
+            UIImage *userImage = userProfile.image;
+            NSString *userName = userProfile.user.displayName;
+
+            __block VLOUser *user = userProfile.user;
+            VLOActionSheetItem *userItem = [[VLOActionSheetItem alloc] initWithTitle:userName
+                                                                               color:[UIColor vlo_grayColor]
+                                                                                font:itemFont
+                                                                             handler:^{
+                if ([self.delegate respondsToSelector:@selector(timelineTableViewController:didUserProfileSelected:)]) {
+                    [self.delegate timelineTableViewController:self didUserProfileSelected:user];
+                }
+            }];
+            [userItem setIcon:userImage];
+            [userListSection addItem:userItem];
+        }
+        [actionSheet addSection:userListSection];
+
+        [actionSheet setCancelTitle:NSLocalizedString(@"OK",) andHandler:^{}];
+        [actionSheet showInViewController:self];
+    }
+    return actionSheet;
+}
 
 - (VLOActionSheet*)showShareActionSheetWithCellTypeName:(NSString *)type
 {
@@ -1740,114 +1787,8 @@ static BOOL isFailMessageOn = NO;
         UIColor *facebookColor = [UIColor colorWithHexString:@"#3A56A1"];
         UIColor *instagramColor = [UIColor colorWithHexString:@"#48769D"];
         UIColor *itemColor = [UIColor whiteColor];
-
-//        shareSection = [[VLOActionSheetSection alloc] init];
-//
-//        VLOActionSheetItem *facebookShareItem = [[VLOActionSheetItem alloc] initWithTitle:NSLocalizedString(@"timeline_share_menu_facebook", ) color:facebookColor font:itemFont handler:^{
-//
-//            VLOShare *shareManager = [VLOShare sharedInstance];
-//
-//            switch(sharedCellType) {
-//                case VLOLogTypeText:
-//                    [self shareViaFacebook:shareManager
-//                              withTextCell:(VLOTableViewTextCell *)_editingCell];
-//                    break;
-//                case VLOLogTypeTitle:
-//                    [self shareViaFacebook:shareManager
-//                             withQuoteCell:(VLOTableViewQuoteCell *)_editingCell];
-//                    break;
-//                case VLOLogTypePhoto:
-//                    [self shareViaFacebook:shareManager
-//                             withPhotoCell:(VLOTableViewPhotoCell *)_editingCell];
-//                    break;
-//                case VLOLogTypeMap:
-//                    [self shareViaFacebook:shareManager
-//                               withMapCell:(VLOTableViewMapCell *)_editingCell];
-//                    break;
-//                case VLOLogTypeRoute:
-//                    [self shareViaFacebook:shareManager
-//                             withRouteCell:(VLOTableViewRouteCell *)_editingCell];
-//                    break;
-//                default:
-//                    // ERROR REPORT
-//                    break;
-//            }
-//            NSInteger cellTarget = 1;
-//            if (![[VLOLocalStorage getCurrentUser].userId isEqualToString:_editingCell.log.user.userId]) {
-//                cellTarget = 2;
-//            }
-//            [VLOAnalyticsManager reportEventWithCategory:VLOCategoryCellShare action:VLOActionShareCellFB label:[VLOLog typeStringWithType:sharedCellType] andValue:@(cellTarget)];
-//            [VLOAnalyticsManager facebookTrackingEvent:VLOFBLogShareCellToFB];
-//            [Flurry logEvent:VLOFlurryCellShareToFacebook withParameters:@{@"cellId": _editingCell.log.timelineId}];
-//        }];
-//        facebookShareItem.backgroundColor = itemColor;
-//        [shareSection addItem:facebookShareItem];
-//        if (sharedCellType == VLOLogTypePhoto || sharedCellType == VLOLogTypeRoute) {
-//
-//            // Share to Instagram
-//            VLOActionSheetItem *instagramShareItem = [[VLOActionSheetItem alloc] initWithTitle:NSLocalizedString(@"timeline_share_menu_instagram", )  color:instagramColor font:itemFont handler:^{
-//
-//                NSURL *instagramURL = [NSURL URLWithString:@"instagram://app"];
-//                BOOL canOpenInstagram = [[UIApplication sharedApplication] canOpenURL:instagramURL];
-//
-//                if (canOpenInstagram) {
-//                    UIImage *image;
-//                    if (sharedCellType == VLOLogTypePhoto) {
-//                        VLOTableViewPhotoCell *photoCell = (VLOTableViewPhotoCell *)_editingCell;
-//                        image = [photoCell imageValueForInstagram];
-//                    }
-//                    else {
-//                        VLOTableViewRouteCell *routeCellForShare = [[VLOTableViewRouteCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:nil];
-//                        routeCellForShare.log = _editingCell.log;
-//                        image = [routeCellForShare imageValueForInstagram];
-//                        routeCellForShare = nil;
-//                    }
-//
-//                    NSString *photoFilePath = [NSString stringWithFormat:@"%@/voloinstgramphoto.igo",[NSHomeDirectory() stringByAppendingPathComponent:@"Documents"]];
-//
-//                    [UIImageJPEGRepresentation(image, 1.0) writeToFile:photoFilePath
-//                                                            atomically:YES];
-//
-//                    NSURL *fileURL = [NSURL fileURLWithPath:photoFilePath];
-//
-//                    NSString *caption = @"#withVOLO";
-//                    _documentInteractionController = [UIDocumentInteractionController interactionControllerWithURL:fileURL];
-//                    _documentInteractionController.UTI = @"com.instagram.exclusivegram";
-//                    _documentInteractionController.delegate = nil;
-//                    _documentInteractionController.annotation = [NSDictionary dictionaryWithObject:caption forKey:@"InstagramCaption"];
-//                    [_documentInteractionController presentOpenInMenuFromRect:CGRectZero inView:self.view animated:YES];
-//
-//                    [VLONetwork logInstagramShareInTravel:_travel withSuccess:^{
-//                    } failure:^(NSError *error, NSString *message) {
-//
-//                    }];
-//                    NSInteger cellTarget = 1;
-//                    if (![[VLOLocalStorage getCurrentUser].userId isEqualToString:_editingCell.log.user.userId]) {
-//                        cellTarget = 2;
-//                    }
-//                    [VLOAnalyticsManager reportEventWithCategory:VLOCategoryCellShare action:VLOActionShareCellInsta label:[VLOLog typeStringWithType:sharedCellType] andValue:@(cellTarget)];
-//                    [VLOAnalyticsManager facebookTrackingEvent:VLOFBLogShareCellToInsta];
-//                    [Flurry logEvent:VLOFlurryCellShareToInstagram withParameters:@{@"cellId": _editingCell.log.timelineId}];
-//                } else {
-//                    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"alert_title_instagram_not_found", )
-//                                                                                             message:NSLocalizedString(@"alert_message_instagram_not_found", )
-//                                                                                      preferredStyle:UIAlertControllerStyleAlert];
-//                    UIAlertAction *closeAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alert_close", )
-//                                                                          style:UIAlertActionStyleCancel
-//                                                                        handler:nil];
-//                    [alertController addAction:closeAction];
-//                    [self presentViewController:alertController animated:YES completion:nil];
-//                }
-//
-//            }];
-//            instagramShareItem.backgroundColor = itemColor;
-//
-//            [shareSection addItem:instagramShareItem];
-//        }
-        
         
         // menu
-        
         BOOL isMyLog = [_editingCell.log.user.userId isEqualToString:[VLOLocalStorage getCurrentUser].userId];
         
         NSString *addBelowTitleFormatStr = NSLocalizedString(@"timeline_more_addtobelow", );
@@ -1909,7 +1850,9 @@ static BOOL isFailMessageOn = NO;
                 [self.delegate timelineTableViewController:self didEditingWasStarted:YES];
                 [self editCell];
             }];
-            [editItem setIsAddPhotoItem:YES andUserProfileImage:((VLOProfileImageView *)[_editingCell.footerView.userViews firstObject]).image];
+            
+            VLOProfileImageView *firstProfileView = [_editingCell.footerView.userProfileView profileImageViewAtIndex:0];
+            [editItem setIsAddPhotoItem:YES andUserProfileImage:firstProfileView.image];
             
             VLOActionSheetSection *addPhotoSection = [[VLOActionSheetSection alloc] initWithItems:@[editItem, addBelowItem]];
             

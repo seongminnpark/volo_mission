@@ -49,6 +49,7 @@ typedef NS_ENUM(NSInteger, VLOScrollViewSpeed) {
 - (void)timelineTableViewController:(VLOTimelineTableViewController *)controller didEditingWasStarted:(BOOL)isStarted;
 - (void)timelineTableViewController:(VLOTimelineTableViewController *)controller didAddToBelowOfLog:(VLOLog *)log;
 - (void)timelineTableViewController:(VLOTimelineTableViewController *)controller didGetTravelServerId:(NSString *)serverIdf;
+- (void)timelineTableViewController:(VLOTimelineTableViewController *)controller didUserProfileSelected:(VLOUser*)user;
 
 - (void)timelineTableViewControllerWillAppear:(VLOTimelineTableViewController *)controller;
 - (void)timelineTableViewControllerWillDisAppear:(VLOTimelineTableViewController *)controller;
