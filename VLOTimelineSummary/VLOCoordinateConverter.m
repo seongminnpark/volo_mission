@@ -10,6 +10,8 @@
 @property () CGFloat longitudeDiffSum;
 @property () CGFloat latitudeMaxDiff;
 @property () CGFloat latitudeMax;
+@property () CGFloat horizontalLeftOver;
+@property () BOOL tooManyMarkers;
 
 @end
 
@@ -18,11 +20,12 @@
 - (id) init {
     self = [super init];
     _actualWidth = [VLOUtilities screenWidth] - HORIZONTAL_PADDING * 2;
-    _actualHeight = SUMMARY_HEIGHT - VERTICAL_PADDING * 2;
-    
+    _actualHeight = SUMMARY_HEIGHT - (VERTICAL_PADDING * 2);
     _longitudeDiffSum = 0;
     _latitudeMaxDiff = 0;
     _latitudeMax = 0;
+    _horizontalLeftOver = 0;
+    _tooManyMarkers = NO;
     return self;
 }
 
@@ -39,6 +42,9 @@
     [self initializeLists:placeList :longitudeDiffList :latitudeList];
     
     NSMutableArray *markerList = [[NSMutableArray alloc] initWithCapacity:placeList.count];
+    CGFloat noOverlapOffset = (placeList.count - 1) * (MARKER_SIZE * 2);
+    _horizontalLeftOver = _actualWidth - noOverlapOffset;
+    _tooManyMarkers = (_horizontalLeftOver < 0) ? YES : NO;
     
     // First marker
     VLOMarker *firstMarker = [[VLOMarker alloc] init];
@@ -46,6 +52,7 @@
     firstMarker.x = (placeList.count == 1) ? _actualWidth/2 + HORIZONTAL_PADDING : HORIZONTAL_PADDING;
     firstMarker.y = (placeList.count == 1) ? _actualHeight/2 + VERTICAL_PADDING : [self getYCoordinate:latitude];
     firstMarker.name = ((VLOPlace *)[placeList objectAtIndex:0]).name;
+    firstMarker.nameAbove = YES;
     [markerList addObject:firstMarker];
     
     // Every other markers (index 1 < )
@@ -61,6 +68,7 @@
         
         newMarker.x = [self getXCoordinate:longitudeDiffFromPreviousPlace :prevMarker.x];
         newMarker.y = [self getYCoordinate:currentLatitude];
+        newMarker.nameAbove = newMarker.x - MARKER_SIZE/2 > prevMarker.x + MARKER_SIZE/2;
         newMarker.name = currPlace.name;
         
         [markerList addObject:newMarker];
@@ -81,11 +89,11 @@
         
         BOOL sameLong = currPlace.coordinates.longitude.floatValue == nextPlace.coordinates.longitude.floatValue;
         BOOL sameLat = currPlace.coordinates.latitude.floatValue == nextPlace.coordinates.latitude.floatValue;
-        BOOL sameName = [currPlace.name isEqualToString:nextPlace.name];
+        //BOOL sameName = [currPlace.name isEqualToString:nextPlace.name];
         
-        if (sameLong && sameLat && sameName) {
+        if (sameLong && sameLat) {
             
-            // 연속으로 동일한 마커 제거. removeObject 메쏘드는 같은 마커 모두 지움.
+            // 연속으로 동일한 마커 제거.
             [placeList removeObjectAtIndex:i];
             
         } else {
@@ -118,7 +126,8 @@
     
     // 모든 마커의 x좌표가 같은 경우 모든 마커는 써머리 뷰 중간에 놓음.
     CGFloat longitudeRatio = (_longitudeDiffSum == 0) ? 0.5 : longitudeDiff / _longitudeDiffSum;
-    CGFloat xIncrement = longitudeRatio * _actualWidth;
+    CGFloat xIncrement = _tooManyMarkers ? longitudeRatio * _actualWidth
+    : longitudeRatio * _horizontalLeftOver + MARKER_SIZE * 2;
     CGFloat newX = previousX + xIncrement;
     
     //    // 가로 variation을 줄이기 위해 newX의 중앙(_actualWidth/2 + HORIZONTAL_PADDING)과의 거리는 반으로 줄인다.
