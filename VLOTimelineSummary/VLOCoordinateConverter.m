@@ -37,7 +37,7 @@
     NSMutableArray *longitudeDiffList = [NSMutableArray arrayWithCapacity:placeList.count - 1];
     NSMutableArray *latitudeList = [[NSMutableArray alloc] initWithCapacity:placeList.count];
     [self initializeLists:placeList :longitudeDiffList :latitudeList];
-
+    
     NSMutableArray *markerList = [[NSMutableArray alloc] initWithCapacity:placeList.count];
     
     // First marker
@@ -65,7 +65,7 @@
         
         [markerList addObject:newMarker];
     }
-
+    
     return markerList;
 }
 
@@ -82,12 +82,12 @@
         BOOL sameLong = currPlace.coordinates.longitude.floatValue == nextPlace.coordinates.longitude.floatValue;
         BOOL sameLat = currPlace.coordinates.latitude.floatValue == nextPlace.coordinates.latitude.floatValue;
         BOOL sameName = [currPlace.name isEqualToString:nextPlace.name];
-
+        
         if (sameLong && sameLat && sameName) {
-
+            
             // 연속으로 동일한 마커 제거. removeObject 메쏘드는 같은 마커 모두 지움.
             [placeList removeObjectAtIndex:i];
-
+            
         } else {
             
             // Longitude
@@ -98,7 +98,7 @@
             // Latitude
             CGFloat latitude = nextPlace.coordinates.latitude.floatValue;
             [latitudeList addObject:[NSNumber numberWithFloat:latitude]];
-
+            
         }
     }
     
@@ -121,14 +121,14 @@
     CGFloat xIncrement = longitudeRatio * _actualWidth;
     CGFloat newX = previousX + xIncrement;
     
-//    // 가로 variation을 줄이기 위해 newX의 중앙(_actualWidth/2 + HORIZONTAL_PADDING)과의 거리는 반으로 줄인다.
-//    if (HORIZONTAL_SQUASH != 0) {
-//        NSLog(@"newx: %f", newX);
-//        CGFloat distFromMiddle = _actualWidth/2 + HORIZONTAL_PADDING - newX;
-//        newX = newX + distFromMiddle/HORIZONTAL_SQUASH;
-//        NSLog(@"    dist: %f", distFromMiddle);
-//        NSLog(@"    newxDone: %f", newX);
-//    }
+    //    // 가로 variation을 줄이기 위해 newX의 중앙(_actualWidth/2 + HORIZONTAL_PADDING)과의 거리는 반으로 줄인다.
+    //    if (HORIZONTAL_SQUASH != 0) {
+    //        NSLog(@"newx: %f", newX);
+    //        CGFloat distFromMiddle = _actualWidth/2 + HORIZONTAL_PADDING - newX;
+    //        newX = newX + distFromMiddle/HORIZONTAL_SQUASH;
+    //        NSLog(@"    dist: %f", distFromMiddle);
+    //        NSLog(@"    newxDone: %f", newX);
+    //    }
     
     return newX;
 }
@@ -150,8 +150,3 @@
 }
 
 @end
-
-
-
-
-
