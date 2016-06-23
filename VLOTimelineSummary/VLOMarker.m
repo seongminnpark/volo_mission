@@ -37,8 +37,8 @@
             break;
         }
         
-        CGFloat labelOffsetAbove = MARKER_LABEL_HEIGHT * (i + 1) + MARKER_TRAVEL;
-        CGFloat label_top = _nameAbove ? - labelOffsetAbove : labelOffsetAbove - MARKER_LABEL_HEIGHT;
+        CGFloat labelOffset = MARKER_LABEL_HEIGHT * (name_split.count - i) + MARKER_TRAVEL;
+        CGFloat label_top = _nameAbove ? - labelOffset : labelOffset - MARKER_LABEL_HEIGHT;
         
         UILabel *markerLabel = [[UILabel alloc] initWithFrame:
                                 CGRectMake(-MARKER_SIZE/2, label_top, MARKER_LABEL_WIDTH, MARKER_LABEL_HEIGHT)];
