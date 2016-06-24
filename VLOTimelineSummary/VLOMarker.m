@@ -37,8 +37,7 @@
             break;
         }
         
-        CGFloat labelOffset = MARKER_LABEL_HEIGHT * (name_split.count - i) + MARKER_TRAVEL;
-        CGFloat label_top = _nameAbove ? - labelOffset : labelOffset - MARKER_LABEL_HEIGHT;
+        CGFloat label_top = [self getLabelTop:name_split.count :i];
         
         UILabel *markerLabel = [[UILabel alloc] initWithFrame:
                                 CGRectMake(-MARKER_SIZE/2, label_top, MARKER_LABEL_WIDTH, MARKER_LABEL_HEIGHT)];
@@ -59,6 +58,25 @@
     }
     
     return markerView;
+}
+
+- (CGFloat) getLabelTop:(NSInteger)nameSplitCount :(NSInteger)index {
+    CGFloat label_top;
+    CGFloat labelOffset;
+    
+    NSInteger wordCount = nameSplitCount;
+    if (wordCount > 3) {
+        wordCount = 3;
+    }
+    if (_nameAbove) {
+        labelOffset = MARKER_LABEL_HEIGHT * (wordCount - index) + MARKER_TRAVEL;
+        label_top = - labelOffset;
+    } else {
+        CGFloat labelOffset = MARKER_LABEL_HEIGHT * index + MARKER_TRAVEL;
+        label_top = labelOffset;
+    }
+    
+    return label_top;
 }
 
 @end

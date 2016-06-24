@@ -18,6 +18,6 @@
 @interface VLOCoordinateConverter : NSObject
 
 - (id) init;
-- (NSArray *) getCoordinates:(NSArray *)originalPlaceList;
+- (NSArray *) getCoordinates:(NSArray *)originalPlaceList; 
 
 @end
