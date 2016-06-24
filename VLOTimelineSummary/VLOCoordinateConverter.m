@@ -68,7 +68,8 @@
         
         newMarker.x = [self getXCoordinate:longitudeDiffFromPreviousPlace :prevMarker.x];
         newMarker.y = [self getYCoordinate:currentLatitude];
-        newMarker.nameAbove = newMarker.x - MARKER_SIZE/2 > prevMarker.x + MARKER_SIZE/2;
+        BOOL noOverlap = newMarker.x - MARKER_SIZE/2 <= prevMarker.x + MARKER_SIZE/2;
+        newMarker.nameAbove = noOverlap || !newMarker.nameAbove;
         newMarker.name = currPlace.name;
         
         [markerList addObject:newMarker];
