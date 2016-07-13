@@ -7,12 +7,11 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
-#define MARKER_SIZE 30.0
-#define MARKER_LABEL_HEIGHT 10.0
-#define MARKER_LABEL_WIDTH MARKER_SIZE * 2.0
-#define MARKER_ANIMATION_DURATION 0.3
-#define MARKER_TRAVEL 20.0
-#define MARKER_IMAGE_NAME @"marker5.png"
+#define MARKER_SIZE         30
+#define MARKER_LABEL_HEIGHT 10.0f
+#define MARKER_LABEL_WIDTH  MARKER_SIZE * 2.0f
+#define MARKER_TRAVEL       20.0f
+#define MARKER_IMAGE_NAME   @"marker5.png"
 
 
 @interface VLOMarker : NSObject
