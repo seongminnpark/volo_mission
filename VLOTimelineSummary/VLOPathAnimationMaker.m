@@ -48,7 +48,7 @@
         UIBezierPath *newPath = [_pathMaker pathBetweenPoint:currPoint point:nextPoint];
     
         CGFloat durationFraction = [VLOMarker distanceBetweenMarker1:currMarker Marker2:nextMarker] / actualWidth;
-        CGFloat duration = ANIMATION_DURATION * durationFraction;
+        CGFloat duration = LINE_ANIMATION_DURATION * durationFraction;
         
         // Path 애니메이션 추가.
         [self addPathAnimation:newPath duration:duration delay:totalDuration];
@@ -73,8 +73,8 @@
     pathLayer.lineWidth = LINE_WIDTH;
     pathLayer.strokeStart = 0.0;
     pathLayer.strokeEnd = 1.0;
-    pathLayer.lineJoin = LINEJOIN;
-    pathLayer.lineCap = LINECAP;
+    pathLayer.lineJoin = kCALineJoinBevel;
+    pathLayer.lineCap = kCALineCapRound;
     pathLayer.miterLimit = MITERLIM;
     [_animationLayer addSublayer:pathLayer];
     

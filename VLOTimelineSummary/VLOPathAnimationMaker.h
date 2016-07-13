@@ -6,7 +6,8 @@
 #import "VLOPathMaker.h"
 #import "VLOMarker.h"
 
-#define ANIMATION_DURATION 2
+#define MARKER_ANIMATION_DURATION 0.3
+#define LINE_ANIMATION_DURATION   2
 
 /**
  *  `VLOPathAnimationMaker`는 주어진 Marker의 목록으로 지도 같이 구불구불한 길을 그리는 

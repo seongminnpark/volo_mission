@@ -5,13 +5,10 @@
 
 @interface VLOCoordinateConverter()
 
-@property () CGFloat actualHeight;
+@property (strong, nonatomic) NSMutableArray *distanceList;
+
 @property () CGFloat actualWidth;
-@property () CGFloat longitudeDiffSum;
-@property () CGFloat latitudeMaxDiff;
-@property () CGFloat latitudeMax;
-@property () CGFloat horizontalLeftOver;
-@property () BOOL tooManyMarkers;
+@property () CGFloat distanceSum;
 
 @end
 
@@ -20,15 +17,8 @@
 - (id) init {
     self = [super init];
     _actualWidth = [VLOUtilities screenWidth] - HORIZONTAL_PADDING * 2;
-    _actualHeight = SUMMARY_HEIGHT - (VERTICAL_PADDING * 2);
-    _longitudeDiffSum = 0;
-    _latitudeMaxDiff = 0;
-    _latitudeMax = 0;
-    _horizontalLeftOver = 0;
-    _tooManyMarkers = NO;
     return self;
 }
-
 
 - (NSArray *) getCoordinates:(NSArray *)originalPlaceList {
     
@@ -36,41 +26,42 @@
         return [NSArray array];
     }
     
-    NSMutableArray *placeList = [originalPlaceList mutableCopy];
-    NSMutableArray *longitudeDiffList = [NSMutableArray arrayWithCapacity:placeList.count - 1];
-    NSMutableArray *latitudeList = [[NSMutableArray alloc] initWithCapacity:placeList.count];
-    [self initializeLists:placeList :longitudeDiffList :latitudeList];
+    // 연속으로 중복되거나 불량한 인풋을 정리하고, 군집된 로케이션 더 큰 범위로 묶습니다.
+    NSArray *placeList = [originalPlaceList copy];
     
-    NSMutableArray *markerList = [[NSMutableArray alloc] initWithCapacity:placeList.count];
-    CGFloat noOverlapOffset = (placeList.count - 1) * (MARKER_SIZE * 2);
-    _horizontalLeftOver = _actualWidth - noOverlapOffset;
-    _tooManyMarkers = (_horizontalLeftOver < 0) ? YES : NO;
+    placeList = [self sanitizeInput:placeList];
     
-    // First marker
-    VLOMarker *firstMarker = [[VLOMarker alloc] init];
-    CGFloat latitude = [[latitudeList objectAtIndex:0] floatValue];
-    firstMarker.x = (placeList.count == 1) ? _actualWidth/2 + HORIZONTAL_PADDING : HORIZONTAL_PADDING;
-    firstMarker.y = (placeList.count == 1) ? _actualHeight/2 + VERTICAL_PADDING : [self getYCoordinate:latitude];
-    firstMarker.name = ((VLOPlace *)[placeList objectAtIndex:0]).name;
-    firstMarker.nameAbove = YES;
-    [markerList addObject:firstMarker];
+    // 각 마커의 x 좌표를 설정하기 위해 경도 분포를 확인합니다.
+    [self initDistanceList:placeList];
     
-    // Every other markers (index 1 < )
-    for (NSInteger i = 1; i < placeList.count; i++) {
+    // 첫 VLOMarker의 좌표.
+    CGFloat leftover = _actualWidth - @(MIN_DIST).intValue * (placeList.count - 1);
+    CGFloat xVariation = (placeList.count == 1) ? 0 : leftover / 5.0;
+    CGFloat leftmostX = @(MIN_DIST).intValue * (placeList.count - 1) / 2 ;
+    CGFloat adjustedLeftMostX = [VLOUtilities screenWidth] / 2 - leftmostX - xVariation;
+    
+    // VLOMarker 생성.
+    NSMutableArray *markerList = [[NSMutableArray alloc] initWithCapacity:originalPlaceList.count];
+    CGFloat newX = adjustedLeftMostX;
+    NSInteger up = -1;
+    
+    for (NSInteger i = 0; i < placeList.count; i++) {
         
-        VLOPlace *currPlace = [placeList objectAtIndex:i];
+        VLOPlace *place = [placeList objectAtIndex:i];
         
-        CGFloat longitudeDiffFromPreviousPlace = [[longitudeDiffList objectAtIndex:i-1] floatValue];
-        CGFloat currentLatitude = [[latitudeList objectAtIndex:i] floatValue];
-        
-        VLOMarker *prevMarker = [markerList objectAtIndex:i-1];
         VLOMarker *newMarker = [[VLOMarker alloc] init];
         
-        newMarker.x = [self getXCoordinate:longitudeDiffFromPreviousPlace :prevMarker.x];
-        newMarker.y = [self getYCoordinate:currentLatitude];
-        BOOL noOverlap = newMarker.x - MARKER_SIZE/2 > prevMarker.x + MARKER_SIZE/2;
-        newMarker.nameAbove = noOverlap || !prevMarker.nameAbove;
-        newMarker.name = currPlace.name;
+        if (i > 0) {
+            CGFloat horizontalVariation = xVariation * ([[_distanceList objectAtIndex:i-1] floatValue] / _distanceSum);
+            newX += MIN_DIST + horizontalVariation;
+        }
+        
+        newMarker.x = newX;
+        newMarker.y = SUMMARY_HEIGHT / 2 + up * Y_VARIATION;
+        newMarker.name = place.name;
+        newMarker.nameAbove = YES;
+        
+        up *= -1;
         
         [markerList addObject:newMarker];
     }
@@ -78,85 +69,91 @@
     return markerList;
 }
 
+- (NSArray *) sanitizeInput:(NSArray *)placeList {
+    
+    NSMutableIndexSet *indicesToRemove = [NSMutableIndexSet indexSet];
+    
+    NSInteger maxMarkers = @(_actualWidth).intValue / @(MIN_DIST).intValue + 1;
+    
+    for (NSInteger i = 1; i < placeList.count; i++) {
+        
+        VLOPlace *prevPlace = [placeList objectAtIndex:i-1];
+        VLOPlace *currPlace = [placeList objectAtIndex:i];
+        
+        BOOL sameLat = prevPlace.coordinates.latitude.floatValue == currPlace.coordinates.latitude.floatValue;
+        BOOL sameLong = prevPlace.coordinates.longitude.floatValue == currPlace.coordinates.longitude.floatValue;
+        
+        // 중복되는 마커 제거. 중복되는 기준은 같은 coordinate.
+        if (sameLat & sameLong) {
+            [indicesToRemove addIndex:i];
+        }
+        
+        // 군집 제거.
+        BOOL tooManyMarkers = placeList.count - indicesToRemove.count > maxMarkers;
 
-- (void) initializeLists:(NSMutableArray *)placeList :(NSMutableArray *)longitudeDiffList :(NSMutableArray *)latitudeList {
-    
-    NSMutableArray *originalPlaceList = [placeList mutableCopy];
-    
-    for (NSInteger i = 0; i < originalPlaceList.count - 1; i++) {
-        
-        VLOPlace *currPlace = [originalPlaceList objectAtIndex:i];
-        VLOPlace *nextPlace = [originalPlaceList objectAtIndex:i+1];
-        
-        BOOL sameLong = currPlace.coordinates.longitude.floatValue == nextPlace.coordinates.longitude.floatValue;
-        BOOL sameLat = currPlace.coordinates.latitude.floatValue == nextPlace.coordinates.latitude.floatValue;
-        //BOOL sameName = [currPlace.name isEqualToString:nextPlace.name];
-        
-        if (sameLong && sameLat) {
-            
-            // 연속으로 동일한 마커 제거.
-            [placeList removeObjectAtIndex:i];
-            
-        } else {
-            
-            // Longitude
-            CGFloat longitudeDiff = fabs(nextPlace.coordinates.longitude.floatValue - currPlace.coordinates.longitude.floatValue);
-            [longitudeDiffList addObject:[NSNumber numberWithFloat:longitudeDiff]];
-            _longitudeDiffSum += longitudeDiff;
-            
-            // Latitude
-            CGFloat latitude = nextPlace.coordinates.latitude.floatValue;
-            [latitudeList addObject:[NSNumber numberWithFloat:latitude]];
-            
+        if (tooManyMarkers) {
+            [self reducePlaceList:placeList :i :indicesToRemove];
         }
     }
     
-    // Add last latitude.
-    VLOPlace *lastPlace = [originalPlaceList lastObject];
-    CGFloat lastLatitude = [lastPlace.coordinates.latitude floatValue];
-    [latitudeList addObject:[NSNumber numberWithFloat:lastLatitude]];
+    NSMutableArray *newPlaceList = [placeList mutableCopy];
+    [newPlaceList removeObjectsAtIndexes:indicesToRemove];
     
-    CGFloat maxLatitude = [[latitudeList valueForKeyPath:@"@max.doubleValue"] floatValue];
-    CGFloat minLatitude = [[latitudeList valueForKeyPath:@"@min.doubleValue"] floatValue];
-    _latitudeMaxDiff = maxLatitude - minLatitude; // 마커가 하나일 땐 이 값이 0이므로 getYCoordinate애서 분모로 이용하지 않음.
-    _latitudeMax = maxLatitude;
-}
-
-
-- (CGFloat) getXCoordinate:(CGFloat)longitudeDiff :(CGFloat)previousX {
-    
-    // 모든 마커의 x좌표가 같은 경우 모든 마커는 써머리 뷰 중간에 놓음.
-    CGFloat longitudeRatio = (_longitudeDiffSum == 0) ? 0.5 : longitudeDiff / _longitudeDiffSum;
-    CGFloat xIncrement = _tooManyMarkers ? longitudeRatio * _actualWidth
-    : longitudeRatio * _horizontalLeftOver + MARKER_SIZE * 2;
-    CGFloat newX = previousX + xIncrement;
-    
-    //    // 가로 variation을 줄이기 위해 newX의 중앙(_actualWidth/2 + HORIZONTAL_PADDING)과의 거리는 반으로 줄인다.
-    //    if (HORIZONTAL_SQUASH != 0) {
-    //        NSLog(@"newx: %f", newX);
-    //        CGFloat distFromMiddle = _actualWidth/2 + HORIZONTAL_PADDING - newX;
-    //        newX = newX + distFromMiddle/HORIZONTAL_SQUASH;
-    //        NSLog(@"    dist: %f", distFromMiddle);
-    //        NSLog(@"    newxDone: %f", newX);
-    //    }
-    
-    return newX;
-}
-
-
-- (CGFloat) getYCoordinate:(CGFloat)currentLatutude {
-    
-    // 모든 마커의 y좌표가 같은 경우 모든 마커는 써머리 뷰 중간에 놓음.
-    CGFloat latitudeRatio = (_latitudeMaxDiff == 0) ? 0.5 : (_latitudeMax - currentLatutude) / _latitudeMaxDiff;
-    CGFloat newY = latitudeRatio * _actualHeight + VERTICAL_PADDING;
-    
-    // 세로 variation을 줄이기 위해 newY의 중앙(_actualHeight/2 + VERTICAL_PADDING)과의 거리는 반으로 줄인다.
-    if (VERTICAL_SQUASH != 0) {
-        CGFloat distFromMiddle = _actualHeight/2 + VERTICAL_PADDING - newY;
-        newY = newY + distFromMiddle/VERTICAL_SQUASH;
+    if (newPlaceList.count > maxMarkers) {
+        newPlaceList = (NSMutableArray *)[newPlaceList subarrayWithRange:(NSRange){0, maxMarkers}];
     }
     
-    return newY;
+    return newPlaceList;
 }
 
+- (void) reducePlaceList:(NSArray *)placeList :(NSInteger)index :(NSMutableIndexSet *)indicesToRemove {
+    
+    for (NSInteger i = index; i < placeList.count; i++) {
+        
+        VLOCountry *prevCountry = ((VLOPlace *)[placeList objectAtIndex:i-1]).country;
+        VLOCountry *currCountry = ((VLOPlace *)[placeList objectAtIndex:i]).country;
+        
+        BOOL sameCountry = [prevCountry.isoCountryCode isEqualToString:currCountry.isoCountryCode];
+        
+        if (!sameCountry) break;
+        
+        ((VLOPlace *)[placeList objectAtIndex:i-1]).name = prevCountry.country;
+        [indicesToRemove addIndex:i];
+        
+    }
+}
+
+- (void) initDistanceList:(NSArray *)placeList {
+    _distanceList = [[NSMutableArray alloc] initWithCapacity:placeList.count-1];
+    _distanceSum = 0;
+    
+    for (NSInteger i = 1; i < placeList.count; i++) {
+        VLOPlace *prevPlace = [placeList objectAtIndex:i-1];
+        VLOPlace *currPlace = [placeList objectAtIndex:i];
+        
+        CGFloat distance = [self distance:prevPlace:currPlace];
+        _distanceSum += distance;
+        [_distanceList addObject: @(distance)];
+    }
+    
+}
+
+- (CGFloat) distance:(VLOPlace *)from :(VLOPlace *)to {
+    
+    CGFloat latitudeDiff = [to.coordinates.latitude floatValue] - [from.coordinates.latitude floatValue];
+    CGFloat longitudeDiff = [to.coordinates.longitude floatValue] - [from.coordinates.longitude floatValue];
+    
+    return sqrt(pow(latitudeDiff,2) + pow(longitudeDiff,2));
+}
+
+
 @end
+
+
+
+
+
+
+
+
+
