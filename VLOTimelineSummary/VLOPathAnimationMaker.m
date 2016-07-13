@@ -38,7 +38,7 @@
     CGFloat actualWidth = [VLOUtilities screenWidth] - MARKER_SIZE * 2;
     
     for (NSInteger i = 0; i < markerList.count - 1; i++) {
-  
+        
         // 새로운 path 생성.
         VLOMarker *currMarker = [markerList objectAtIndex:i];
         VLOMarker *nextMarker = [markerList objectAtIndex:i+1];
@@ -46,7 +46,7 @@
         CGPoint currPoint = CGPointMake(currMarker.x, currMarker.y);
         CGPoint nextPoint = CGPointMake(nextMarker.x, nextMarker.y);
         UIBezierPath *newPath = [_pathMaker pathBetweenPoint:currPoint point:nextPoint];
-    
+        
         CGFloat durationFraction = [VLOMarker distanceBetweenMarker1:currMarker Marker2:nextMarker] / actualWidth;
         CGFloat duration = LINE_ANIMATION_DURATION * durationFraction;
         
@@ -59,7 +59,7 @@
         
         totalDuration += duration;
     }
-   
+    
     // 마지막 마커 추가.
     VLOMarker *marker = (VLOMarker *) [markerList objectAtIndex:markerList.count-1];
     [self addMarkerAnimation:marker delay:totalDuration];
@@ -68,7 +68,8 @@
 - (void) addPathAnimation:(UIBezierPath *)path duration:(CGFloat)duration delay:(CGFloat)delay {
     CAShapeLayer *pathLayer = [[CAShapeLayer alloc] init];
     pathLayer.path = path.CGPath;
-    pathLayer.strokeColor = [UIColor colorWithRed:51.0/255.0 green:51.0/255.0 blue:51.0/255.0 alpha:1].CGColor;
+    
+    pathLayer.strokeColor = [UIColor colorWithRed:211.0/255.0 green:211.0/255.0 blue:211.0/255.0 alpha:1].CGColor;
     pathLayer.fillColor = [UIColor clearColor].CGColor;
     pathLayer.lineWidth = LINE_WIDTH;
     pathLayer.strokeStart = 0.0;
