@@ -26,9 +26,9 @@
         return [NSArray array];
     }
     
-    // 연속으로 중복되거나 불량한 인풋을 정리하고, 군집된 로케이션 더 큰 범위로 묶습니다.
-    NSArray *placeList = [originalPlaceList copy];
+    NSArray *placeList = [[NSArray alloc] initWithArray:originalPlaceList copyItems:YES];
     
+    // 연속으로 중복되거나 불량한 인풋을 정리하고, 군집된 로케이션 더 큰 범위로 묶습니다.
     placeList = [self sanitizeInput:placeList];
     
     // 각 마커의 x 좌표를 설정하기 위해 경도 분포를 확인합니다.

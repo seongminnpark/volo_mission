@@ -627,8 +627,9 @@ VLOTagEditViewDelegate, VLOFriendsListDelegate>
     _tableViewBackground.frame = CGRectSetY(_tableViewBackground.frame, setY);
     
     if (_tableView.contentOffset.y <= _tableView.contentInset.top) {
-        CGFloat contentInsetTop =
-        MAX(SUMMARY_HEIGHT, (64.0f + SUMMARY_HEIGHT)-(setY/[VLOUtilities screenWidth]*(64.0f+SUMMARY_HEIGHT)));
+        //CGFloat contentInsetTop =
+        //MAX(SUMMARY_HEIGHT, (64.0f + SUMMARY_HEIGHT)-(setY/[VLOUtilities screenWidth]*(64.0f+SUMMARY_HEIGHT)));
+        CGFloat contentInsetTop = MAX(0, 64.0f-(setY/[VLOUtilities screenWidth]*64.0f));
         [_tableView setContentInset:UIEdgeInsetsMake(contentInsetTop, 0, 64, 0)];
         [_tableView setContentOffset:CGPointMake(0, -contentInsetTop)];
     } else {
