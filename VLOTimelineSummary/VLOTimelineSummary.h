@@ -6,8 +6,6 @@
 #import "VLOMarker.h"
 #import "VLOCoordinateConverter.h"
 
-#define SUMMARY_HEIGHT 130 // MARKER_SIZE + (MARKER_LABEL_HEIGHT * 3) 이상 이어야 합니다.
-
 
 @interface VLOTimelineSummary : NSObject
 

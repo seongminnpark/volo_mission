@@ -51,7 +51,10 @@
         CGFloat duration = LINE_ANIMATION_DURATION * durationFraction;
         
         // Path 애니메이션 추가.
-        [self addPathAnimation:newPath duration:duration delay:totalDuration];
+        [self addPathAnimation:newPath
+                      duration:duration
+                         delay:totalDuration
+                        dotted:currMarker.dottedLine];
         
         // 마커 애니메이션 추가.
         VLOMarker *marker = (VLOMarker *) [markerList objectAtIndex:i];
@@ -65,20 +68,31 @@
     [self addMarkerAnimation:marker delay:totalDuration];
 }
 
-- (void) addPathAnimation:(UIBezierPath *)path duration:(CGFloat)duration delay:(CGFloat)delay {
+- (void) addPathAnimation:(UIBezierPath *)path
+                 duration:(CGFloat)duration
+                    delay:(CGFloat)delay
+                   dotted:(BOOL)dotted {
+    
+    // Path 모양 추가.
     CAShapeLayer *pathLayer = [[CAShapeLayer alloc] init];
     pathLayer.path = path.CGPath;
-    
-    pathLayer.strokeColor = [UIColor colorWithRed:211.0/255.0 green:211.0/255.0 blue:211.0/255.0 alpha:1].CGColor;
+    pathLayer.strokeColor = [UIColor whiteColor].CGColor;
     pathLayer.fillColor = [UIColor clearColor].CGColor;
     pathLayer.lineWidth = LINE_WIDTH;
     pathLayer.strokeStart = 0.0;
     pathLayer.strokeEnd = 1.0;
-    pathLayer.lineJoin = kCALineJoinBevel;
+    pathLayer.lineJoin = kCALineJoinRound;
     pathLayer.lineCap = kCALineCapRound;
     pathLayer.miterLimit = MITERLIM;
+    
+    if (dotted) {
+        NSArray *dashes = [NSArray arrayWithObjects:@(1), @(5), nil];
+        [pathLayer setLineDashPattern:dashes];
+    }
+    
     [_animationLayer addSublayer:pathLayer];
     
+    // Path 애니메이션 추가.
     CABasicAnimation *pathDrawAnimation = [CABasicAnimation animationWithKeyPath:@"strokeEnd"];
     pathDrawAnimation.duration  = duration;
     pathDrawAnimation.beginTime = CACurrentMediaTime() + delay;

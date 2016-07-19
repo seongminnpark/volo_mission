@@ -8,18 +8,22 @@
 @property (strong, nonatomic) NSMutableArray *distanceList;
 
 @property () CGFloat actualWidth;
+@property () CGFloat summaryWidth;
+@property () CGFloat summaryHeight;
 @property () CGFloat distanceSum;
-@property () BOOL tooManyMarkers;
-@property () NSInteger diff;
+@property () NSInteger maxMarkers;
+@property () NSInteger markerNum;
 
 @end
 
 @implementation VLOCoordinateConverter
 
-- (id) init {
+- (id) initWithWidth:(CGFloat)width andHeight:(CGFloat)height {
     self = [super init];
-    _actualWidth = [VLOUtilities screenWidth] - HORIZONTAL_PADDING * 2;
-    _tooManyMarkers = FALSE;
+    _summaryWidth = width;
+    _summaryHeight = height;
+    _actualWidth = _summaryWidth - HORIZONTAL_PADDING * 2;
+    _maxMarkers = @(_actualWidth).intValue / @(MIN_DIST).intValue + 1;
     return self;
 }
 
@@ -29,55 +33,53 @@
         return [NSArray array];
     }
     
-
-    NSArray *placeList = [[NSArray alloc] initWithArray:originalPlaceList copyItems:YES];
-    
     // 연속으로 중복되거나 불량한 인풋을 정리하고, 군집된 로케이션 더 큰 범위로 묶습니다.
-
-    placeList = [self sanitizeInput:placeList];
+    NSArray *placeList = [self sanitizeInput:originalPlaceList];
+    
+    BOOL tooManyMarkers = placeList.count > _maxMarkers;
     
     // 각 마커의 x 좌표를 설정하기 위해 경도 분포를 확인합니다.
-    [self initDistanceList:placeList];
+    [self initDistanceList:placeList tooMany:tooManyMarkers];
     
     // 첫 VLOMarker의 좌표.
-    CGFloat leftover = _actualWidth - @(MIN_DIST).intValue * (placeList.count - 1);
+    CGFloat leftover = _actualWidth - @(MIN_DIST).intValue * (_markerNum - 1);
     CGFloat xVariation = (placeList.count == 1) ? 0 : leftover / 5.0;
-    CGFloat leftmostX = @(MIN_DIST).intValue * (placeList.count - 1) / 2 ;
-    CGFloat adjustedLeftMostX = [VLOUtilities screenWidth] / 2 - leftmostX - xVariation;
-    
+    CGFloat leftmostX = @(MIN_DIST).intValue * (_markerNum - 1) / 2 ;
+    CGFloat adjustedLeftMostX = [VLOUtilities screenWidth]/2 - leftmostX - xVariation;
+
     // VLOMarker 생성.
-    NSMutableArray *markerList = [[NSMutableArray alloc] initWithCapacity:originalPlaceList.count];
+    NSMutableArray *markerList = [[NSMutableArray alloc] initWithCapacity:_markerNum];
     CGFloat newX = adjustedLeftMostX;
     NSInteger up = -1;
-    
+
     for (NSInteger i = 0; i < placeList.count; i++) {
         
-        VLOPlace *place = [placeList objectAtIndex:i];
+        // 마커가 너무 많을 때 중간 마커를 생략한다.
+        if (tooManyMarkers) {
+            
+            // 마커를 생략해야 할 때 점선의 왼쪽과 오른쪽 마커의 개수.
+            NSInteger markersOnLeft = _maxMarkers/2;
+            NSInteger markersOnRight = (_maxMarkers % 2 == 0) ? _maxMarkers/2 : _maxMarkers/2 + 1;
+            
+            BOOL omitThisIndex = i >= markersOnLeft && i < (placeList.count - markersOnRight);
+            
+            if (omitThisIndex) continue;
+        }
         
+        VLOPlace *place = [placeList objectAtIndex:i];
         VLOMarker *newMarker = [[VLOMarker alloc] init];
         
         if (i > 0) {
-            if (i > (placeList.count / 2) && i < (placeList.count / 2) + _diff) {
-                continue;
-            }
             CGFloat horizontalVariation = xVariation * ([[_distanceList objectAtIndex:i-1] floatValue] / _distanceSum);
             newX += MIN_DIST + horizontalVariation;
-            
         }
         
         newMarker.x = newX;
-        newMarker.y = SUMMARY_HEIGHT / 2 + up * Y_VARIATION;
+        newMarker.y = _summaryHeight / 2 + up * Y_VARIATION;
         newMarker.name = place.name;
         newMarker.nameAbove = YES;
-        
-        if (i == placeList.count / 2) {
-            newMarker.isVisible = FALSE;
-        }
-        else {
-            newMarker.isVisible = TRUE;
-        }
-        
-        
+        newMarker.dottedLine = tooManyMarkers && (i == _maxMarkers/2 - 1);
+
         up *= -1;
         
         [markerList addObject:newMarker];
@@ -88,10 +90,8 @@
 
 - (NSArray *) sanitizeInput:(NSArray *)placeList {
     
-    NSMutableIndexSet *indicesToRemove = [NSMutableIndexSet indexSet];
-    
-    NSInteger maxMarkers = @(_actualWidth).intValue / @(MIN_DIST).intValue + 1;
-    
+    NSMutableArray *newPlaceList = [[NSMutableArray alloc] initWithArray:placeList copyItems:YES];
+
     for (NSInteger i = 1; i < placeList.count; i++) {
         
         VLOPlace *prevPlace = [placeList objectAtIndex:i-1];
@@ -102,63 +102,51 @@
         
         // 중복되는 마커 제거. 중복되는 기준은 같은 coordinate.
         if (sameLat & sameLong) {
-            [indicesToRemove addIndex:i];
+            [newPlaceList removeObject:currPlace];
         }
-        
-        // 군집 제거.
-        /* BOOL tooManyMarkers = placeList.count - indicesToRemove.count > maxMarkers;
-         
-         if (tooManyMarkers) {
-         //[self reducePlaceList:placeList :i :indicesToRemove];
-         //_crowded_cnt = maxMarkers - (placeList.count - indicesToRemove.count);
-         }*/
     }
-    
-    NSMutableArray *newPlaceList = [placeList mutableCopy];
-    [newPlaceList removeObjectsAtIndexes:indicesToRemove];
-    
-    /*if (newPlaceList.count > maxMarkers) {
-     newPlaceList = (NSMutableArray *)[newPlaceList subarrayWithRange:(NSRange){0, maxMarkers}];
-     }*/
-    
-    if(newPlaceList.count > maxMarkers)
-    {
-        _tooManyMarkers = TRUE;
-        _diff = newPlaceList.count - maxMarkers;
-    }
-    
     
     return newPlaceList;
 }
 
-- (void) reducePlaceList:(NSArray *)placeList :(NSInteger)index :(NSMutableIndexSet *)indicesToRemove {
-    
-    for (NSInteger i = index; i < placeList.count; i++) {
-        
-        VLOCountry *prevCountry = ((VLOPlace *)[placeList objectAtIndex:i-1]).country;
-        VLOCountry *currCountry = ((VLOPlace *)[placeList objectAtIndex:i]).country;
-        
-        BOOL sameCountry = [prevCountry.isoCountryCode isEqualToString:currCountry.isoCountryCode];
-        
-        if (!sameCountry) break;
-        
-        ((VLOPlace *)[placeList objectAtIndex:i-1]).name = prevCountry.country;
-        [indicesToRemove addIndex:i];
-        
-    }
-}
-
-- (void) initDistanceList:(NSArray *)placeList {
+- (void) initDistanceList:(NSArray *)placeList tooMany:(BOOL)tooManyMarkers {
     _distanceList = [[NSMutableArray alloc] initWithCapacity:placeList.count-1];
     _distanceSum = 0;
+    _markerNum = 0;
     
     for (NSInteger i = 1; i < placeList.count; i++) {
+        
         VLOPlace *prevPlace = [placeList objectAtIndex:i-1];
         VLOPlace *currPlace = [placeList objectAtIndex:i];
+        
+        if (tooManyMarkers) {
+            
+            // 마커를 생략해야 할 때 점선의 왼쪽과 오른쪽 마커의 개수.
+            NSInteger markersOnLeft = _maxMarkers/2;
+            NSInteger markersOnRight = (_maxMarkers % 2 == 0) ? _maxMarkers/2 : _maxMarkers/2 + 1;
+            
+            BOOL omitThisIndex = i >= markersOnLeft && i < (placeList.count - markersOnRight);
+            
+            if (omitThisIndex) {
+                [_distanceList addObject: @(0)];
+                continue;
+            }
+            
+            // 생략 점선 이후 그려지는 첫 마커.
+            else if (i == placeList.count - markersOnRight) {
+                prevPlace = [placeList objectAtIndex:_maxMarkers/2 - 1];
+                CGFloat distance = [self distance:prevPlace:currPlace];
+                _distanceSum += distance;
+                [_distanceList addObject: @(distance)];
+                _markerNum += 1;
+                continue;
+            }
+        }
         
         CGFloat distance = [self distance:prevPlace:currPlace];
         _distanceSum += distance;
         [_distanceList addObject: @(distance)];
+        _markerNum += 1;
     }
     
 }

@@ -10,10 +10,8 @@
 #define MIN_DISTANCE      10.0
 #define ANGLE_DEVIATION   11
 
-#define LINE_WIDTH 4.0
 #define ALPHA      2.0
-#define MITERLIM   5.0
-#define FAR_ENOUGH 2.0
+#define FAR_ENOUGH 3.0
 
 #define RAD(degrees) (degrees / 180.0 * M_PI)
 #define DEG(radians) (radians * (180.0 / M_PI))
