@@ -10,7 +10,7 @@
 #define LINE_ANIMATION_DURATION   2
 
 #define MITERLIM   5.0
-#define LINE_WIDTH 4
+#define LINE_WIDTH 2
 
 /**
  *  `VLOPathAnimationMaker`는 주어진 Marker의 목록으로 지도 같이 구불구불한 길을 그리는 
