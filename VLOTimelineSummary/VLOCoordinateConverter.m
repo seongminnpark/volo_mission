@@ -8,15 +8,19 @@
 @property (strong, nonatomic) NSMutableArray *distanceList;
 
 @property () CGFloat actualWidth;
+@property () CGFloat summaryWidth;
+@property () CGFloat summaryHeight;
 @property () CGFloat distanceSum;
 
 @end
 
 @implementation VLOCoordinateConverter
 
-- (id) init {
+- (id) initWithWidth:(CGFloat)width andHeight:(CGFloat)height {
     self = [super init];
-    _actualWidth = [VLOUtilities screenWidth] - HORIZONTAL_PADDING * 2;
+    _summaryWidth = width;
+    _summaryHeight = height;
+    _actualWidth = _summaryWidth - HORIZONTAL_PADDING * 2;
     return self;
 }
 
@@ -38,13 +42,13 @@
     CGFloat leftover = _actualWidth - @(MIN_DIST).intValue * (placeList.count - 1);
     CGFloat xVariation = (placeList.count == 1) ? 0 : leftover / 5.0;
     CGFloat leftmostX = @(MIN_DIST).intValue * (placeList.count - 1) / 2 ;
-    CGFloat adjustedLeftMostX = [VLOUtilities screenWidth] / 2 - leftmostX - xVariation;
-    
+    CGFloat adjustedLeftMostX = [VLOUtilities screenWidth] / 2 - leftmostX - xVariation / 2;
+
     // VLOMarker 생성.
     NSMutableArray *markerList = [[NSMutableArray alloc] initWithCapacity:originalPlaceList.count];
     CGFloat newX = adjustedLeftMostX;
     NSInteger up = -1;
-    
+
     for (NSInteger i = 0; i < placeList.count; i++) {
         
         VLOPlace *place = [placeList objectAtIndex:i];
@@ -57,10 +61,10 @@
         }
         
         newMarker.x = newX;
-        newMarker.y = SUMMARY_HEIGHT / 2 + up * Y_VARIATION;
+        newMarker.y = _summaryHeight / 2 + up * Y_VARIATION;
         newMarker.name = place.name;
         newMarker.nameAbove = YES;
-        
+
         up *= -1;
         
         [markerList addObject:newMarker];

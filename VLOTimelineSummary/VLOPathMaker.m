@@ -22,8 +22,9 @@
 #pragma mark - Create Route Points
 
 - (NSMutableArray *) createPointsBetweenPoint:(CGPoint)from point:(CGPoint)to {
-    NSInteger randomSeed = from.x + from.y + to.x + to.y;
-    
+    //NSInteger randomSeed = from.x + from.y + to.x + to.y;
+    NSInteger randomSeed = 850;
+
     // NSMutableArray에 좌표를 저장하기 위해 CGPoint object를 NSValue로 변환합니다.
     NSValue *ns_from = [NSValue valueWithCGPoint:from];
     NSValue *ns_to = [NSValue valueWithCGPoint:to];
@@ -48,16 +49,21 @@
         
         for (NSNumber *partition in partition_lengths) {
             CGFloat partition_length = partition.floatValue;
-            // 너무 크거나 거꾸로 가는 각도의 deviation은 피합니다.
+            
+            // -ANGLE_DEVIATION < degree_angle < ANGLE_DEVIATION
             CGFloat degree_angle = randomSeed % (ANGLE_DEVIATION*2) - ANGLE_DEVIATION;
-            while(degree_angle <= 0) {
-                degree_angle += 1;
-            }
+    
             CGFloat random_angle = RAD(degree_angle);
             CGFloat angle_from_x_axis = atan2f(to.y-from.y, to.x-from.x);
             CGFloat new_angle = random_angle + angle_from_x_axis;
             CGFloat new_x = partition_length * cosf(new_angle) + from.x;
             CGFloat new_y = partition_length * sinf(new_angle) + from.y;
+            
+            // 뒤로 가거나 너무 가까운 점은 피합니다.
+            while(new_x < from.x + FAR_ENOUGH) {
+                new_x += 1;
+            }
+            
             CGPoint new_point = CGPointMake(new_x, new_y);
             
             NSValue *ns_new_point = [NSValue valueWithCGPoint:new_point];

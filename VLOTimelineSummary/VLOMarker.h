@@ -23,5 +23,6 @@
 @property (nonatomic) CGFloat y;
 @property (nonatomic) NSString *name;
 @property (nonatomic) BOOL nameAbove;
+@property (nonatomic) BOOL dottedLine;
 
 @end

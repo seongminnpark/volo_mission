@@ -3,7 +3,6 @@
 
 
 #import <Foundation/Foundation.h>
-#import "VLOUtilities.h"
 #import "VLOMarker.h"
 #import "VLOLocationCoordinate.h"
 #import "VLOPlace.h"
@@ -17,7 +16,7 @@
 
 @interface VLOCoordinateConverter : NSObject
 
-- (id) init;
+- (id) initWithWidth:(CGFloat)width andHeight:(CGFloat)height;
 - (NSArray *) getCoordinates:(NSArray *)originalPlaceList; 
 
 @end
