@@ -9,6 +9,8 @@
 
 @property () CGFloat actualWidth;
 @property () CGFloat distanceSum;
+@property () BOOL tooManyMarkers;
+@property () NSInteger diff;
 
 @end
 
@@ -17,6 +19,7 @@
 - (id) init {
     self = [super init];
     _actualWidth = [VLOUtilities screenWidth] - HORIZONTAL_PADDING * 2;
+    _tooManyMarkers = FALSE;
     return self;
 }
 
@@ -26,9 +29,9 @@
         return [NSArray array];
     }
     
-    // 연속으로 중복되거나 불량한 인풋을 정리하고, 군집된 로케이션 더 큰 범위로 묶습니다.
-    NSArray *placeList = [originalPlaceList copy];
     
+    // 연속으로 중복되거나 불량한 인풋을 정리하고, 군집된 로케이션 더 큰 범위로 묶습니다.
+    NSArray *placeList = [[NSArray alloc] initWithArray:originalPlaceList copyItems:YES];
     placeList = [self sanitizeInput:placeList];
     
     // 각 마커의 x 좌표를 설정하기 위해 경도 분포를 확인합니다.
@@ -52,14 +55,26 @@
         VLOMarker *newMarker = [[VLOMarker alloc] init];
         
         if (i > 0) {
+            if (i > (placeList.count / 2) && i < (placeList.count / 2) + _diff) {
+                continue;
+            }
             CGFloat horizontalVariation = xVariation * ([[_distanceList objectAtIndex:i-1] floatValue] / _distanceSum);
             newX += MIN_DIST + horizontalVariation;
+            
         }
         
         newMarker.x = newX;
         newMarker.y = SUMMARY_HEIGHT / 2 + up * Y_VARIATION;
         newMarker.name = place.name;
         newMarker.nameAbove = YES;
+        
+        if (i == placeList.count / 2) {
+            newMarker.isVisible = FALSE;
+        }
+        else {
+            newMarker.isVisible = TRUE;
+        }
+        
         
         up *= -1;
         
@@ -89,19 +104,27 @@
         }
         
         // 군집 제거.
-        BOOL tooManyMarkers = placeList.count - indicesToRemove.count > maxMarkers;
-
-        if (tooManyMarkers) {
-            [self reducePlaceList:placeList :i :indicesToRemove];
-        }
+        /* BOOL tooManyMarkers = placeList.count - indicesToRemove.count > maxMarkers;
+         
+         if (tooManyMarkers) {
+         //[self reducePlaceList:placeList :i :indicesToRemove];
+         //_crowded_cnt = maxMarkers - (placeList.count - indicesToRemove.count);
+         }*/
     }
     
     NSMutableArray *newPlaceList = [placeList mutableCopy];
     [newPlaceList removeObjectsAtIndexes:indicesToRemove];
     
-    if (newPlaceList.count > maxMarkers) {
-        newPlaceList = (NSMutableArray *)[newPlaceList subarrayWithRange:(NSRange){0, maxMarkers}];
+    /*if (newPlaceList.count > maxMarkers) {
+     newPlaceList = (NSMutableArray *)[newPlaceList subarrayWithRange:(NSRange){0, maxMarkers}];
+     }*/
+    
+    if(newPlaceList.count > maxMarkers)
+    {
+        _tooManyMarkers = TRUE;
+        _diff = newPlaceList.count - maxMarkers;
     }
+    
     
     return newPlaceList;
 }
