@@ -7,7 +7,7 @@
 
 - (NSArray *)partitionLineOfDistance:(NSInteger)distance
                    numberOfDivisions:(NSInteger)divisions
-                          randomSeed:(NSInteger)randonSeed;
+                          randomSeed:(NSInteger)randomSeed;
 
 @end
 
@@ -24,14 +24,7 @@
 - (NSMutableArray *) createPointsBetweenPoint:(CGPoint)from point:(CGPoint)to {
     NSInteger randomSeed = from.x + from.y + to.x + to.y;
     
-    CGFloat degree_angle = randomSeed % (ANGLE_DEVIATION*2) - ANGLE_DEVIATION;
-    
-    // 너무 크거나 거꾸로 가는 각도의 deviation은 피합니다.
-    while(degree_angle <= 0) {
-        degree_angle += 1;
-    }
-    
-    CGFloat random_angle = RAD(degree_angle);
+    CGFloat random_angle = RAD(ANGLE_DEVIATION);
     
     // NSMutableArray에 좌표를 저장하기 위해 CGPoint object를 NSValue로 변환합니다.
     NSValue *ns_from = [NSValue valueWithCGPoint:from];
@@ -45,9 +38,9 @@
     NSInteger max_divisions = floor(distance/MIN_DISTANCE);
     NSInteger num_divisions = MIN(max_divisions, MAX_LINE_DIVISION);
     
-    BOOL too_short = distance < MIN_DISTANCE;
-    BOOL max_division_0 = num_divisions == 0;
-    if (too_short || max_division_0) {
+    BOOL too_short = distance <= MIN_DISTANCE;
+    BOOL max_division_zero = num_divisions == 0;
+    if (too_short || max_division_zero) {
         [points addObject:ns_from];
         [points addObject:ns_to];
     } else {
