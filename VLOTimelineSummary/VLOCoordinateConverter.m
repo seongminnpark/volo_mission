@@ -122,11 +122,22 @@
     // 군집되는 경우
     if (_tooManyMarkers) {
         NSInteger diff = (placeList.count - overlap_cnt) - _maxMarkers;
-        NSInteger min_index = (placeList.count / 2) + 1;
-        NSInteger max_index = (placeList.count / 2) + diff;
+        NSInteger min_index = (placeList.count - diff) / 2;
+        NSInteger max_index = ((placeList.count - diff) / 2) + diff;
         
         for (NSInteger i = min_index; i < max_index + 1; i++) {
             [indicesToRemove addIndex:i];
+        }
+        
+        if ((placeList.count - indicesToRemove.count) > _maxMarkers) {
+            diff = (placeList.count - indicesToRemove.count) - _maxMarkers;
+            min_index = ((placeList.count - indicesToRemove.count - diff) / 2);
+            max_index = ((placeList.count - indicesToRemove.count - diff) / 2) + diff;
+            
+            for (NSInteger i = min_index; i < max_index + 1; i++)
+            {
+                [indicesToRemove addIndex:i];
+            }
         }
     }
     

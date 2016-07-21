@@ -20,7 +20,9 @@
     _summaryWidth = summaryView.bounds.size.width;
     _summaryHeight = summaryView.bounds.size.height;
     
-    VLOCoordinateConverter *converter = [[VLOCoordinateConverter alloc] initWithWidth:_summaryWidth andHeight:_summaryHeight];
+    //VLOCoordinateConverter *converter = [[VLOCoordinateConverter alloc] initWithWidth:_summaryWidth andHeight:_summaryHeight];
+    VLOCoordinateConverter *converter = [[VLOCoordinateConverter alloc] init];
+    
     NSArray *markerList = [converter getCoordinates:placeList];
 
     _animationMaker = [[VLOPathAnimationMaker alloc] initWithView:summaryView andMarkerList:markerList];

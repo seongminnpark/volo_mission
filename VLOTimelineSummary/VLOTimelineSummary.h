@@ -6,6 +6,8 @@
 #import "VLOMarker.h"
 #import "VLOCoordinateConverter.h"
 
+#define SUMMARY_HEIGHT 130
+
 
 @interface VLOTimelineSummary : NSObject
 
