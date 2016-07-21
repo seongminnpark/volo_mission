@@ -128,6 +128,17 @@
         for (NSInteger i = min_index; i < max_index + 1; i++) {
             [indicesToRemove addIndex:i];
         }
+        
+        if ((placeList.count - indicesToRemove.count) > _maxMarkers) {
+            diff = (placeList.count - indicesToRemove.count) - _maxMarkers;
+            min_index = ((placeList.count - indicesToRemove.count) / 2) + 1;
+            max_index = ((placeList.count - indicesToRemove.count) / 2) + diff;
+            
+            for (NSInteger i = min_index; i < max_index + 1; i++)
+            {
+                [indicesToRemove addIndex:i];
+            }
+        }
     }
     
     // 군집, 중복마커 제거

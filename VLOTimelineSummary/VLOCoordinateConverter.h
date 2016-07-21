@@ -16,7 +16,7 @@
 
 @interface VLOCoordinateConverter : NSObject
 
-- (id) initWithWidth:(CGFloat)width andHeight:(CGFloat)height;
+- (void) initWithWidth:(CGFloat)width andHeight:(CGFloat)height;
 - (NSArray *) getCoordinates:(NSArray *)originalPlaceList; 
 
 @end
