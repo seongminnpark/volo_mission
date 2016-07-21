@@ -25,12 +25,10 @@
 #import "VLOPhoto.h"
 #import "VLOTimezone.h"
 #import "VLOTravelListCell.h"
-#import "VLOTimelineSummary.h"
 
 #import <Masonry/Masonry.h>
 #import <QuartzCore/QuartzCore.h>
 #import <SDWebImage/UIImageView+WebCache.h>
-
 
 static NSString * const VLOTimelineCoverToggleAnimationKey = @"ToggleButtonFlashAnimation";
 
@@ -105,21 +103,15 @@ static NSString * const VLOTimelineCoverToggleAnimationKey = @"ToggleButtonFlash
     _dateLabel = [[UILabel alloc] init];
     _dateLabel.textColor = [UIColor colorWithWhite:1.0f alpha:1.0f];
     _dateLabel.font = [UIFont museoSans500WithRatioSize:11.0f];
- 
+    
     _imageView = [[UIImageView alloc] init];
     _imageView.frame = CGRectMake(-PARALLAX_MAX/2.0f, -PARALLAX_MAX/2.0f, [VLOUtilities screenWidth] + PARALLAX_MAX, [VLOUtilities screenWidth] + PARALLAX_MAX);
-    
-    //add
-    _summaryView = [[UIView alloc] initWithFrame:CGRectMake(PARALLAX_MAX/2.0f, [VLOUtilities screenWidth] - (SUMMARY_HEIGHT - 10.0f), [UIScreen mainScreen].bounds.size.width, SUMMARY_HEIGHT)];
-    //add
     
     _overlay = [CAGradientLayer layer];
     _overlay.frame = CGRectMake(0, 0, [VLOUtilities screenWidth]*1.5f, [VLOUtilities screenHeight]);
     _overlay.colors = @[(id)[[UIColor colorWithHexString:@"#454545" alpha:0.5f] CGColor],
                         (id)[[UIColor colorWithHexString:@"#454545" alpha:0.5f] CGColor]];
     _imageView.backgroundColor = [UIColor clearColor];
-    [_imageView setUserInteractionEnabled:YES];
-    [_imageView addSubview:_summaryView];
     [_imageView.layer addSublayer:_overlay];
     _imageView.alpha = .3f;
 
@@ -141,7 +133,10 @@ static NSString * const VLOTimelineCoverToggleAnimationKey = @"ToggleButtonFlash
     _shareButton.hitEdgeInsets = UIEdgeInsetsMake(-50, -10, -50, -50);
     _shareButton.hidden = !_isViewMode;
     
-
+    
+    //add
+    _summaryView = [[UIView alloc] init];
+    //add
     
     [self addSubview:_topContainerView];
     [_topContainerView addSubview:_imageView];
@@ -152,6 +147,7 @@ static NSString * const VLOTimelineCoverToggleAnimationKey = @"ToggleButtonFlash
     [self insertSubview:_editButton aboveSubview:_topContainerView];
     [self insertSubview:_shareButton aboveSubview:_topContainerView];
     [self addSubview:_friendsView];
+    [self addSubview:_summaryView];
     [self makeAutoLayoutConstraints];
     
 }
@@ -160,7 +156,6 @@ static NSString * const VLOTimelineCoverToggleAnimationKey = @"ToggleButtonFlash
 {
     _imageView.frame = CGRectMake(-PARALLAX_MAX/2.0f, -PARALLAX_MAX/2.0f, self.bounds.size.width + PARALLAX_MAX, self.bounds.size.height + PARALLAX_MAX);
 }
-    
 
 - (double)checkTimeInCoverViewWithPresentTime:(CGFloat)presentTime andWhere:(NSString *)where
 {
@@ -274,6 +269,14 @@ static NSString * const VLOTimelineCoverToggleAnimationKey = @"ToggleButtonFlash
         make.width.equalTo(@(cellSizeRatio * MIN(_friends.count + _type, 5) + 7.5f * [VLOUtilities screenRatio] * (MIN(_friends.count + _type, 5)-1)));
         make.centerX.equalTo(self);
     }];
+    
+    // add
+    [_summaryView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.equalTo(@0.0f);
+        make.top.equalTo(_dateLabel.mas_bottom);
+        make.bottom.equalTo(_friendsView.mas_top);
+    }];
+    // add
 }
 
 - (void)setTravel:(VLOTravel *)travel
@@ -501,6 +504,7 @@ static NSString * const VLOTimelineCoverToggleAnimationKey = @"ToggleButtonFlash
     _titleSeparator.alpha = viewAlpha;
     _dateLabel.alpha = viewAlpha;
     _friendsView.alpha = viewAlpha;
+    _summaryView.alpha = viewAlpha;
 }
 
 - (void)coverPageInteractionEnd
@@ -513,6 +517,7 @@ static NSString * const VLOTimelineCoverToggleAnimationKey = @"ToggleButtonFlash
         _titleSeparator.alpha = 1.0f;
         _dateLabel.alpha = 1.0f;
         _friendsView.alpha = 1.0f;
+        _summaryView.alpha = 1.0f;
     } completion:^(BOOL finished) {
         _gestureMove = 0.0f;
     }];
@@ -525,7 +530,5 @@ static NSString * const VLOTimelineCoverToggleAnimationKey = @"ToggleButtonFlash
     }
     return NO;
 }
-
-
 
 @end

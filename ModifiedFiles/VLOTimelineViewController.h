@@ -12,8 +12,6 @@
 #import <MapKit/MapKit.h>
 #import <SDWebImage/UIImageView+WebCache.h>
 
-#import "VLOTimelineSummary.h"
-
 
 @class VLOTravelListViewController;
 @class VLOTimelineTableViewController;
