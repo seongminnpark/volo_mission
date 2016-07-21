@@ -8,13 +8,13 @@
 
 #import <UIKit/UIKit.h>
 #import <MapKit/MapKit.h>
+#import "VLOTimelineSummary.h"
 
 @class VLOTravel;
 @class VLOTravelListCell;
 @class VLOBlurredImageView;
 @class VLOTimelineCoverView;
 @class VLOFriendsView;
-@class VLOTimelineSummary;
 
 typedef NS_ENUM(NSInteger, VLOTimelineCoverPressedViewType) {
     VLOTimelineCoverPressedViewTypeDefault,
@@ -69,11 +69,8 @@ static NSString * const VLOTimelineCoverViewNibName = @"VLOTimelineCoverView";
 
 @property (weak, nonatomic) VLOTravel *travel;
 @property (nonatomic) double beginTime;
-@property (nonatomic, strong) UIView *summaryView;
 
-
-
-
+@property (strong, nonatomic) UIView *summaryView;
 
 - (void)resizeTextViewHeight;
 - (void)coverPageAppear;
