@@ -1,4 +1,3 @@
-
 // VLOCoordinateConverter.m
 
 
@@ -20,14 +19,14 @@
 
 @implementation VLOCoordinateConverter
 
-- (void) initWithWidth:(CGFloat)width andHeight:(CGFloat)height {
-    //self = [super init];
+- (id) initWithWidth:(CGFloat)width andHeight:(CGFloat)height {
+    self = [super init];
     _summaryWidth = width;
     _summaryHeight = height;
     _actualWidth = _summaryWidth - HORIZONTAL_PADDING * 2;
     _maxMarkers = @(_actualWidth).intValue / @(MIN_DIST).intValue + 1;
-    _tooManyMarkers = FALSE;
-    //return self;
+    _tooManyMarkers = NO;
+    return self;
 }
 
 - (NSArray *) getCoordinates:(NSArray *)originalPlaceList {
@@ -36,7 +35,7 @@
         return [NSArray array];
     }
     
-    [self initWithWidth:[UIScreen mainScreen].bounds.size.width andHeight:SUMMARY_HEIGHT];
+    //[self initWithWidth:[UIScreen mainScreen].bounds.size.width andHeight:_summaryHeight];
     
     // 연속으로 중복되거나 불량한 인풋, 군집된 로케이션 정리
     NSArray *placeList = [self sanitizeInput:originalPlaceList];
@@ -52,12 +51,9 @@
         leftover = 0;
     }
     
-    
-    CGFloat xVariation = (placeList.count == 1) ? 0 : leftover / placeList.count;
+    CGFloat xVariation = (placeList.count == 1) ? 0 : leftover / 8.0;
     CGFloat leftmostX = @(MIN_DIST).intValue * (_markerNum - 1) / 2 ;
     CGFloat adjustedLeftMostX = [VLOUtilities screenWidth]/2 - leftmostX - xVariation;
-    
-    
     
     // VLOMarker 생성.
     NSMutableArray *markerList = [[NSMutableArray alloc] initWithCapacity:_markerNum];
@@ -78,7 +74,6 @@
                 CGFloat horizontalVariation = xVariation * ([[_distanceList objectAtIndex:i-1] floatValue] / _distanceSum);
                 newX += MIN_DIST + horizontalVariation;
             }
-            
         }
         
         newMarker.x = newX;
@@ -91,7 +86,7 @@
         [markerList addObject:newMarker];
     }
     
-    _tooManyMarkers = FALSE;
+    _tooManyMarkers = NO;
     return markerList;
 }
 
@@ -133,8 +128,6 @@
     // 군집, 중복마커 제거
     [newPlaceList removeObjectsAtIndexes:indicesToRemove];
     
-    
-    
     return newPlaceList;
 }
 
@@ -165,7 +158,6 @@
 
 
 @end
-
 
 
 
