@@ -270,9 +270,12 @@ static NSString * const VLOTimelineCoverToggleAnimationKey = @"ToggleButtonFlash
         make.centerX.equalTo(self);
     }];
     
+    _summaryView.backgroundColor = [UIColor redColor];
     // add
     [_summaryView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.left.equalTo(@0.0f);
+        make.left.equalTo(_titleTextView.mas_left);
+        make.right.equalTo(_titleTextView.mas_right);
+        
         make.top.equalTo(_dateLabel.mas_bottom);
         make.bottom.equalTo(_friendsView.mas_top);
     }];
