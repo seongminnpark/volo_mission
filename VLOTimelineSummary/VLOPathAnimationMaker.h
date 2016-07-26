@@ -12,6 +12,8 @@
 #define MITERLIM   5.0
 #define LINE_WIDTH 2
 
+#define DAY_LABEL_COLOR [UIColor darkGrayColor]
+
 /**
  *  `VLOPathAnimationMaker`는 주어진 Marker의 목록으로 지도 같이 구불구불한 길을 그리는 
  *  애니메이션이 담긴 UIView를 만듭니다.

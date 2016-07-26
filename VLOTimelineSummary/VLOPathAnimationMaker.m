@@ -2,6 +2,7 @@
 
 
 #import "VLOPathAnimationMaker.h"
+#import "UIFont+VLOExtension.h"
 
 @interface VLOPathAnimationMaker()
 
@@ -36,6 +37,8 @@
     
     CGFloat totalDuration = 0;
     CGFloat actualWidth = _receivedView.bounds.size.width - MARKER_SIZE * 2;
+    
+    VLOMarker *firstMarkerOfSameDay;
 
     for (NSInteger i = 0; i < markerList.count; i++) {
         
@@ -51,7 +54,6 @@
         
         // 마커 애니메이션 추가.
         [self addMarkerAnimation:currMarker delay:totalDuration color:currMarker.color];
-        //[self addDayAnimation:currMarker delay:totalDuration color:currMarker.color];
         
         if (prevMarker) {
             
@@ -66,6 +68,8 @@
                              delay:totalDuration
                              color:currMarker.color
                             dotted:currMarker.dottedLeft];
+        } else {
+            firstMarkerOfSameDay = currMarker;
         }
         
         totalDuration += durationLeft;
@@ -83,6 +87,15 @@
                              delay:totalDuration
                              color:currMarker.color
                             dotted:currMarker.dottedRight];
+            
+            // 다음 마커와 날짜가 같지 않다면 date label의 위치를 계산해 추가하고 firstMarkerOfSameDay를 리셋합니다.
+            if (currMarker.day != nextMarker.day) {
+                [self addDayLabelAnimation:currMarker firstMarker:firstMarkerOfSameDay delay:totalDuration];
+                firstMarkerOfSameDay = nextMarker;
+            }
+            
+        } else { // 마지막 마커일 땐 항상 date label을 추가합니다.
+            [self addDayLabelAnimation:currMarker firstMarker:firstMarkerOfSameDay delay:totalDuration];
         }
         
         totalDuration += durationRight;
@@ -162,10 +175,32 @@
     [_receivedView addSubview: markerView];
 }
 
-//- (void) addDayAnimation:(VLOMarker *)marker delay:(CGFloat)delay color:(UIColor *)color {
-//    UILabel *dayLabel = [[UILabel alloc]initWithFrame:CGRectMake(91, 15, 0, 0)];
-//    UILabel *markerLabel =
-//}
+- (void) addDayLabelAnimation:(VLOMarker *)marker firstMarker:(VLOMarker *)firstMarker delay:(CGFloat)delay {
+    CGFloat labelX = (marker.x + firstMarker.x) / 2 - MARKER_LABEL_WIDTH / 2;
+    CGFloat labelY = marker.y + MARKER_TRAVEL;
+    
+    UILabel *dayLabel = [[UILabel alloc]initWithFrame:
+                         CGRectMake(labelX, labelY, MARKER_LABEL_WIDTH, MARKER_LABEL_HEIGHT)];
+    dayLabel.text = [NSString stringWithFormat:@"Day %li", marker.day];
+    dayLabel.font = [UIFont museoSans700WithSize:10.0f];
+    dayLabel.textAlignment = NSTextAlignmentCenter;
+    dayLabel.textColor = DAY_LABEL_COLOR;
+    
+    // 마커 애니메이션.
+    dayLabel.alpha = 0;
+    dayLabel.hidden = NO;
+    UIViewAnimationOptions options = UIViewAnimationOptionCurveEaseInOut;
+    [UIView animateWithDuration:MARKER_ANIMATION_DURATION delay:delay options:options
+                     animations:^{
+                         dayLabel.alpha = 1;
+                         CGFloat dateLeft = dayLabel.frame.origin.x;
+                         CGFloat dateTop = dayLabel.frame.origin.y;
+                         CGFloat dateWidth = dayLabel.frame.size.width;
+                         CGFloat dateHeight = dayLabel.frame.size.height;
+                         [dayLabel setFrame:CGRectMake(dateLeft, dateTop - MARKER_TRAVEL, dateWidth, dateHeight)];
+                     } completion: nil];
+    [_receivedView addSubview: dayLabel];
+}
 
 - (void) eraseAll {
     _animationLayer.sublayers = nil;
