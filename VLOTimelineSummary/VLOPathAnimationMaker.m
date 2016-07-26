@@ -89,7 +89,7 @@
                             dotted:currMarker.dottedRight];
             
             // 다음 마커와 날짜가 같지 않다면 date label의 위치를 계산해 추가하고 firstMarkerOfSameDay를 리셋합니다.
-            if (currMarker.day != nextMarker.day) {
+            if ([currMarker.day integerValue] != [nextMarker.day integerValue]) {
                 [self addDayLabelAnimation:currMarker firstMarker:firstMarkerOfSameDay delay:totalDuration];
                 firstMarkerOfSameDay = nextMarker;
             }
@@ -182,7 +182,7 @@
     
     UILabel *dayLabel = [[UILabel alloc]initWithFrame:
                          CGRectMake(labelX, labelY, MARKER_LABEL_WIDTH, MARKER_LABEL_HEIGHT)];
-    dayLabel.text = [NSString stringWithFormat:@"Day %li", marker.day];
+    dayLabel.text = [NSString stringWithFormat:@"Day %li", [marker.day integerValue]];
     dayLabel.font = [UIFont museoSans700WithSize:10.0f];
     dayLabel.textAlignment = NSTextAlignmentCenter;
     dayLabel.textColor = DAY_LABEL_COLOR;
