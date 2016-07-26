@@ -47,14 +47,13 @@
         leftover = 0;
     }
     
-    CGFloat xVariation = (placeList.count == 1) ? 0 : leftover / 8.0;
+    CGFloat xVariation = (placeList.count == 1) ? 0 : leftover / 8.0; // 실험 결과 8이 가장 이상적인 모양.
     CGFloat leftmostX = @(MIN_DIST).intValue * (markerNum - 1) / 2 ;
     CGFloat adjustedLeftMostX = _summaryWidth/2 - leftmostX - xVariation/2;
     
     // VLOMarker 생성.
     NSMutableArray *markerList = [[NSMutableArray alloc] initWithCapacity:markerNum];
     CGFloat newX = adjustedLeftMostX;
-    //NSInteger up = -1;
     
     for (NSInteger i = 0; i < placeList.count; i++) {
         
@@ -68,14 +67,12 @@
         }
         
         newMarker.x = newX;
-//        newMarker.y = _summaryHeight / 2 + up * Y_VARIATION;
         newMarker.y = _summaryHeight / 2;
         newMarker.name = place.name;
         newMarker.nameAbove = YES;
         newMarker.dottedLeft = _tooManyMarkers && (i == _maxMarkers / 2);
         newMarker.dottedRight = _tooManyMarkers && (i == _maxMarkers / 2 - 1);
-        //newMarker.color = [UIColor darkGrayColor];
-        //up *= -1;
+        newMarker.day = i+1;
         
         // Random new marker color.
         CGFloat hue = ( arc4random() % 256 / 256.0 );  //  0.0 to 1.0
