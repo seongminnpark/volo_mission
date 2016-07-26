@@ -16,7 +16,7 @@
     return distance;
 }
 
-- (UIView *) getMarkerView {
+- (UIView *) getMarkerViewWithColor:(UIColor *)color {
     // 마커 생성.
     UIImageView *markerImageView = [[UIImageView alloc]
                                     initWithImage: [UIImage imageNamed:MARKER_IMAGE_NAME]];
@@ -54,6 +54,7 @@
     // 마커 레이블 + 마커를 담은 UIView 생성.
     UIView *markerView = [[UIView alloc] initWithFrame:
                           CGRectMake(markerLeft, markerTop, MARKER_SIZE, MARKER_SIZE + MARKER_LABEL_HEIGHT)];
+    [markerImageView setTintColor:color];
     [markerView addSubview:markerImageView];
     
     for (UILabel *label in label_arr)

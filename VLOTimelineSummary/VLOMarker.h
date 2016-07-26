@@ -17,12 +17,14 @@
 @interface VLOMarker : NSObject
 
 + (CGFloat) distanceBetweenMarker1:(VLOMarker *)marker1 Marker2:(VLOMarker *)marker2;
-- (UIView *) getMarkerView;
+- (UIView *) getMarkerViewWithColor:(UIColor *)color;
 
 @property (nonatomic) CGFloat x;
 @property (nonatomic) CGFloat y;
 @property (nonatomic) NSString *name;
+@property (nonatomic) UIColor *color;
 @property (nonatomic) BOOL nameAbove;
-@property (nonatomic) BOOL dottedLine;
+@property (nonatomic) BOOL dottedLeft;
+@property (nonatomic) BOOL dottedRight;
 
 @end

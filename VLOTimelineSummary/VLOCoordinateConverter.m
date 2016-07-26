@@ -54,7 +54,7 @@
     // VLOMarker 생성.
     NSMutableArray *markerList = [[NSMutableArray alloc] initWithCapacity:markerNum];
     CGFloat newX = adjustedLeftMostX;
-    NSInteger up = -1;
+    //NSInteger up = -1;
     
     for (NSInteger i = 0; i < placeList.count; i++) {
         
@@ -68,11 +68,13 @@
         }
         
         newMarker.x = newX;
-        newMarker.y = _summaryHeight / 2 + up * Y_VARIATION;
+//        newMarker.y = _summaryHeight / 2 + up * Y_VARIATION;
+        newMarker.y = _summaryHeight / 2;
         newMarker.name = place.name;
         newMarker.nameAbove = YES;
-        newMarker.dottedLine = _tooManyMarkers && (i == _maxMarkers / 2 - 1);
-        up *= -1;
+        newMarker.dottedLeft = _tooManyMarkers && (i == _maxMarkers / 2);
+        newMarker.dottedRight = _tooManyMarkers && (i == _maxMarkers / 2 - 1);
+        //up *= -1;
         [markerList addObject:newMarker];
     }
 
