@@ -2,6 +2,7 @@
 
 
 #import "VLOTimelineSummary.h"
+#import "VLOUtilities.h"
 
 @interface VLOTimelineSummary()
 
@@ -13,6 +14,7 @@
 - (id)initWithView:(UIView *)summaryView andLogList:(NSArray *)logList
 {
     self = [super init];
+    
     
     _summaryWidth = summaryView.bounds.size.width;
     _summaryHeight = summaryView.bounds.size.height;
