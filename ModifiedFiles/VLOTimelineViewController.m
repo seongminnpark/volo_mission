@@ -94,6 +94,8 @@
 #import <Masonry/Masonry.h>
 #import <AFNetworking/AFNetworking.h>
 
+#import "VLOTimelineSummary.h"
+
 
 
 @interface VLOTimelineViewController () <VLOTimelineTableViewDelegate, VLOTableViewPhotoCellDelegate, VLOTableViewMapCellDelegate,
@@ -405,7 +407,7 @@ VLOTagEditViewDelegate, VLOFriendsListDelegate>
     [[UITapGestureRecognizer alloc] initWithTarget:self
                                             action:@selector(showSummary)];
     [tapSummary setNumberOfTapsRequired:1];
-    [_coverView.summaryView addGestureRecognizer:tapSummary];
+    [_tableView.summaryView addGestureRecognizer:tapSummary];
     
     [self showSummary];
 }
@@ -413,12 +415,13 @@ VLOTagEditViewDelegate, VLOFriendsListDelegate>
 - (void)showSummary
 {
     // summaryView 리셋.
-    [[_coverView.summaryView subviews] makeObjectsPerformSelector:@selector(removeFromSuperview)];
-    _coverView.summaryView.layer.sublayers = nil;
+    [[_tableView.summaryView subviews] makeObjectsPerformSelector:@selector(removeFromSuperview)];
+    _tableView.summaryView.layer.sublayers = nil;
     
     NSArray *logs = _tableViewController.logs;
     
     VLOTimelineSummary *summaryMaker = [[VLOTimelineSummary alloc] initWithView:_coverView.summaryView andLogList:logs];
+
     [summaryMaker animateSummary];
 }
 
@@ -612,7 +615,8 @@ VLOTagEditViewDelegate, VLOFriendsListDelegate>
     _tableViewBackground.frame = CGRectSetY(_tableViewBackground.frame, setY);
     
     if (_tableView.contentOffset.y <= _tableView.contentInset.top) {
-        CGFloat contentInsetTop = MAX(0, 64.0f-(setY/[VLOUtilities screenWidth]*64.0f));
+        //CGFloat contentInsetTop = MAX(0, 64.0f-(setY/[VLOUtilities screenWidth]*64.0f));
+        CGFloat contentInsetTop = MAX(SUMMARY_HEIGHT, (64.0f + SUMMARY_HEIGHT)-(setY/[VLOUtilities screenWidth]*(64.0f+SUMMARY_HEIGHT)));
         [_tableView setContentInset:UIEdgeInsetsMake(contentInsetTop, 0, 64, 0)];
         [_tableView setContentOffset:CGPointMake(0, -contentInsetTop)];
     }

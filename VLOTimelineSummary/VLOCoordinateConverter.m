@@ -1,4 +1,3 @@
-
 // VLOCoordinateConverter.m
 
 
@@ -13,21 +12,19 @@
 @property () CGFloat summaryHeight;
 @property () CGFloat distanceSum;
 @property () NSInteger maxMarkers;
-@property () NSInteger markerNum;
 @property () BOOL tooManyMarkers;
 
 @end
 
 @implementation VLOCoordinateConverter
 
-- (void) initWithWidth:(CGFloat)width andHeight:(CGFloat)height {
-    //self = [super init];
+- (id) initWithWidth:(CGFloat)width andHeight:(CGFloat)height {
+    self = [super init];
     _summaryWidth = width;
     _summaryHeight = height;
     _actualWidth = _summaryWidth - HORIZONTAL_PADDING * 2;
     _maxMarkers = @(_actualWidth).intValue / @(MIN_DIST).intValue + 1;
-    _tooManyMarkers = FALSE;
-    //return self;
+    return self;
 }
 
 - (NSArray *) getCoordinates:(NSArray *)originalLogList {
@@ -38,8 +35,6 @@
     if (originalLogList.count < 1) {
         return [NSArray array];
     }
-    
-    [self initWithWidth:[UIScreen mainScreen].bounds.size.width andHeight:SUMMARY_HEIGHT];
     
     for(NSInteger i = 0; i < originalLogList.count; i++) {
         VLOLog *log = [originalLogList objectAtIndex:i];
@@ -58,29 +53,28 @@
             [dayList addObject:day];
         }
     }
-    
-    
     // 연속으로 중복되거나 불량한 인풋, 군집된 로케이션 정리
-    placeList = [self sanitizeInput:placeList];
+    NSArray *organized_placeList = [self sanitizeInput:placeList];
+
     // 각 마커의 x 좌표를 설정하기 위해 경도 분포를 확인합니다.
-    [self initDistanceList:placeList];
+    [self initDistanceList:organized_placeList];
     
-    _markerNum = placeList.count;
+    NSInteger markerNum = organized_placeList.count;
     
     // 첫 VLOMarker의 좌표.
-    CGFloat leftover = _actualWidth - @(MIN_DIST).intValue * (_markerNum - 1);
+    CGFloat leftover = _actualWidth - @(MIN_DIST).intValue * (markerNum - 1);
     if (leftover < 0) {
         leftover = 0;
     }
-    
-    CGFloat xVariation = (placeList.count == 1) ? 0 : leftover / placeList.count;
-    CGFloat leftmostX = @(MIN_DIST).intValue * (_markerNum - 1) / 2 ;
-    CGFloat adjustedLeftMostX = [VLOUtilities screenWidth]/2 - leftmostX - xVariation;
+
+    CGFloat xVariation = (placeList.count == 1) ? 0 : leftover / 8.0;
+    CGFloat leftmostX = @(MIN_DIST).intValue * (markerNum - 1) / 2 ;
+    CGFloat adjustedLeftMostX = _summaryWidth/2 - leftmostX - xVariation/2;
     
     // VLOMarker 생성.
-    NSMutableArray *markerList = [[NSMutableArray alloc] initWithCapacity:_markerNum];
+    NSMutableArray *markerList = [[NSMutableArray alloc] initWithCapacity:markerNum];
     CGFloat newX = adjustedLeftMostX;
-    NSInteger up = -1;
+    //NSInteger up = -1;
     
     for (NSInteger i = 0; i < placeList.count; i++) {
         
@@ -90,29 +84,32 @@
         
         if (i > 0) {
             // 오른쪽 여백이 안맞는 경우가 있어서 마지막 x좌표는 임의로 설정
-            if (i == placeList.count - 1) {
-                newX = adjustedLeftMostX + ([VLOUtilities screenWidth] - (2 * adjustedLeftMostX));
-            }
-            else {
-                CGFloat horizontalVariation = xVariation * ([[_distanceList objectAtIndex:i-1] floatValue] / _distanceSum);
-                newX += MIN_DIST + horizontalVariation;
-            }
-            
+            CGFloat horizontalVariation = xVariation * ([[_distanceList objectAtIndex:i-1] floatValue] / _distanceSum);
+            newX += MIN_DIST + horizontalVariation;
         }
         
         newMarker.x = newX;
-        newMarker.y = _summaryHeight / 2 + up * Y_VARIATION;
+//        newMarker.y = _summaryHeight / 2 + up * Y_VARIATION;
+        newMarker.y = _summaryHeight / 2;
         newMarker.name = place.name;
         newMarker.nameAbove = YES;
-        newMarker.dottedLine = _tooManyMarkers && (i == placeList.count / 2);
         newMarker.country = place.country;
         newMarker.day = dayNum;
-        up *= -1;
+        newMarker.dottedLeft = _tooManyMarkers && (i == _maxMarkers / 2);
+        newMarker.dottedRight = _tooManyMarkers && (i == _maxMarkers / 2 - 1);
+        //newMarker.color = [UIColor darkGrayColor];
+        //up *= -1;
+        
+        // Random new marker color.
+        CGFloat hue = ( arc4random() % 256 / 256.0 );  //  0.0 to 1.0
+        CGFloat saturation = ( arc4random() % 128 / 256.0 ) + 0.5;  //  0.5 to 1.0, away from white
+        CGFloat brightness = ( arc4random() % 128 / 256.0 ) + 0.5;  //  0.5 to 1.0, away from black
+        UIColor *color = [UIColor colorWithHue:hue saturation:saturation brightness:brightness alpha:1];
+        newMarker.color = color;
         
         [markerList addObject:newMarker];
     }
-    
-    _tooManyMarkers = FALSE;
+
     return markerList;
 }
 
@@ -135,37 +132,22 @@
             overlap_cnt ++;
             [indicesToRemove addIndex:i];
         }
-        
+
     }
     
     _tooManyMarkers = (placeList.count - overlap_cnt) > _maxMarkers;
     
     // 군집되는 경우
     if (_tooManyMarkers) {
-        NSInteger diff = (placeList.count - overlap_cnt) - _maxMarkers;
-        NSInteger min_index = (placeList.count - diff) / 2;
-        NSInteger max_index = ((placeList.count - diff) / 2) + diff;
         
-        for (NSInteger i = min_index; i < max_index + 1; i++) {
-            [indicesToRemove addIndex:i];
-        }
+        NSInteger trimIndexStart = _maxMarkers / 2;
+        NSInteger overflow = placeList.count - _maxMarkers;
         
-        if ((placeList.count - indicesToRemove.count) > _maxMarkers) {
-            diff = (placeList.count - indicesToRemove.count) - _maxMarkers;
-            min_index = ((placeList.count - indicesToRemove.count - diff) / 2);
-            max_index = ((placeList.count - indicesToRemove.count - diff) / 2) + diff;
-            
-            for (NSInteger i = min_index; i < max_index + 1; i++)
-            {
-                [indicesToRemove addIndex:i];
-            }
-        }
+        [indicesToRemove addIndexesInRange:NSMakeRange(trimIndexStart, overflow)];
     }
     
     // 군집, 중복마커 제거
     [newPlaceList removeObjectsAtIndexes:indicesToRemove];
-    
-    
     
     return newPlaceList;
 }
@@ -173,7 +155,6 @@
 - (void) initDistanceList:(NSArray *)placeList {
     _distanceList = [[NSMutableArray alloc] initWithCapacity:placeList.count-1];
     _distanceSum = 0;
-    _markerNum = 0;
     
     for (NSInteger i = 1; i < placeList.count; i++) {
         
@@ -182,7 +163,6 @@
         CGFloat distance = [self distance:prevPlace:currPlace];
         _distanceSum += distance;
         [_distanceList addObject: @(distance)];
-        _markerNum += 1;
     }
     
 }
@@ -197,7 +177,6 @@
 
 
 @end
-
 
 
 
