@@ -27,19 +27,39 @@
     return self;
 }
 
-- (NSArray *) getCoordinates:(NSArray *)originalPlaceList {
-    
-    if (originalPlaceList.count < 1) {
+- (NSArray *) getCoordinates:(NSArray *)originalLogList {
+    NSMutableArray *placeList = [[NSMutableArray alloc] init];
+    NSMutableArray *dayList = [[NSMutableArray alloc] init];
+    NSNumber *day;
+   
+    if (originalLogList.count < 1) {
         return [NSArray array];
     }
     
+    for(NSInteger i = 0; i < originalLogList.count; i++) {
+        VLOLog *log = [originalLogList objectAtIndex:i];
+        
+        if(log.type == VLOLogTypeDay) {
+            VLODayLog *dayLog = (VLODayLog *)log;
+            day = dayLog.day;
+        }
+        if(log.type == VLOLogTypeMap) {
+            [placeList addObject:log.place];
+            [dayList addObject:day];
+        } else if(log.type == VLOLogTypeRoute) {
+            for (VLOLog *node in ((VLORouteLog *)log).nodes) {
+                [placeList addObject:node.place];
+            }
+            [dayList addObject:day];
+        }
+    }
     // 연속으로 중복되거나 불량한 인풋, 군집된 로케이션 정리
-    NSArray *placeList = [self sanitizeInput:originalPlaceList];
-    
+    NSArray *organized_placeList = [self sanitizeInput:placeList :dayList];
+
     // 각 마커의 x 좌표를 설정하기 위해 경도 분포를 확인합니다.
-    [self initDistanceList:placeList];
+    [self initDistanceList:organized_placeList];
     
-    NSInteger markerNum = placeList.count;
+    NSInteger markerNum = organized_placeList.count;
     
     // 첫 VLOMarker의 좌표.
     CGFloat leftover = _actualWidth - @(MIN_DIST).intValue * (markerNum - 1);
@@ -47,7 +67,8 @@
         leftover = 0;
     }
     
-    CGFloat xVariation = (placeList.count == 1) ? 0 : leftover / 8.0; // 실험 결과 8이 가장 이상적인 모양.
+    CGFloat xVariation = (organized_placeList.count == 1) ? 0 : leftover / 8.0; // 실험 결과 8이 가장 이상적인 모양.
+
     CGFloat leftmostX = @(MIN_DIST).intValue * (markerNum - 1) / 2 ;
     CGFloat adjustedLeftMostX = _summaryWidth/2 - leftmostX - xVariation/2;
     
@@ -55,10 +76,11 @@
     NSMutableArray *markerList = [[NSMutableArray alloc] initWithCapacity:markerNum];
     CGFloat newX = adjustedLeftMostX;
     
-    for (NSInteger i = 0; i < placeList.count; i++) {
+    for (NSInteger i = 0; i < organized_placeList.count; i++) {
         
-        VLOPlace *place = [placeList objectAtIndex:i];
+        VLOPlace *place = [organized_placeList objectAtIndex:i];
         VLOMarker *newMarker = [[VLOMarker alloc] init];
+        NSNumber *dayNum = [dayList objectAtIndex:i];
         
         if (i > 0) {
             // 오른쪽 여백이 안맞는 경우가 있어서 마지막 x좌표는 임의로 설정
@@ -70,9 +92,10 @@
         newMarker.y = _summaryHeight / 2;
         newMarker.name = place.name;
         newMarker.nameAbove = YES;
+        newMarker.country = place.country;
+        newMarker.day = dayNum;
         newMarker.dottedLeft = _tooManyMarkers && (i == _maxMarkers / 2);
         newMarker.dottedRight = _tooManyMarkers && (i == _maxMarkers / 2 - 1);
-        newMarker.day = i+1;
         
         // Random new marker color.
         CGFloat hue = ( arc4random() % 256 / 256.0 );  //  0.0 to 1.0
@@ -87,7 +110,7 @@
     return markerList;
 }
 
-- (NSArray *) sanitizeInput:(NSArray *)placeList {
+- (NSArray *) sanitizeInput:(NSArray *)placeList :(NSMutableArray *)dayList {
     
     NSMutableIndexSet *indicesToRemove = [NSMutableIndexSet indexSet];
     NSMutableArray *newPlaceList = [[NSMutableArray alloc] initWithArray:placeList copyItems:YES];
@@ -122,11 +145,12 @@
     
     // 군집, 중복마커 제거
     [newPlaceList removeObjectsAtIndexes:indicesToRemove];
+    [dayList removeObjectsAtIndexes:indicesToRemove];
     
     return newPlaceList;
 }
 
-- (void) initDistanceList:(NSArray *)placeList {
+- (void) initDistanceList:(NSArray *)placeList{
     _distanceList = [[NSMutableArray alloc] initWithCapacity:placeList.count-1];
     _distanceSum = 0;
     

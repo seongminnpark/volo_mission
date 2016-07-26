@@ -2,6 +2,7 @@
 
 
 #import "VLOTimelineSummary.h"
+#import "VLOUtilities.h"
 
 @interface VLOTimelineSummary()
 
@@ -10,16 +11,17 @@
 @implementation VLOTimelineSummary
 
 
-- (id)initWithView:(UIView *)summaryView andPlaceList:(NSArray *)placeList
+- (id)initWithView:(UIView *)summaryView andLogList:(NSArray *)logList
 {
     self = [super init];
     
-    CGFloat summaryWidth = summaryView.bounds.size.width;
-    CGFloat summaryHeight = summaryView.bounds.size.height;
     
-    VLOCoordinateConverter *converter = [[VLOCoordinateConverter alloc] initWithWidth:summaryWidth andHeight:summaryHeight];
-    NSArray *markerList = [converter getCoordinates:placeList];
-
+    _summaryWidth = summaryView.bounds.size.width;
+    _summaryHeight = summaryView.bounds.size.height;
+    
+    VLOCoordinateConverter *converter = [[VLOCoordinateConverter alloc] initWithWidth:_summaryWidth andHeight:_summaryHeight];
+    
+    NSArray *markerList = [converter getCoordinates:logList];
     _animationMaker = [[VLOPathAnimationMaker alloc] initWithView:summaryView andMarkerList:markerList];
     
     return self;

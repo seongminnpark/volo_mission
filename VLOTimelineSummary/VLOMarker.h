@@ -6,6 +6,7 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import "VLOCountry.h"
 
 #define MARKER_SIZE         10.0f
 #define MARKER_LABEL_HEIGHT 10.0f
@@ -22,8 +23,9 @@
 @property (nonatomic) CGFloat y;
 @property (nonatomic) NSString *name;
 @property (nonatomic) UIColor *color;
-@property (nonatomic) NSInteger day;
 @property (nonatomic) BOOL nameAbove;
+@property (nonatomic) VLOCountry *country;
+@property (nonatomic) NSNumber *day;
 @property (nonatomic) BOOL dottedLeft;
 @property (nonatomic) BOOL dottedRight;
 
