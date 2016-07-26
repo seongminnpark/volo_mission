@@ -13,17 +13,16 @@
 @implementation VLOTimelineSummary
 
 
-- (id)initWithView:(UIView *)summaryView andPlaceList:(NSArray *)placeList
+- (id)initWithView:(UIView *)summaryView andLogList:(NSArray *)logList
 {
     self = [super init];
     
     _summaryWidth = summaryView.bounds.size.width;
     _summaryHeight = summaryView.bounds.size.height;
     
-    //VLOCoordinateConverter *converter = [[VLOCoordinateConverter alloc] initWithWidth:_summaryWidth andHeight:_summaryHeight];
     VLOCoordinateConverter *converter = [[VLOCoordinateConverter alloc] init];
     
-    NSArray *markerList = [converter getCoordinates:placeList];
+    NSArray *markerList = [converter getCoordinates:logList];
 
     _animationMaker = [[VLOPathAnimationMaker alloc] initWithView:summaryView andMarkerList:markerList];
     

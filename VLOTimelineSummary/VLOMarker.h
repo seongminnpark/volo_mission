@@ -6,6 +6,7 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import "VLOCountry.h"
 
 //#define MARKER_SIZE         30
 #define MARKER_SIZE         15
@@ -24,5 +25,7 @@
 @property (nonatomic) NSString *name;
 @property (nonatomic) BOOL nameAbove;
 @property (nonatomic) BOOL dottedLine;
+@property (nonatomic) VLOCountry *country;
+@property (nonatomic) NSNumber *day;
 
 @end
