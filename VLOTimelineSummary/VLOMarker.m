@@ -18,10 +18,14 @@
 
 - (UIView *) getMarkerViewWithColor:(UIColor *)color {
     // 마커 생성.
-    UIImageView *markerImageView = [[UIImageView alloc]
-                                    initWithImage: [UIImage imageNamed:MARKER_IMAGE_NAME]];
+//    UIImageView *markerImageView = [[UIImageView alloc]
+//                                    initWithImage: [UIImage imageNamed:MARKER_IMAGE_NAME]];
+    UIImageView *markerImageView = [[UIImageView alloc] init];
+    markerImageView.image = [[UIImage imageNamed:MARKER_IMAGE_NAME] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+    [markerImageView setTintColor:color];
+    
     CGFloat markerLeft = x - MARKER_SIZE/2;
-    CGFloat markerTop = y - MARKER_SIZE;
+    CGFloat markerTop = y - MARKER_SIZE/2;
     
     [markerImageView setFrame:CGRectMake(0, -MARKER_TRAVEL, MARKER_SIZE, MARKER_SIZE)];
     

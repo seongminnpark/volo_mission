@@ -8,11 +8,11 @@
 #import <UIKit/UIKit.h>
 #import "VLOCountry.h"
 
-#define MARKER_SIZE         15
+#define MARKER_SIZE         10.0f
 #define MARKER_LABEL_HEIGHT 10.0f
 #define MARKER_LABEL_WIDTH  MARKER_SIZE * 2.5f
 #define MARKER_TRAVEL       20.0f
-#define MARKER_IMAGE_NAME   @"marker6.png"
+#define MARKER_IMAGE_NAME   @"marker7.png"
 
 @interface VLOMarker : NSObject
 
