@@ -5,9 +5,6 @@
 
 @interface VLOTimelineSummary()
 
-@property CGFloat summaryWidth;
-@property CGFloat summaryHeight;
-
 @end
 
 @implementation VLOTimelineSummary
@@ -17,12 +14,10 @@
 {
     self = [super init];
     
-    _summaryWidth = summaryView.bounds.size.width;
-    _summaryHeight = summaryView.bounds.size.height;
+    CGFloat summaryWidth = summaryView.bounds.size.width;
+    CGFloat summaryHeight = summaryView.bounds.size.height;
     
-    //VLOCoordinateConverter *converter = [[VLOCoordinateConverter alloc] initWithWidth:_summaryWidth andHeight:_summaryHeight];
-    VLOCoordinateConverter *converter = [[VLOCoordinateConverter alloc] init];
-    
+    VLOCoordinateConverter *converter = [[VLOCoordinateConverter alloc] initWithWidth:summaryWidth andHeight:summaryHeight];
     NSArray *markerList = [converter getCoordinates:placeList];
 
     _animationMaker = [[VLOPathAnimationMaker alloc] initWithView:summaryView andMarkerList:markerList];
