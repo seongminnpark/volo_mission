@@ -20,6 +20,10 @@
     // 마커 생성.
     UIImageView *markerImageView = [[UIImageView alloc]
                                     initWithImage: [UIImage imageNamed:MARKER_IMAGE_NAME]];
+    
+    markerImageView.image = [markerImageView.image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+    [markerImageView setTintColor:color];
+    
     CGFloat markerLeft = x - MARKER_SIZE/2;
     CGFloat markerTop = y - MARKER_SIZE;
     
