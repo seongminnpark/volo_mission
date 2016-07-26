@@ -9,7 +9,6 @@
 #define MARKER_ANIMATION_DURATION 0.3
 #define LINE_ANIMATION_DURATION   1.0
 
-#define MITERLIM   5.0
 #define LINE_WIDTH 2
 
 #define DAY_LABEL_COLOR [UIColor darkGrayColor]

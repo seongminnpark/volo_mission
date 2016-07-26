@@ -113,16 +113,17 @@
     pathLayer.path = path.CGPath;
     pathLayer.strokeColor = color.CGColor;
     pathLayer.fillColor = [UIColor clearColor].CGColor;
-    pathLayer.lineWidth = LINE_WIDTH;
     pathLayer.strokeStart = 0.0;
     pathLayer.strokeEnd = 1.0;
     pathLayer.lineJoin = kCALineJoinRound;
     pathLayer.lineCap = kCALineCapRound;
-    pathLayer.miterLimit = MITERLIM;
     
     if (dotted) {
-        NSArray *dashes = [NSArray arrayWithObjects:@(1), @(5), nil];
+        NSArray *dashes = [NSArray arrayWithObjects:@(1), @(2), nil];
         [pathLayer setLineDashPattern:dashes];
+        pathLayer.lineWidth = 1.0;
+    } else {
+        pathLayer.lineWidth = LINE_WIDTH;
     }
     
     [_animationLayer addSublayer:pathLayer];
@@ -177,7 +178,7 @@
 
 - (void) addDayLabelAnimation:(VLOMarker *)marker firstMarker:(VLOMarker *)firstMarker delay:(CGFloat)delay {
     CGFloat labelX = (marker.x + firstMarker.x) / 2 - MARKER_LABEL_WIDTH / 2;
-    CGFloat labelY = marker.y + MARKER_TRAVEL;
+    CGFloat labelY = marker.y + MARKER_TRAVEL*2;
     
     UILabel *dayLabel = [[UILabel alloc]initWithFrame:
                          CGRectMake(labelX, labelY, MARKER_LABEL_WIDTH, MARKER_LABEL_HEIGHT)];
@@ -185,6 +186,7 @@
     dayLabel.font = [UIFont museoSans700WithSize:10.0f];
     dayLabel.textAlignment = NSTextAlignmentCenter;
     dayLabel.textColor = DAY_LABEL_COLOR;
+    [dayLabel sizeToFit];
     
     // 마커 애니메이션.
     dayLabel.alpha = 0;
