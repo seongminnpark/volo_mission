@@ -11,9 +11,8 @@
 #import "VLORouteLog.h"
 
 #define VERTICAL_PADDING   MARKER_SIZE + MARKER_LABEL_HEIGHT * 3 // 마커 레이블은 세 줄까지 가능.
-#define HORIZONTAL_PADDING MARKER_SIZE
-#define MIN_DIST           MARKER_SIZE + 20 // 두 마커 사이 최소 거리.
-#define Y_VARIATION        MARKER_SIZE / 4.0f
+#define HORIZONTAL_PADDING MARKER_LABEL_WIDTH * 2
+#define MIN_DIST           MARKER_LABEL_WIDTH + 20.0f // 두 마커 사이 최소 거리.
 
 @interface VLOCoordinateConverter : NSObject
 

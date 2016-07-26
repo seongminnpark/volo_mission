@@ -49,7 +49,6 @@
                                 CGRectMake(-MARKER_SIZE/2, label_top, MARKER_LABEL_WIDTH, MARKER_LABEL_HEIGHT)];
         markerLabel.text = [name_split objectAtIndex:i];
         markerLabel.font = [UIFont museoSans700WithSize:10.0f];
-        // markerLabel.font = [markerLabel.font fontWithSize:10];
         markerLabel.textAlignment = NSTextAlignmentCenter;
         markerLabel.textColor = [UIColor darkGrayColor];
         [label_arr addObject:markerLabel];

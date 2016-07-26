@@ -17,7 +17,7 @@
 @property NSInteger summaryWidth;
 @property NSInteger summaryHeight;
 
-- (id) initWithView:(UIView *)summaryView andLogList:(NSArray *)placeList;
+- (id) initWithView:(UIView *)summaryView andLogList:(NSArray *)logList;
 - (void) animateSummary;
 
 @end
