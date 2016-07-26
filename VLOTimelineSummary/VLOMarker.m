@@ -47,7 +47,7 @@
         markerLabel.font = [UIFont museoSans700WithSize:10.0f];
         // markerLabel.font = [markerLabel.font fontWithSize:10];
         markerLabel.textAlignment = NSTextAlignmentCenter;
-        markerLabel.textColor = [UIColor whiteColor];
+        markerLabel.textColor = [UIColor darkGrayColor];
         [label_arr addObject:markerLabel];
     }
     

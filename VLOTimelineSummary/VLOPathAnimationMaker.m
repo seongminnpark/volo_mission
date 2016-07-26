@@ -50,8 +50,8 @@
         //UIBezierPath *newPath = [_pathMaker pathBetweenPoint:currPoint point:nextPoint];
         
         // 마커 애니메이션 추가.
-        VLOMarker *marker = (VLOMarker *) [markerList objectAtIndex:i];
-        [self addMarkerAnimation:marker delay:totalDuration color:currMarker.color];
+        [self addMarkerAnimation:currMarker delay:totalDuration color:currMarker.color];
+        //[self addDayAnimation:currMarker delay:totalDuration color:currMarker.color];
         
         if (prevMarker) {
             
@@ -161,6 +161,11 @@
                      } completion: nil];
     [_receivedView addSubview: markerView];
 }
+
+//- (void) addDayAnimation:(VLOMarker *)marker delay:(CGFloat)delay color:(UIColor *)color {
+//    UILabel *dayLabel = [[UILabel alloc]initWithFrame:CGRectMake(91, 15, 0, 0)];
+//    UILabel *markerLabel =
+//}
 
 - (void) eraseAll {
     _animationLayer.sublayers = nil;

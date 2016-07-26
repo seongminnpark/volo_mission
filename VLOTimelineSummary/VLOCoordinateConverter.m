@@ -74,7 +74,16 @@
         newMarker.nameAbove = YES;
         newMarker.dottedLeft = _tooManyMarkers && (i == _maxMarkers / 2);
         newMarker.dottedRight = _tooManyMarkers && (i == _maxMarkers / 2 - 1);
+        //newMarker.color = [UIColor darkGrayColor];
         //up *= -1;
+        
+        // Random new marker color.
+        CGFloat hue = ( arc4random() % 256 / 256.0 );  //  0.0 to 1.0
+        CGFloat saturation = ( arc4random() % 128 / 256.0 ) + 0.5;  //  0.5 to 1.0, away from white
+        CGFloat brightness = ( arc4random() % 128 / 256.0 ) + 0.5;  //  0.5 to 1.0, away from black
+        UIColor *color = [UIColor colorWithHue:hue saturation:saturation brightness:brightness alpha:1];
+        newMarker.color = color;
+        
         [markerList addObject:newMarker];
     }
 
@@ -100,7 +109,7 @@
             overlap_cnt ++;
             [indicesToRemove addIndex:i];
         }
-        
+
     }
     
     _tooManyMarkers = (placeList.count - overlap_cnt) > _maxMarkers;
