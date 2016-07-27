@@ -31,10 +31,6 @@
     NSMutableArray *placeList = [[NSMutableArray alloc] init];
     NSMutableArray *dayList = [[NSMutableArray alloc] init];
     NSNumber *day = @(1);
-   
-    if (originalLogList.count < 1) {
-        return [NSArray array];
-    }
     
     for(NSInteger i = 0; i < originalLogList.count; i++) {
         VLOLog *log = [originalLogList objectAtIndex:i];
