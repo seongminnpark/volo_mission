@@ -51,8 +51,14 @@
                 [placeList addObject:node.place];
                 [dayList addObject:day];
             }
+
         }
     }
+    
+    if (placeList.count < 1) {
+        return [NSArray array];
+    }
+    
     // 연속으로 중복되거나 불량한 인풋, 군집된 로케이션 정리
     NSArray *organized_placeList = [self sanitizeInput:placeList :dayList];
 
