@@ -6,8 +6,6 @@
 
 
 @implementation VLOMarker
-@synthesize x;
-@synthesize y;
 
 + (CGFloat) distanceBetweenMarker1:(VLOMarker *)marker1 Marker2:(VLOMarker *)marker2 {
     CGFloat xDelta = marker2.x - marker1.x;
@@ -16,18 +14,19 @@
     return distance;
 }
 
-- (UIView *) getMarkerViewWithColor:(UIColor *)color {
+- (UIView *) getMarkerView {
     // 마커 생성.
 //    UIImageView *markerImageView = [[UIImageView alloc]
 //                                    initWithImage: [UIImage imageNamed:MARKER_IMAGE_NAME]];
     UIImageView *markerImageView = [[UIImageView alloc] init];
     markerImageView.image = [[UIImage imageNamed:MARKER_IMAGE_NAME] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-    [markerImageView setTintColor:color];
+    [markerImageView setTintColor:_color];
     
-    CGFloat markerLeft = x - MARKER_SIZE/2;
-    CGFloat markerTop = y - MARKER_SIZE/2;
+    CGFloat imageViewLeft = MARKER_LABEL_WIDTH/2 - MARKER_SIZE/2;
+    CGFloat imageViewTop = -MARKER_SIZE/2;
     
-    [markerImageView setFrame:CGRectMake(0, -MARKER_TRAVEL, MARKER_SIZE, MARKER_SIZE)];
+    [markerImageView setFrame:CGRectMake(imageViewLeft, imageViewTop, MARKER_SIZE, MARKER_SIZE)];
+    [markerImageView setTintColor:_color];
     
     // 마커 레이블 생성. 띄어쓰기가 있으면 여러줄로 나눔.
     NSMutableArray *label_arr = [NSMutableArray array];
@@ -43,10 +42,11 @@
             break;
         }
         
-        CGFloat label_top = [self getLabelTop:name_split.count :i];
+        CGFloat labelTop = [self getLabelTop:name_split.count :i];
         
+        // Label의 left bound가 0인 이유는 label의 넓이와 superview의 넓이와 같기 때문에 superview의 왼쪽 끝에서 시작한다.
         UILabel *markerLabel = [[UILabel alloc] initWithFrame:
-                                CGRectMake(-MARKER_SIZE/2, label_top, MARKER_LABEL_WIDTH, MARKER_LABEL_HEIGHT)];
+                                CGRectMake(0, labelTop, MARKER_LABEL_WIDTH, MARKER_LABEL_HEIGHT)];
         markerLabel.text = [name_split objectAtIndex:i];
         markerLabel.font = [UIFont museoSans700WithSize:10.0f];
         markerLabel.textAlignment = NSTextAlignmentCenter;
@@ -55,9 +55,14 @@
     }
     
     // 마커 레이블 + 마커를 담은 UIView 생성.
+    CGFloat markerViewLeft = _x - MARKER_LABEL_WIDTH/2;
+    CGFloat markerViewTop = _y - MARKER_LABEL_HEIGHT - MARKER_SIZE;
+    
     UIView *markerView = [[UIView alloc] initWithFrame:
-                          CGRectMake(markerLeft, markerTop, MARKER_SIZE, MARKER_SIZE + MARKER_LABEL_HEIGHT)];
-    [markerImageView setTintColor:color];
+                          CGRectMake(markerViewLeft, markerViewTop, MARKER_LABEL_WIDTH, MARKER_SIZE + MARKER_LABEL_HEIGHT)];
+    
+    
+    // Subview 추가.
     [markerView addSubview:markerImageView];
     
     for (UILabel *label in label_arr)
