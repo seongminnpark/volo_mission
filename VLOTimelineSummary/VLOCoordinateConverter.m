@@ -30,7 +30,7 @@
 - (NSArray *) getCoordinates:(NSArray *)originalLogList groupByDate:(BOOL)groupByDate {
     NSMutableArray *placeList = [[NSMutableArray alloc] init];
     NSMutableArray *dayList = [[NSMutableArray alloc] init];
-    NSNumber *day;
+    NSNumber *day = @(1);
    
     if (originalLogList.count < 1) {
         return [NSArray array];
@@ -49,8 +49,8 @@
         } else if(log.type == VLOLogTypeRoute) {
             for (VLOLog *node in ((VLORouteLog *)log).nodes) {
                 [placeList addObject:node.place];
+                [dayList addObject:day];
             }
-            [dayList addObject:day];
         }
     }
     // 연속으로 중복되거나 불량한 인풋, 군집된 로케이션 정리

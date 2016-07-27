@@ -82,10 +82,11 @@
         wordCount = 3;
     }
     if (_nameAbove) {
-        labelOffset = MARKER_LABEL_HEIGHT * (wordCount - index) + MARKER_TRAVEL;
+         // 글자와 마커가 딱 붙어있지 않도록 10을 더합니다.
+        labelOffset = MARKER_LABEL_HEIGHT * (wordCount - index) + 10;
         label_top = - labelOffset;
     } else {
-        CGFloat labelOffset = MARKER_LABEL_HEIGHT * index + MARKER_TRAVEL;
+        CGFloat labelOffset = MARKER_LABEL_HEIGHT * index + 10;
         label_top = labelOffset;
     }
     
