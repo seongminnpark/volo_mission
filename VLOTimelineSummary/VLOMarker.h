@@ -10,14 +10,14 @@
 
 #define MARKER_SIZE         10.0f
 #define MARKER_LABEL_HEIGHT 10.0f
-#define MARKER_LABEL_WIDTH  20.0f
+#define MARKER_LABEL_WIDTH  50.0f
 #define MARKER_TRAVEL       20.0f
 #define MARKER_IMAGE_NAME   @"marker7.png"
 
 @interface VLOMarker : NSObject
 
 + (CGFloat) distanceBetweenMarker1:(VLOMarker *)marker1 Marker2:(VLOMarker *)marker2;
-- (UIView *) getMarkerViewWithColor:(UIColor *)color;
+- (UIView *) getMarkerView;
 
 @property (nonatomic) CGFloat x;
 @property (nonatomic) CGFloat y;

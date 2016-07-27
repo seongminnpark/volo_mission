@@ -27,7 +27,7 @@
     return self;
 }
 
-- (NSArray *) getCoordinates:(NSArray *)originalLogList {
+- (NSArray *) getCoordinates:(NSArray *)originalLogList groupByDate:(BOOL)groupByDate {
     NSMutableArray *placeList = [[NSMutableArray alloc] init];
     NSMutableArray *dayList = [[NSMutableArray alloc] init];
     NSNumber *day;
@@ -75,10 +75,12 @@
     // VLOMarker 생성.
     NSMutableArray *markerList = [[NSMutableArray alloc] initWithCapacity:markerNum];
     CGFloat newX = adjustedLeftMostX;
+    UIColor *prevColor = [self randomColor];
     
     for (NSInteger i = 0; i < organized_placeList.count; i++) {
         
         VLOPlace *place = [organized_placeList objectAtIndex:i];
+        
         VLOMarker *newMarker = [[VLOMarker alloc] init];
         NSNumber *dayNum = [dayList objectAtIndex:i];
         
@@ -86,6 +88,17 @@
             // 오른쪽 여백이 안맞는 경우가 있어서 마지막 x좌표는 임의로 설정
             CGFloat horizontalVariation = xVariation * ([[_distanceList objectAtIndex:i-1] floatValue] / _distanceSum);
             newX += MIN_DIST + horizontalVariation;
+            
+            VLOPlace *prevPlace = [organized_placeList objectAtIndex:i-1];
+            
+            BOOL sameDate    = dayNum == [dayList objectAtIndex:i-1];
+            BOOL sameCountry = [place.country.isoCountryCode isEqualToString:prevPlace.country.isoCountryCode];
+            BOOL changeColor = (groupByDate && !sameDate) || (!groupByDate && !sameCountry);
+            
+            if (changeColor) {
+                prevColor = [self randomColor];
+                newMarker.color = prevColor;
+            }
         }
         
         newMarker.x = newX;
@@ -96,17 +109,12 @@
         newMarker.day = dayNum;
         newMarker.dottedLeft = _tooManyMarkers && (i == _maxMarkers / 2);
         newMarker.dottedRight = _tooManyMarkers && (i == _maxMarkers / 2 - 1);
-        
-        // Random new marker color.
-        CGFloat hue = ( arc4random() % 256 / 256.0 );  //  0.0 to 1.0
-        CGFloat saturation = ( arc4random() % 128 / 256.0 ) + 0.5;  //  0.5 to 1.0, away from white
-        CGFloat brightness = ( arc4random() % 128 / 256.0 ) + 0.5;  //  0.5 to 1.0, away from black
-        UIColor *color = [UIColor colorWithHue:hue saturation:saturation brightness:brightness alpha:1];
-        newMarker.color = color;
+    
+        newMarker.color = prevColor;
         
         [markerList addObject:newMarker];
     }
-
+    
     return markerList;
 }
 
@@ -171,6 +179,13 @@
     CGFloat longitudeDiff = [to.coordinates.longitude floatValue] - [from.coordinates.longitude floatValue];
     
     return sqrt(pow(latitudeDiff,2) + pow(longitudeDiff,2));
+}
+
+- (UIColor *) randomColor {
+    CGFloat hue = ( arc4random() % 256 / 256.0 );
+    CGFloat saturation = ( arc4random() % 128 / 256.0 ) + 0.5;
+    CGFloat brightness = ( arc4random() % 128 / 256.0 ) + 0.5;
+    return [UIColor colorWithHue:hue saturation:saturation brightness:brightness alpha:1];
 }
 
 

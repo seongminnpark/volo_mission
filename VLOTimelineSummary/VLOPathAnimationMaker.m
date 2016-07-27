@@ -53,7 +53,7 @@
         //UIBezierPath *newPath = [_pathMaker pathBetweenPoint:currPoint point:nextPoint];
         
         // 마커 애니메이션 추가.
-        [self addMarkerAnimation:currMarker delay:totalDuration color:currMarker.color];
+        [self addMarkerAnimation:currMarker delay:totalDuration];
         
         if (prevMarker) {
             
@@ -157,8 +157,8 @@
 }
 
 
-- (void) addMarkerAnimation:(VLOMarker *)marker delay:(CGFloat)delay color:(UIColor *)color {
-    UIView *markerView = [marker getMarkerViewWithColor:color];
+- (void) addMarkerAnimation:(VLOMarker *)marker delay:(CGFloat)delay {
+    UIView *markerView = [marker getMarkerView];
     
     // 마커 애니메이션.
     markerView.alpha = 0;
