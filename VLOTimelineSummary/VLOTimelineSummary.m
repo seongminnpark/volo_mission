@@ -19,7 +19,7 @@
     _summaryHeight = summaryView.bounds.size.height;
     
     VLOCoordinateConverter *converter = [[VLOCoordinateConverter alloc] initWithWidth:_summaryWidth andHeight:_summaryHeight];
-    NSArray *markerList = [converter getCoordinates:logList groupByDate:NO];
+    NSArray *markerList = [converter getCoordinates:logList groupByDate:groupByDate];
     
     _animationMaker = [[VLOPathAnimationMaker alloc] initWithView:summaryView andMarkerList:markerList];
     

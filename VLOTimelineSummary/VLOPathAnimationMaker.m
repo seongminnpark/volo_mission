@@ -186,7 +186,6 @@
     dayLabel.font = [UIFont museoSans700WithSize:10.0f];
     dayLabel.textAlignment = NSTextAlignmentCenter;
     dayLabel.textColor = DAY_LABEL_COLOR;
-    [dayLabel sizeToFit];
     
     // 마커 애니메이션.
     dayLabel.alpha = 0;
