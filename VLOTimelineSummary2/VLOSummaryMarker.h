@@ -21,10 +21,8 @@
 @property (nonatomic) NSNumber *day;
 
 + (CGFloat) distanceBetweenMarker1:(VLOSummaryMarker *)marker1 Marker2:(VLOSummaryMarker *)marker2;
-- (UIView *) getMarkerView;
+- (UIView *) getDrawableView;
 
 @end
 
-
-@interface VLOMarker : NSObject
 

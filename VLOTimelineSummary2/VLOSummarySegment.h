@@ -10,10 +10,10 @@
 #import <UIkit/UIkit.h>
 #import "VLOSummaryMarker.h"
 
-#define LEFT_TO_RIGHT = 0;
-#define RIGHT_TO_LEFT = 1;
+#define LEFT_TO_RIGHT = 0
+#define RIGHT_TO_LEFT = 1
 
-@interface VLOSummarySegment : NSObject
+@interface VLOSummarySegment
 
 
 @property (strong, nonatomic) VLOSummaryMarker *fromMarker;
