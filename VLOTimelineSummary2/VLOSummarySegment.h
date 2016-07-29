@@ -10,16 +10,14 @@
 #import <UIkit/UIkit.h>
 #import "VLOSummaryMarker.h"
 
-#define LEFT_TO_RIGHT = 0
-#define RIGHT_TO_LEFT = 1
-
 @interface VLOSummarySegment : NSObject 
 
 
 @property (strong, nonatomic) VLOSummaryMarker *fromMarker;
 @property (strong, nonatomic) VLOSummaryMarker *toMarker;
 @property () BOOL curved;
-@property () NSInteger direction;
+@property () BOOL leftToRight;
+@property () BOOL hasLineContent;
 
 - (id) initFrom:(VLOSummaryMarker *)fromMarker to:(VLOSummaryMarker *)toMarker;
 - (void) setLine:(UIImage *)lineImage;
