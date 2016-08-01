@@ -73,6 +73,9 @@
         if (_hasMarkerContent) {
             [markerLayer setStrokeColor:[[UIColor redColor] CGColor]];
             [markerLayer setFillColor:[[UIColor clearColor] CGColor]];
+        } else {
+            [markerLayer setStrokeColor:[[UIColor redColor] CGColor]];
+            [markerLayer setFillColor:[[UIColor redColor] CGColor]];
         }
     }
 }
@@ -86,7 +89,7 @@
         UIImage *contentImage = [UIImage imageNamed:_contentImageName];
         _markerContentView = [[UIImageView alloc] initWithImage:contentImage];
         _markerContentView.frame =
-            CGRectMake(contentLeft, contentTop, MARKER_CONTENT_SIZE + LINE_SIZE, MARKER_CONTENT_SIZE + LINE_SIZE);
+            CGRectMake(contentLeft, contentTop, MARKER_CONTENT_SIZE, MARKER_CONTENT_SIZE + LINE_SIZE);
         
     } else {
         _markerContentView = [[UIView alloc] initWithFrame:
@@ -125,14 +128,15 @@
         drawableWidth  = MAX(_markerView.frame.size.width,  _markerContentView.frame.size.width);
         drawableHeight = MAX(_markerView.frame.size.height, _markerContentView.frame.size.height);
     } else {
-        drawableLeft   = _markerContentView.frame.origin.x;
-        drawableTop    = _markerContentView.frame.origin.y;
-        drawableWidth  = _markerContentView.frame.origin.y;
-        drawableHeight = _markerContentView.frame.size.height;
+        drawableLeft   = _markerView.frame.origin.x;
+        drawableTop    = _markerView.frame.origin.y;
+        drawableWidth  = _markerView.frame.size.width;
+        drawableHeight = _markerView.frame.size.height;
     }
     
     UIView *drawableView = [[UIView alloc] initWithFrame:CGRectMake(drawableLeft, drawableTop, drawableWidth, drawableHeight)];
     [drawableView addSubview:_markerView];
+    [drawableView setBackgroundColor:[UIColor blueColor]];
     if (_hasMarkerContent) [drawableView addSubview:_markerContentView];
     
     return drawableView;
