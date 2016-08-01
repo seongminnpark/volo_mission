@@ -17,6 +17,11 @@
 @property () NSString *markerImageName;
 @property () NSString *contentImageName;
 
+@property () CGFloat drawableLeft;
+@property () CGFloat drawableTop;
+@property () CGFloat drawableWidth;
+@property () CGFloat drawableHeight;
+
 @end
 
 @implementation VLOSummaryMarker
@@ -30,9 +35,11 @@
 
 - (id) init {
     self = [super init];
+    
     _markerUsesCustomImage = NO;
     _markerContentUsesCustomImage = NO;
     _hasMarkerContent = NO;
+    
     return self;
 }
 
@@ -49,9 +56,30 @@
     _contentImageName = contentImageName;
 }
 
+- (UIView *) getDrawableView {
+    
+    // 모든 컴포넌트에 공유되는 Frame 변수들.
+    _drawableLeft   = MIN(_x - MARKER_SIZE/2, _x - MARKER_CONTENT_SIZE/2);
+    _drawableTop    = _y - MARKER_SIZE/2 - LINE_SIZE - MARKER_CONTENT_SIZE/2;
+    _drawableWidth  = MAX(MARKER_SIZE, MARKER_CONTENT_SIZE);
+    _drawableHeight = MARKER_CONTENT_SIZE/2 + LINE_SIZE + MARKER_SIZE/2;
+
+    // 마커와 마커 장식 생성.
+    [self initializeMarkerImage];
+    if (_hasMarkerContent) [self initializeMarkerContentImage];
+
+    // 마커와 마커 장식 묶음이 담길 뷰 생성.
+    UIView *drawableView = [[UIView alloc] initWithFrame:CGRectMake(_drawableLeft, _drawableTop, _drawableWidth, _drawableHeight)];
+    [drawableView addSubview:_markerView];
+    [drawableView setBackgroundColor:[UIColor blueColor]];
+    if (_hasMarkerContent) [drawableView addSubview:_markerContentView];
+    
+    return drawableView;
+}
+
 - (void) initializeMarkerImage {
-    CGFloat markerLeft = _x - MARKER_SIZE/2;
-    CGFloat markerTop  = _y - MARKER_SIZE/2;
+    CGFloat markerLeft = _drawableWidth/2 - MARKER_SIZE/2;
+    CGFloat markerTop  = _drawableHeight - MARKER_SIZE;
     
     if (_markerUsesCustomImage) {
         
@@ -62,8 +90,7 @@
     } else {
         _markerView = [[UIView alloc] initWithFrame:CGRectMake(markerLeft, markerTop, MARKER_SIZE, MARKER_SIZE)];
         
-        UIBezierPath *circlePath = [UIBezierPath bezierPathWithOvalInRect:
-                                    CGRectMake(markerLeft, markerTop, MARKER_SIZE, MARKER_SIZE)];
+        UIBezierPath *circlePath = [UIBezierPath bezierPathWithOvalInRect:CGRectMake(0, 0, MARKER_SIZE, MARKER_SIZE)];
         
         CAShapeLayer *markerLayer = [CAShapeLayer layer];
         [markerLayer setPath:circlePath.CGPath];
@@ -81,15 +108,15 @@
 }
 
 - (void) initializeMarkerContentImage {
-    CGFloat contentLeft = _x - MARKER_CONTENT_SIZE/2;
-    CGFloat contentTop  = _y - LINE_SIZE - MARKER_CONTENT_SIZE;
+    CGFloat contentLeft = _drawableWidth/2 - MARKER_CONTENT_SIZE/2;
+    CGFloat contentTop  = 0;
     
     if (_markerContentUsesCustomImage) {
         
         UIImage *contentImage = [UIImage imageNamed:_contentImageName];
         _markerContentView = [[UIImageView alloc] initWithImage:contentImage];
         _markerContentView.frame =
-            CGRectMake(contentLeft, contentTop, MARKER_CONTENT_SIZE, MARKER_CONTENT_SIZE + LINE_SIZE);
+        CGRectMake(contentLeft, contentTop, MARKER_CONTENT_SIZE, MARKER_CONTENT_SIZE + LINE_SIZE);
         
     } else {
         _markerContentView = [[UIView alloc] initWithFrame:
@@ -112,34 +139,6 @@
         [_markerContentView.layer addSublayer:contentLayer];
         [_markerContentView.layer addSublayer:lineLayer];
     }
-}
-
-- (UIView *) getDrawableView {
-    CGFloat drawableLeft, drawableTop, drawableWidth, drawableHeight;
-    
-    // 마커와 마커 장식 생성.
-    [self initializeMarkerImage];
-    if (_hasMarkerContent) [self initializeMarkerContentImage];
-
-    // 마커와 마커 장식 묶음이 담길 뷰 생성.
-    if (_hasMarkerContent) {
-        drawableLeft   = MIN(_markerView.frame.origin.x,    _markerContentView.frame.origin.x);
-        drawableTop    = MIN(_markerView.frame.origin.y,    _markerContentView.frame.origin.y);
-        drawableWidth  = MAX(_markerView.frame.size.width,  _markerContentView.frame.size.width);
-        drawableHeight = MAX(_markerView.frame.size.height, _markerContentView.frame.size.height);
-    } else {
-        drawableLeft   = _markerView.frame.origin.x;
-        drawableTop    = _markerView.frame.origin.y;
-        drawableWidth  = _markerView.frame.size.width;
-        drawableHeight = _markerView.frame.size.height;
-    }
-    
-    UIView *drawableView = [[UIView alloc] initWithFrame:CGRectMake(drawableLeft, drawableTop, drawableWidth, drawableHeight)];
-    [drawableView addSubview:_markerView];
-    [drawableView setBackgroundColor:[UIColor blueColor]];
-    if (_hasMarkerContent) [drawableView addSubview:_markerContentView];
-    
-    return drawableView;
 }
 
 
