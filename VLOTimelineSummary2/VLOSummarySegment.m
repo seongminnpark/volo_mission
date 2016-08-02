@@ -21,6 +21,10 @@
 @property () CGFloat drawableTop;
 @property () CGFloat drawableWidth;
 @property () CGFloat drawableHeight;
+@property () BOOL fromMarkerXBigger;
+
+@property (strong, nonatomic) VLOSummaryMarker *leftMarker;
+@property (strong, nonatomic) VLOSummaryMarker *rightMarker;
 
 @end
 
@@ -33,6 +37,8 @@
     _curved = NO;
     _leftToRight = YES;
     _hasSegmentContent = NO;
+    _leftMarker  = (fromMarker.x < toMarker.x) ? fromMarker : toMarker;
+    _rightMarker = (fromMarker.x < toMarker.x) ? toMarker : fromMarker;
     return self;
 }
 
@@ -56,7 +62,7 @@
     
     // 모든 컴포넌트에 공유되는 Frame 변수들.
     if (_curved) {
-        _drawableLeft = _leftToRight? _fromMarker.x : _toMarker.x - curveRadius - SEGMENT_CONTENT_SIZE/2;
+        _drawableLeft = _leftToRight? _leftMarker.x : _leftMarker.x - curveRadius - SEGMENT_CONTENT_SIZE/2;
     } else {
         _drawableLeft = _leftToRight? _fromMarker.x : _toMarker.x;
     }
@@ -80,7 +86,6 @@
 
 - (void) initializeSegmentView {
     
-    CGFloat xDiff = fabs(_toMarker.x - _fromMarker.x);
     CGFloat curveRadius = fabs(_toMarker.y - _fromMarker.y) / 2;
     
     CGFloat segmentLeft   = 0;
@@ -89,16 +94,11 @@
     CGFloat segmentHeight = _curved? curveRadius * 2 : 0;
     
     // (0,0)에서 시작하는 프레임에 맞춘 fromMarker과 toMarker 좌표.
-    CGFloat fromMarkerX = _leftToRight? 0 : _drawableWidth;
+    CGFloat fromMarkerX = _fromMarker.x - _drawableLeft;
     CGFloat fromMarkerY = _curved? 0 : SEGMENT_CONTENT_SIZE;
     CGPoint fromMarker  = CGPointMake(fromMarkerX, fromMarkerY);
     
-    CGFloat toMarkerX;
-    if (_curved) {
-        toMarkerX   = _leftToRight? xDiff: _drawableWidth - xDiff;
-    } else {
-        toMarkerX   = _leftToRight? _drawableWidth : 0;
-    }
+    CGFloat toMarkerX   = _toMarker.x - _drawableLeft;
     CGFloat toMarkerY   = _curved? _drawableHeight : SEGMENT_CONTENT_SIZE;
     CGPoint toMarker    = CGPointMake(toMarkerX, toMarkerY);
     
@@ -111,15 +111,17 @@
         
     } else {
         _segmentView = [[UIView alloc] initWithFrame:CGRectMake(segmentLeft, segmentTop, segmentWidth, segmentHeight)];
-        
         UIBezierPath *segmentPath = [UIBezierPath bezierPath];
         [segmentPath moveToPoint:fromMarker];
         
         if (_curved) {
+            CGFloat arcCenterX =_leftToRight? _rightMarker.x - _drawableLeft : _leftMarker.x - _drawableLeft;
+            CGPoint curveStartPoint = CGPointMake(arcCenterX, fromMarkerY);
+            CGPoint arcCenter = CGPointMake(arcCenterX, fromMarkerY + curveRadius);
             
-            CGPoint arcCenter = CGPointMake(toMarkerX, fromMarkerY + curveRadius);
-            [segmentPath addLineToPoint:CGPointMake(toMarkerX, fromMarkerY)];
+            [segmentPath addLineToPoint:curveStartPoint];
             [segmentPath addArcWithCenter:arcCenter radius:curveRadius startAngle:3*M_PI/2 endAngle:M_PI_2 clockwise:_leftToRight];
+            [segmentPath addLineToPoint:toMarker];
             
         } else {
             [segmentPath addLineToPoint:toMarker];

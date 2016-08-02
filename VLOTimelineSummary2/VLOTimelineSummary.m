@@ -54,7 +54,7 @@
     
     VLOSummaryMarker *marker2 = [[VLOSummaryMarker alloc] init];
     NSString *name2 = @"dssddd";
-    marker2.x = 150;
+    marker2.x = 130;
     marker2.y = 100;
     marker2.name = name2;
     marker2.color = VOLO_COLOR;
@@ -64,7 +64,7 @@
     
     VLOSummaryMarker *marker3 = [[VLOSummaryMarker alloc] init];
     NSString *name3 = @"dssadsdd";
-    marker3.x = 200;
+    marker3.x = 210;
     marker3.y = 100;
     marker3.name = name3;
     marker3.color = VOLO_COLOR;
@@ -74,7 +74,7 @@
     
     VLOSummaryMarker *marker4 = [[VLOSummaryMarker alloc] init];
     NSString *name4 = @"dssaddssdd";
-    marker4.x = 250;
+    marker4.x = 260;
     marker4.y = 200;
     marker4.name = name4;
     marker4.color = VOLO_COLOR;
@@ -94,7 +94,7 @@
     
     VLOSummaryMarker *marker6 = [[VLOSummaryMarker alloc] init];
     NSString *name6 = @"dssaddssdd";
-    marker6.x = 150;
+    marker6.x = 120;
     marker6.y = 200;
     marker6.name = name6;
     marker6.color = VOLO_COLOR;
@@ -104,7 +104,7 @@
     
     VLOSummaryMarker *marker7 = [[VLOSummaryMarker alloc] init];
     NSString *name7 = @"dssaddssdd";
-    marker7.x = 100;
+    marker7.x = 80;
     marker7.y = 300;
     marker7.name = name7;
     marker7.color = VOLO_COLOR;
