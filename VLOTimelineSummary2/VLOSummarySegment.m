@@ -17,6 +17,11 @@
 @property () NSString *segmentImageName;
 @property () NSString *contentImageName;
 
+@property () CGFloat drawableLeft;
+@property () CGFloat drawableTop;
+@property () CGFloat drawableWidth;
+@property () CGFloat drawableHeight;
+
 @end
 
 @implementation VLOSummarySegment
@@ -44,72 +49,102 @@
     _contentImageName = contentImageName;
 }
 
-- (void) initializeSegmentImage {
-    CGFloat segmentLeft, segmentWidth, segmentHeight;
-    CGFloat segmentTop = 0;
-    CGFloat curveRadius = LINE_VERTICAL_DIFFERENCE / 2;
+- (UIView *) getDrawableView {
     
+    CGFloat xDiff = fabs(_toMarker.x - _fromMarker.x);
+    CGFloat curveRadius = fabs(_toMarker.y - _fromMarker.y)/2;
+    
+    // 모든 컴포넌트에 공유되는 Frame 변수들.
     if (_curved) {
-        segmentLeft = _leftToRight ? 0 : -curveRadius;
+        _drawableLeft = _leftToRight? _fromMarker.x : _toMarker.x - curveRadius - SEGMENT_CONTENT_SIZE/2;
     } else {
-        segmentLeft = _leftToRight ? _fromMarker.x : _toMarker.x;
+        _drawableLeft = _leftToRight? _fromMarker.x : _toMarker.x;
     }
+    _drawableTop    = _curved? _fromMarker.y : _fromMarker.y - SEGMENT_CONTENT_SIZE;
+    _drawableWidth  = _curved? xDiff + curveRadius + SEGMENT_CONTENT_SIZE/2 : xDiff;
+    _drawableHeight = _curved? MAX(_toMarker.y - _fromMarker.y, SEGMENT_CONTENT_SIZE) : SEGMENT_CONTENT_SIZE;
     
-    segmentWidth = fabs(_toMarker.x - _fromMarker.x);
-    segmentHeight = _curved? _toMarker.y - _fromMarker.y : SEGMENT_HEIGHT;
+    // 선과 선 장식 생성.
+    [self initializeSegmentView];
+    if (_hasSegmentContent) [self initializeSegmentContentView];
+    
+    // 선과 선 장식 묶음이 담길 뷰 생성.
+    UIView *drawableView = [[UIView alloc] initWithFrame:CGRectMake(_drawableLeft, _drawableTop, _drawableWidth, _drawableHeight)];
+    [drawableView addSubview:_segmentView];
+    if (_hasSegmentContent) [drawableView addSubview:_segmentContentView];
+    
+    [drawableView setBackgroundColor:[UIColor colorWithRed:1 green:1 blue:0.6 alpha:0.4]];
+    
+    return drawableView;
+}
+
+- (void) initializeSegmentView {
+    
+    CGFloat xDiff = fabs(_toMarker.x - _fromMarker.x);
+    CGFloat curveRadius = fabs(_toMarker.y - _fromMarker.y) / 2;
+    
+    CGFloat segmentLeft   = 0;
+    CGFloat segmentTop    = 0;
+    CGFloat segmentWidth  = _curved? _drawableWidth - SEGMENT_CONTENT_SIZE/2 : _drawableWidth;
+    CGFloat segmentHeight = _curved? curveRadius * 2 : 0;
+    
+    // (0,0)에서 시작하는 프레임에 맞춘 fromMarker과 toMarker 좌표.
+    CGFloat fromMarkerX = _leftToRight? 0 : _drawableWidth;
+    CGFloat fromMarkerY = _curved? 0 : SEGMENT_CONTENT_SIZE;
+    CGPoint fromMarker  = CGPointMake(fromMarkerX, fromMarkerY);
+    
+    CGFloat toMarkerX;
+    if (_curved) {
+        toMarkerX   = _leftToRight? xDiff: _drawableWidth - xDiff;
+    } else {
+        toMarkerX   = _leftToRight? _drawableWidth : 0;
+    }
+    CGFloat toMarkerY   = _curved? _drawableHeight : SEGMENT_CONTENT_SIZE;
+    CGPoint toMarker    = CGPointMake(toMarkerX, toMarkerY);
     
     // _segmentView 생성.
     if (_segmentUsesCustomImage) {
         
         UIImage *segmentImage= [UIImage imageNamed:_segmentImageName ];
         _segmentView = [[UIImageView alloc] initWithImage:segmentImage];
-        _segmentView.frame = CGRectMake(segmentLeft, segmentTop, segmentWidth, SEGMENT_HEIGHT);
+        _segmentView.frame = CGRectMake(segmentLeft, segmentTop, segmentWidth, segmentHeight);
         
     } else {
         _segmentView = [[UIView alloc] initWithFrame:CGRectMake(segmentLeft, segmentTop, segmentWidth, segmentHeight)];
         
         UIBezierPath *segmentPath = [UIBezierPath bezierPath];
-        [segmentPath moveToPoint:CGPointMake(_fromMarker.x, _fromMarker.y)];
+        [segmentPath moveToPoint:fromMarker];
         
         if (_curved) {
             
-            CGFloat curveStartX = _leftToRight ? _fromMarker.x + CURVE_BUFFER : _fromMarker.x - CURVE_BUFFER;
-            CGPoint arcCenter = CGPointMake(curveStartX, (_fromMarker.y + _toMarker.y)/2);
-            [segmentPath addLineToPoint:CGPointMake(curveStartX, _fromMarker.y)];
-            [segmentPath addArcWithCenter:arcCenter radius:curveRadius startAngle:0 endAngle:M_PI clockwise:YES];
+            CGPoint arcCenter = CGPointMake(toMarkerX, fromMarkerY + curveRadius);
+            [segmentPath addLineToPoint:CGPointMake(toMarkerX, fromMarkerY)];
+            [segmentPath addArcWithCenter:arcCenter radius:curveRadius startAngle:3*M_PI/2 endAngle:M_PI_2 clockwise:_leftToRight];
             
         } else {
-            [segmentPath addLineToPoint:CGPointMake(_toMarker.x, _toMarker.y)];
+            [segmentPath addLineToPoint:toMarker];
         }
         
         CAShapeLayer *segmentLayer = [CAShapeLayer layer];
         [segmentLayer setPath:segmentPath.CGPath];
+        [segmentLayer setStrokeColor:[VOLO_COLOR CGColor]];
+        [segmentLayer setLineWidth:3.0];
+        [segmentLayer setFillColor:[[UIColor clearColor] CGColor]];
         
         [_segmentView.layer addSublayer:segmentLayer];
     }
 }
 
-- (void) initializeSegmentContentImage {
+- (void) initializeSegmentContentView {
     
-    // Segment Content의 frame.origin.x를 구하는 로직.
+    // Segment Content의 frame을 구하는 로직.
     CGFloat contentLeft;
-    CGFloat curveRadius = LINE_VERTICAL_DIFFERENCE / 2;
-    
     if (_curved) {
-        CGFloat curveStartX = _leftToRight ? _fromMarker.x + CURVE_BUFFER : _fromMarker.x - CURVE_BUFFER;
-        if (_leftToRight) {
-            contentLeft = curveStartX + curveRadius - SEGMENT_CONTENT_SIZE/2;
-        } else {
-            contentLeft = curveStartX - curveRadius + SEGMENT_CONTENT_SIZE/2;;
-        }
+        contentLeft = _leftToRight? _drawableWidth - SEGMENT_CONTENT_SIZE : 0;
     } else {
-        CGFloat middleX = (_fromMarker.x + _toMarker.x)/2;
-        contentLeft = middleX - SEGMENT_CONTENT_SIZE/2;
+        contentLeft = _drawableWidth/2 - SEGMENT_CONTENT_SIZE/2;
     }
-    
-    // Segment Content의 frame.origin.y를 구하는 로직.
-    CGFloat arcCenterY = (_fromMarker.y + _toMarker.y)/2;
-    CGFloat contentTop = arcCenterY - SEGMENT_CONTENT_SIZE/2;
+    CGFloat contentTop = _curved? _drawableHeight/2 - SEGMENT_CONTENT_SIZE/2 : 0;
     
     // _segmentContentView 생성.
     if (_segmentContentUsesCustomImage) {
@@ -121,32 +156,8 @@
     } else {
         _segmentContentView = [[UIView alloc] initWithFrame:
                                CGRectMake(contentLeft, contentTop, SEGMENT_CONTENT_SIZE, SEGMENT_CONTENT_SIZE)];
+        [_segmentContentView setBackgroundColor:VOLO_COLOR];
     }
-}
-
-- (UIView *) getDrawableView {
-
-    CGFloat drawableTop, drawableHeight;
-    CGFloat drawableLength = fabs(_toMarker.x - _fromMarker.x);
-    
-    // 선과 선 장식 생성.
-    [self initializeSegmentImage];
-    if (_hasSegmentContent) [self initializeSegmentContentImage];
-    
-    // 선과 선 장식 묶음이 담길 뷰 생성.
-    if (_hasSegmentContent) {
-        drawableTop    = MIN(_segmentView.frame.origin.y,    _segmentContentView.frame.origin.y);
-        drawableHeight = MAX(_segmentView.frame.size.height, _segmentContentView.frame.size.height);
-    } else {
-        drawableTop    = _segmentView.frame.origin.y;
-        drawableHeight = _segmentView.frame.size.height;
-    }
-    
-    UIView *drawableView = [[UIView alloc] initWithFrame:CGRectMake(_fromMarker.x, drawableTop, drawableLength, drawableHeight)];
-    [drawableView addSubview:_segmentView];
-    if (_hasSegmentContent) [drawableView addSubview:_segmentContentView];
-    
-    return drawableView;
 }
 
 @end

@@ -60,13 +60,13 @@
     
     // 모든 컴포넌트에 공유되는 Frame 변수들.
     _drawableLeft   = MIN(_x - MARKER_SIZE/2, _x - MARKER_CONTENT_SIZE/2);
-    _drawableTop    = _y - MARKER_SIZE/2 - LINE_SIZE - MARKER_CONTENT_SIZE/2;
+    _drawableTop    = _y - LINE_SIZE - MARKER_CONTENT_SIZE/2;
     _drawableWidth  = MAX(MARKER_SIZE, MARKER_CONTENT_SIZE);
     _drawableHeight = MARKER_CONTENT_SIZE/2 + LINE_SIZE + MARKER_SIZE/2;
 
     // 마커와 마커 장식 생성.
-    [self initializeMarkerImage];
-    if (_hasMarkerContent) [self initializeMarkerContentImage];
+    [self initializeMarkerView];
+    if (_hasMarkerContent) [self initializeMarkerContentView];
 
     // 마커와 마커 장식 묶음이 담길 뷰 생성.
     UIView *drawableView = [[UIView alloc] initWithFrame:CGRectMake(_drawableLeft, _drawableTop, _drawableWidth, _drawableHeight)];
@@ -77,7 +77,7 @@
     return drawableView;
 }
 
-- (void) initializeMarkerImage {
+- (void) initializeMarkerView {
     CGFloat markerLeft = _drawableWidth/2 - MARKER_SIZE/2;
     CGFloat markerTop  = _drawableHeight - MARKER_SIZE;
     
@@ -108,7 +108,7 @@
     }
 }
 
-- (void) initializeMarkerContentImage {
+- (void) initializeMarkerContentView {
     CGFloat contentLeft = _drawableWidth/2 - MARKER_CONTENT_SIZE/2;
     CGFloat contentTop  = 0;
     
