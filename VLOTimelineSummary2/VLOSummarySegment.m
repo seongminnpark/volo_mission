@@ -62,7 +62,7 @@
     
     // 모든 컴포넌트에 공유되는 Frame 변수들.
     if (_curved) {
-        _drawableLeft = _leftToRight? _leftMarker.x : _leftMarker.x - curveRadius - SEGMENT_CONTENT_SIZE/2;
+        _drawableLeft = _leftToRight? _leftMarker.x - curveRadius - SEGMENT_CONTENT_SIZE/2 : _leftMarker.x;
     } else {
         _drawableLeft = _leftToRight? _fromMarker.x : _toMarker.x;
     }
@@ -116,12 +116,12 @@
         [segmentPath moveToPoint:fromMarker];
         
         if (_curved) {
-            CGFloat arcCenterX =_leftToRight? _rightMarker.x - _drawableLeft : _leftMarker.x - _drawableLeft;
+            CGFloat arcCenterX =_leftToRight? _leftMarker.x - _drawableLeft : _rightMarker.x - _drawableLeft;
             CGPoint curveStartPoint = CGPointMake(arcCenterX, fromMarkerY);
             CGPoint arcCenter = CGPointMake(arcCenterX, fromMarkerY + curveRadius);
             
             [segmentPath addLineToPoint:curveStartPoint];
-            [segmentPath addArcWithCenter:arcCenter radius:curveRadius startAngle:3*M_PI/2 endAngle:M_PI_2 clockwise:_leftToRight];
+            [segmentPath addArcWithCenter:arcCenter radius:curveRadius startAngle:3*M_PI/2 endAngle:M_PI_2 clockwise:!_leftToRight];
             [segmentPath addLineToPoint:toMarker];
             
         } else {
@@ -144,7 +144,7 @@
     // Segment Content의 frame을 구하는 로직.
     CGFloat contentLeft;
     if (_curved) {
-        contentLeft = _leftToRight? _drawableWidth - SEGMENT_CONTENT_SIZE : 0;
+        contentLeft = _leftToRight? 0 : _drawableWidth - SEGMENT_CONTENT_SIZE;
     } else {
         contentLeft = _drawableWidth/2 - SEGMENT_CONTENT_SIZE/2;
     }
