@@ -60,9 +60,9 @@
     
     // 모든 컴포넌트에 공유되는 Frame 변수들.
     _drawableLeft   = MIN(_x - MARKER_SIZE/2, _x - MARKER_CONTENT_SIZE/2);
-    _drawableTop    = _y - LINE_SIZE - MARKER_CONTENT_SIZE/2;
+    _drawableTop    = _y - MARKER_SIZE/2 - MARKER_CONTENT_GAP - MARKER_CONTENT_SIZE;
     _drawableWidth  = MAX(MARKER_SIZE, MARKER_CONTENT_SIZE);
-    _drawableHeight = MARKER_CONTENT_SIZE/2 + LINE_SIZE + MARKER_SIZE/2;
+    _drawableHeight = MARKER_CONTENT_SIZE + MARKER_CONTENT_GAP + MARKER_SIZE;
 
     // 마커와 마커 장식 생성.
     [self initializeMarkerView];
@@ -71,7 +71,7 @@
     // 마커와 마커 장식 묶음이 담길 뷰 생성.
     UIView *drawableView = [[UIView alloc] initWithFrame:CGRectMake(_drawableLeft, _drawableTop, _drawableWidth, _drawableHeight)];
     [drawableView addSubview:_markerView];
-    [drawableView setBackgroundColor:[UIColor blueColor]];
+    //[drawableView setBackgroundColor:[UIColor blueColor]];
     if (_hasMarkerContent) [drawableView addSubview:_markerContentView];
     
     return drawableView;
@@ -99,12 +99,12 @@
         
         if (_hasMarkerContent) {
             [markerLayer setStrokeColor:[VOLO_COLOR CGColor]];
-            [markerLayer setFillColor:[[UIColor clearColor] CGColor]];
+            [markerLayer setFillColor:[[UIColor whiteColor] CGColor]];
         } else {
             [markerLayer setStrokeColor:[VOLO_COLOR CGColor]];
             [markerLayer setFillColor:[VOLO_COLOR CGColor]];
         }
-        [markerLayer setLineWidth:3.0];
+        [markerLayer setLineWidth:LINE_WIDTH];
     }
 }
 
@@ -112,37 +112,43 @@
     CGFloat contentLeft = _drawableWidth/2 - MARKER_CONTENT_SIZE/2;
     CGFloat contentTop  = 0;
     
+    _markerContentView = [[UIView alloc] initWithFrame:
+                          CGRectMake(contentLeft, contentTop, MARKER_CONTENT_SIZE, MARKER_CONTENT_SIZE + MARKER_CONTENT_GAP)];
+    
     if (_markerContentUsesCustomImage) {
         
         UIImage *contentImage = [UIImage imageNamed:_contentImageName];
-        _markerContentView = [[UIImageView alloc] initWithImage:contentImage];
-        _markerContentView.frame =
-        CGRectMake(contentLeft, contentTop, MARKER_CONTENT_SIZE, MARKER_CONTENT_SIZE + LINE_SIZE);
+        UIImageView *contentImageView = [[UIImageView alloc] initWithImage:contentImage];
+        contentImageView.frame = CGRectMake(0, 0, MARKER_CONTENT_SIZE, MARKER_CONTENT_SIZE);
+        
+        [_markerContentView addSubview:contentImageView];
         
     } else {
-        _markerContentView = [[UIView alloc] initWithFrame:
-                              CGRectMake(contentLeft, contentTop, MARKER_CONTENT_SIZE + LINE_SIZE, MARKER_CONTENT_SIZE + LINE_SIZE)];
         
         // 국기
         UIBezierPath *circlePath = [UIBezierPath bezierPathWithOvalInRect:
-                                    CGRectMake(contentLeft, contentTop, MARKER_CONTENT_SIZE, MARKER_CONTENT_SIZE)];
+                                    CGRectMake(0, 0, MARKER_CONTENT_SIZE, MARKER_CONTENT_SIZE)];
         CAShapeLayer *contentLayer = [CAShapeLayer layer];
         [contentLayer setPath:circlePath.CGPath];
         [contentLayer setStrokeColor:[VOLO_COLOR CGColor]];
         [contentLayer setFillColor:[[UIColor clearColor] CGColor]];
-        [contentLayer setLineWidth:3.0];
-        
-        // 마커와 국기를 잇는 선.
-        UIBezierPath *linePath = [UIBezierPath bezierPath];
-        [linePath moveToPoint:CGPointMake(_x, _y)];
-        [linePath addLineToPoint:CGPointMake(_x, _y - LINE_SIZE)];
-        
-        CAShapeLayer *lineLayer = [CAShapeLayer layer];
-        [lineLayer setPath:linePath.CGPath];
+        [contentLayer setLineWidth:LINE_WIDTH];
         
         [_markerContentView.layer addSublayer:contentLayer];
-        [_markerContentView.layer addSublayer:lineLayer];
     }
+    // 마커와 국기를 잇는 선.
+    UIBezierPath *linePath = [UIBezierPath bezierPath];
+    CGFloat topOfMarker = _drawableHeight - MARKER_SIZE;
+    CGFloat bottomOfFlag = topOfMarker - MARKER_CONTENT_GAP;
+    [linePath moveToPoint:CGPointMake(_drawableWidth/2, topOfMarker)];
+    [linePath addLineToPoint:CGPointMake(_drawableWidth/2, bottomOfFlag)];
+    
+    CAShapeLayer *lineLayer = [CAShapeLayer layer];
+    [lineLayer setPath:linePath.CGPath];
+    
+    [_markerContentView.layer addSublayer:lineLayer];
+    [lineLayer setStrokeColor:[VOLO_COLOR CGColor]];
+    [lineLayer setLineWidth:LINE_WIDTH];
 }
 
 

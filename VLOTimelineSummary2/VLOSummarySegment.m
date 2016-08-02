@@ -79,7 +79,7 @@
     [drawableView addSubview:_segmentView];
     if (_hasSegmentContent) [drawableView addSubview:_segmentContentView];
     
-    [drawableView setBackgroundColor:[UIColor colorWithRed:1 green:1 blue:0.6 alpha:0.4]];
+    //[drawableView setBackgroundColor:[UIColor colorWithRed:1 green:1 blue:0.6 alpha:0.4]];
     
     return drawableView;
 }
@@ -146,19 +146,24 @@
     } else {
         contentLeft = _drawableWidth/2 - SEGMENT_CONTENT_SIZE/2;
     }
-    CGFloat contentTop = _curved? _drawableHeight/2 - SEGMENT_CONTENT_SIZE/2 : 0;
+    CGFloat contentTop;
     
     // _segmentContentView 생성.
     if (_segmentContentUsesCustomImage) {
         
         UIImage *contentImage = [UIImage imageNamed:_contentImageName];
+        CGFloat imageWidthHeightRatio = contentImage.size.height / contentImage.size.width;
+        CGFloat imageHeight = imageWidthHeightRatio * SEGMENT_CONTENT_SIZE;
+        
+        contentTop = _curved? _drawableHeight/2 - imageHeight/2 : imageHeight - LINE_WIDTH; // Segment와 겹쳐서 LINE_WIDTH만큼 빼준다.
         _segmentContentView = [[UIImageView alloc] initWithImage:contentImage];
-        _segmentContentView.frame = CGRectMake(contentLeft, contentTop, SEGMENT_CONTENT_SIZE, SEGMENT_CONTENT_SIZE);
+        _segmentContentView.frame = CGRectMake(contentLeft, contentTop, SEGMENT_CONTENT_SIZE, imageHeight);
+        [_segmentContentView setBackgroundColor:[UIColor whiteColor]];
         
     } else {
+        contentTop = _curved? _drawableHeight/2 - SEGMENT_CONTENT_SIZE/2 : 0;
         _segmentContentView = [[UIView alloc] initWithFrame:
                                CGRectMake(contentLeft, contentTop, SEGMENT_CONTENT_SIZE, SEGMENT_CONTENT_SIZE)];
-        [_segmentContentView setBackgroundColor:VOLO_COLOR];
     }
 }
 
