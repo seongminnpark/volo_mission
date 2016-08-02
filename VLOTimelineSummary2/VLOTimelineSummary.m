@@ -74,7 +74,7 @@
     
     VLOSummaryMarker *marker4 = [[VLOSummaryMarker alloc] init];
     NSString *name4 = @"dssaddssdd";
-    marker4.x = 260;
+    marker4.x = 250;
     marker4.y = 200;
     marker4.name = name4;
     marker4.color = VOLO_COLOR;
@@ -84,17 +84,18 @@
     
     VLOSummaryMarker *marker5 = [[VLOSummaryMarker alloc] init];
     NSString *name5 = @"dssadfffdssdd";
-    marker5.x = 200;
+    marker5.x = 180;
     marker5.y = 200;
     marker5.name = name4;
     marker5.color = VOLO_COLOR;
     marker5.country = [[VLOCountry alloc] initWithCode:name5 country:name5];
     marker5.day = @1;
     marker5.hasMarkerContent = YES;
+    [marker5 setMarkerContentImage:@"42_DE"];
     
     VLOSummaryMarker *marker6 = [[VLOSummaryMarker alloc] init];
     NSString *name6 = @"dssaddssdd";
-    marker6.x = 120;
+    marker6.x = 110;
     marker6.y = 200;
     marker6.name = name6;
     marker6.color = VOLO_COLOR;
@@ -121,11 +122,13 @@
     segment2.leftToRight = YES;
     segment2.curved = NO;
     segment2.hasSegmentContent = YES;
+    [segment2 setSegmentContentImage:@"train"];
     
     VLOSummarySegment *segment3 = [[VLOSummarySegment alloc] initFrom:marker3 to:marker4];
     segment3.leftToRight = YES;
     segment3.curved = YES;
     segment3.hasSegmentContent = YES;
+    [segment3 setSegmentContentImage:@"tram"];
     
     VLOSummarySegment *segment4 = [[VLOSummarySegment alloc] initFrom:marker4 to:marker5];
     segment4.leftToRight = NO;
@@ -141,7 +144,15 @@
     segment6.leftToRight = NO;
     segment6.curved = YES;
     segment6.hasSegmentContent = YES;
+    [segment6 setSegmentContentImage:@"plane"];
     
+    // 마커를 나중에 그림.
+    [_drawables addObject:[segment1 getDrawableView]];
+    [_drawables addObject:[segment2 getDrawableView]];
+    [_drawables addObject:[segment3 getDrawableView]];
+    [_drawables addObject:[segment4 getDrawableView]];
+    [_drawables addObject:[segment5 getDrawableView]];
+    [_drawables addObject:[segment6 getDrawableView]];
     [_drawables addObject:[marker1 getDrawableView]];
     [_drawables addObject:[marker2 getDrawableView]];
     [_drawables addObject:[marker3 getDrawableView]];
@@ -149,12 +160,6 @@
     [_drawables addObject:[marker5 getDrawableView]];
     [_drawables addObject:[marker6 getDrawableView]];
     [_drawables addObject:[marker7 getDrawableView]];
-    [_drawables addObject:[segment1 getDrawableView]];
-    [_drawables addObject:[segment2 getDrawableView]];
-    [_drawables addObject:[segment3 getDrawableView]];
-    [_drawables addObject:[segment4 getDrawableView]];
-    [_drawables addObject:[segment5 getDrawableView]];
-    [_drawables addObject:[segment6 getDrawableView]];
    
 }
 
