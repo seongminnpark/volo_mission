@@ -131,18 +131,18 @@
         
         [_markerContentView addSubview:contentImageView];
         
-    } else {
-        
-        UIBezierPath *circlePath = [UIBezierPath bezierPathWithOvalInRect:
-                                    CGRectMake(0, 0, MARKER_CONTENT_SIZE, MARKER_CONTENT_SIZE)];
-        CAShapeLayer *contentLayer = [CAShapeLayer layer];
-        [contentLayer setPath:circlePath.CGPath];
-        [contentLayer setStrokeColor:[VOLO_COLOR CGColor]];
-        [contentLayer setFillColor:[[UIColor clearColor] CGColor]];
-        [contentLayer setLineWidth:LINE_WIDTH];
-        
-        [_markerContentView.layer addSublayer:contentLayer];
     }
+    
+    // 마커 컨텐츠 테두리.
+    UIBezierPath *circlePath = [UIBezierPath bezierPathWithOvalInRect:
+                                CGRectMake(0, 0, MARKER_CONTENT_SIZE, MARKER_CONTENT_SIZE)];
+    CAShapeLayer *contentLayer = [CAShapeLayer layer];
+    [contentLayer setPath:circlePath.CGPath];
+    [contentLayer setStrokeColor:[VOLO_COLOR CGColor]];
+    [contentLayer setFillColor:[[UIColor clearColor] CGColor]];
+    [contentLayer setLineWidth:LINE_WIDTH];
+    
+    [_markerContentView.layer addSublayer:contentLayer];
     
     // 마커와 국기를 잇는 선.
     UIBezierPath *linePath = [UIBezierPath bezierPath];
