@@ -51,6 +51,7 @@
     marker1.country = [[VLOCountry alloc] initWithCode:name1 country:name1];
     marker1.day = 0;
     marker1.hasMarkerContent = YES;
+    [marker1 setMarkerContentImage:@"78_KR"];
     
     VLOSummaryMarker *marker2 = [[VLOSummaryMarker alloc] init];
     NSString *name2 = @"보스턴";
@@ -91,7 +92,7 @@
     marker5.country = [[VLOCountry alloc] initWithCode:name5 country:name5];
     marker5.day = @1;
     marker5.hasMarkerContent = YES;
-    [marker5 setMarkerContentImage:@"42_DE"];
+    [marker5 setMarkerContentImage:@"78_DE"];
     
     VLOSummaryMarker *marker6 = [[VLOSummaryMarker alloc] init];
     NSString *name6 = @"시드니";
