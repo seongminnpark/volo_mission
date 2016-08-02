@@ -43,7 +43,7 @@
     /* 데모용 */
     
     VLOSummaryMarker *marker1 = [[VLOSummaryMarker alloc] init];
-    NSString *name1 = @"dssdd";
+    NSString *name1 = @"뉴욕";
     marker1.x = 50;
     marker1.y = 100;
     marker1.name = name1;
@@ -53,7 +53,7 @@
     marker1.hasMarkerContent = YES;
     
     VLOSummaryMarker *marker2 = [[VLOSummaryMarker alloc] init];
-    NSString *name2 = @"dssddd";
+    NSString *name2 = @"보스턴";
     marker2.x = 130;
     marker2.y = 100;
     marker2.name = name2;
@@ -63,7 +63,7 @@
     marker2.hasMarkerContent = YES;
     
     VLOSummaryMarker *marker3 = [[VLOSummaryMarker alloc] init];
-    NSString *name3 = @"dssadsdd";
+    NSString *name3 = @"서울";
     marker3.x = 210;
     marker3.y = 100;
     marker3.name = name3;
@@ -73,7 +73,7 @@
     marker3.hasMarkerContent = NO;
     
     VLOSummaryMarker *marker4 = [[VLOSummaryMarker alloc] init];
-    NSString *name4 = @"dssaddssdd";
+    NSString *name4 = @"방콕";
     marker4.x = 250;
     marker4.y = 200;
     marker4.name = name4;
@@ -83,7 +83,7 @@
     marker4.hasMarkerContent = YES;
     
     VLOSummaryMarker *marker5 = [[VLOSummaryMarker alloc] init];
-    NSString *name5 = @"dssadfffdssdd";
+    NSString *name5 = @"바그다드";
     marker5.x = 180;
     marker5.y = 200;
     marker5.name = name4;
@@ -94,7 +94,7 @@
     [marker5 setMarkerContentImage:@"42_DE"];
     
     VLOSummaryMarker *marker6 = [[VLOSummaryMarker alloc] init];
-    NSString *name6 = @"dssaddssdd";
+    NSString *name6 = @"시드니";
     marker6.x = 110;
     marker6.y = 200;
     marker6.name = name6;
@@ -104,7 +104,7 @@
     marker6.hasMarkerContent = YES;
     
     VLOSummaryMarker *marker7 = [[VLOSummaryMarker alloc] init];
-    NSString *name7 = @"dssaddssdd";
+    NSString *name7 = @"피츠버그";
     marker7.x = 80;
     marker7.y = 300;
     marker7.name = name7;

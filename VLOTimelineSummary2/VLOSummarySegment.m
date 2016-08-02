@@ -85,6 +85,7 @@
 }
 
 - (void) initializeSegmentView {
+    if (_segmentView) return;
     
     CGFloat curveRadius = fabs(_toMarker.y - _fromMarker.y) / 2;
     
@@ -138,6 +139,7 @@
 }
 
 - (void) initializeSegmentContentView {
+    if (_segmentContentView) return;
     
     // Segment Content의 frame을 구하는 로직.
     CGFloat contentLeft;
