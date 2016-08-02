@@ -98,12 +98,13 @@
         [_markerView.layer addSublayer:markerLayer];
         
         if (_hasMarkerContent) {
-            [markerLayer setStrokeColor:[[UIColor redColor] CGColor]];
+            [markerLayer setStrokeColor:[VOLO_COLOR CGColor]];
             [markerLayer setFillColor:[[UIColor clearColor] CGColor]];
         } else {
-            [markerLayer setStrokeColor:[[UIColor redColor] CGColor]];
-            [markerLayer setFillColor:[[UIColor redColor] CGColor]];
+            [markerLayer setStrokeColor:[VOLO_COLOR CGColor]];
+            [markerLayer setFillColor:[VOLO_COLOR CGColor]];
         }
+        [markerLayer setLineWidth:3.0];
     }
 }
 
@@ -127,6 +128,9 @@
                                     CGRectMake(contentLeft, contentTop, MARKER_CONTENT_SIZE, MARKER_CONTENT_SIZE)];
         CAShapeLayer *contentLayer = [CAShapeLayer layer];
         [contentLayer setPath:circlePath.CGPath];
+        [contentLayer setStrokeColor:[VOLO_COLOR CGColor]];
+        [contentLayer setFillColor:[[UIColor clearColor] CGColor]];
+        [contentLayer setLineWidth:3.0];
         
         // 마커와 국기를 잇는 선.
         UIBezierPath *linePath = [UIBezierPath bezierPath];

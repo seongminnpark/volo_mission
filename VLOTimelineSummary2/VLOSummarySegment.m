@@ -46,11 +46,11 @@
 
 - (void) initializeSegmentImage {
     CGFloat segmentLeft, segmentWidth, segmentHeight;
-    CGFloat segmentTop = _fromMarker.y;
+    CGFloat segmentTop = 0;
     CGFloat curveRadius = LINE_VERTICAL_DIFFERENCE / 2;
     
     if (_curved) {
-        segmentLeft = _leftToRight ? _fromMarker.x : _toMarker.x - curveRadius;
+        segmentLeft = _leftToRight ? 0 : -curveRadius;
     } else {
         segmentLeft = _leftToRight ? _fromMarker.x : _toMarker.x;
     }

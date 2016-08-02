@@ -13,6 +13,7 @@
 #define MARKER_SIZE         10.0
 #define MARKER_CONTENT_SIZE 30.0
 #define LINE_SIZE           20.0
+#define VOLO_COLOR          [UIColor colorWithRed:200/255.0 green:240/255.0 blue:235/255.0 alpha:1]
 
 @interface VLOSummaryMarker : NSObject
 
