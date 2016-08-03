@@ -47,72 +47,61 @@
     marker1.x = 50;
     marker1.y = 100;
     marker1.name = name1;
-    marker1.color = VOLO_COLOR;
     marker1.country = [[VLOCountry alloc] initWithCode:name1 country:name1];
     marker1.day = 0;
-    marker1.hasMarkerContent = YES;
-    [marker1 setMarkerContentImage:@"78_KR"];
+    [marker1 setMarkerContentImage:@"78_KR" isFlag:YES];
     
     VLOSummaryMarker *marker2 = [[VLOSummaryMarker alloc] init];
     NSString *name2 = @"보스턴";
     marker2.x = 130;
     marker2.y = 100;
     marker2.name = name2;
-    marker2.color = VOLO_COLOR;
     marker2.country = [[VLOCountry alloc] initWithCode:name2 country:name2];
     marker2.day = @2;
-    marker2.hasMarkerContent = YES;
+    [marker2 setMarkerContentImage:@"gy_camping" isFlag:NO];
     
     VLOSummaryMarker *marker3 = [[VLOSummaryMarker alloc] init];
     NSString *name3 = @"서울";
     marker3.x = 210;
     marker3.y = 100;
     marker3.name = name3;
-    marker3.color = VOLO_COLOR;
     marker3.country = [[VLOCountry alloc] initWithCode:name3 country:name3];
     marker3.day = @1;
-    marker3.hasMarkerContent = NO;
     
     VLOSummaryMarker *marker4 = [[VLOSummaryMarker alloc] init];
     NSString *name4 = @"방콕";
     marker4.x = 250;
     marker4.y = 200;
     marker4.name = name4;
-    marker4.color = VOLO_COLOR;
     marker4.country = [[VLOCountry alloc] initWithCode:name4 country:name4];
     marker4.day = @1;
-    marker4.hasMarkerContent = YES;
     
     VLOSummaryMarker *marker5 = [[VLOSummaryMarker alloc] init];
     NSString *name5 = @"바그다드";
     marker5.x = 180;
     marker5.y = 200;
-    marker5.name = name4;
-    marker5.color = VOLO_COLOR;
+    marker5.name = name5;
     marker5.country = [[VLOCountry alloc] initWithCode:name5 country:name5];
     marker5.day = @1;
-    marker5.hasMarkerContent = YES;
-    [marker5 setMarkerContentImage:@"78_DE"];
+    [marker5 setMarkerContentImage:@"78_DE" isFlag:YES];
     
     VLOSummaryMarker *marker6 = [[VLOSummaryMarker alloc] init];
     NSString *name6 = @"시드니";
     marker6.x = 110;
     marker6.y = 200;
     marker6.name = name6;
-    marker6.color = VOLO_COLOR;
     marker6.country = [[VLOCountry alloc] initWithCode:name6 country:name6];
     marker6.day = @1;
-    marker6.hasMarkerContent = YES;
+    [marker6 setMarkerContentImage:@"tabbar-menu-discover-selected" isFlag:NO];
     
     VLOSummaryMarker *marker7 = [[VLOSummaryMarker alloc] init];
     NSString *name7 = @"피츠버그";
     marker7.x = 80;
     marker7.y = 300;
     marker7.name = name7;
-    marker7.color = VOLO_COLOR;
     marker7.country = [[VLOCountry alloc] initWithCode:name7 country:name7];
     marker7.day = @1;
-    marker7.hasMarkerContent = YES;
+    [marker7 setMarkerContentImage:@"gy_twisted" isFlag:NO];
     
     VLOSummarySegment *segment1 = [[VLOSummarySegment alloc] initFrom:marker1 to:marker2];
     segment1.leftToRight = YES;

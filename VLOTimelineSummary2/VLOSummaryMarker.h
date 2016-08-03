@@ -10,12 +10,13 @@
 #import <UIkit/UIkit.h>
 #import "VLOCountry.h"
 
-#define MARKER_SIZE         10.0
+#define MARKER_SIZE         5.0
 #define MARKER_CONTENT_SIZE 30.0
 #define MARKER_CONTENT_GAP  10.0
 #define MARKER_LABEL        10.0
-#define LINE_WIDTH          3.0
+#define LINE_WIDTH          1.0
 #define VOLO_COLOR          [UIColor colorWithRed:200/255.0 green:240/255.0 blue:235/255.0 alpha:1]
+#define LINE_COLOR           [UIColor colorWithRed:211/255.0 green:213/255.0 blue:212/255.0 alpha:1]
 
 @interface VLOSummaryMarker : NSObject
 
@@ -25,11 +26,10 @@
 @property (nonatomic) UIColor *color;
 @property (nonatomic) VLOCountry *country;
 @property (nonatomic) NSNumber *day;
-@property (nonatomic) BOOL hasMarkerContent;
 
 + (CGFloat) distanceBetweenMarker1:(VLOSummaryMarker *)marker1 Marker2:(VLOSummaryMarker *)marker2;
 - (void) setMarkerImage:(NSString *)markerImageName;
-- (void) setMarkerContentImage:(NSString *)contentImageName;
+- (void) setMarkerContentImage:(NSString *)contentImageName isFlag:(BOOL)isFlag;
 - (UIView *) getDrawableView;
 
 

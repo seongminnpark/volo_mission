@@ -128,8 +128,8 @@
         
         CAShapeLayer *segmentLayer = [CAShapeLayer layer];
         [segmentLayer setPath:segmentPath.CGPath];
-        [segmentLayer setStrokeColor:[_fromMarker.color CGColor]];
-        [segmentLayer setLineWidth:3.0];
+        [segmentLayer setStrokeColor:[LINE_COLOR CGColor]];
+        [segmentLayer setLineWidth:LINE_WIDTH];
         [segmentLayer setFillColor:[[UIColor clearColor] CGColor]];
         
         [_segmentView.layer addSublayer:segmentLayer];
