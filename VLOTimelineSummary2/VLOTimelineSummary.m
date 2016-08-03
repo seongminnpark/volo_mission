@@ -33,6 +33,11 @@
     
     _summaryView = view;
     
+    _summaryWidth = _summaryView.bounds.size.width;
+    _summaryHeight = _summaryView.bounds.size.height;
+    _actualWidth = _summaryWidth - (MARKER_CONTENT_SIZE * 2);
+    
+    
     [self parseLogList:logList];
     
     return self;
@@ -40,136 +45,205 @@
 
 - (void) parseLogList:(NSArray *)logList {
     
-    /* 데모용 */
+
+    NSMutableArray *placeList = [[NSMutableArray alloc] init];
+    NSMutableArray *dayList = [[NSMutableArray alloc] init];
+    NSMutableArray *transportList = [[NSMutableArray alloc] init];
+    NSNumber *day = @(1);
+    NSInteger line_cnt = 1;
     
-    VLOSummaryMarker *marker1 = [[VLOSummaryMarker alloc] init];
-    NSString *name1 = @"뉴욕";
-    marker1.x = 50;
-    marker1.y = 100;
-    marker1.name = name1;
-    marker1.color = VOLO_COLOR;
-    marker1.country = [[VLOCountry alloc] initWithCode:name1 country:name1];
-    marker1.day = 0;
-    marker1.hasMarkerContent = YES;
-    [marker1 setMarkerContentImage:@"78_KR"];
+    for(NSInteger i = 0; i < logList.count; i++) {
+        VLOLog *log = [logList objectAtIndex:i];
+        
+        if(log.type == VLOLogTypeDay) {
+            VLODayLog *dayLog = (VLODayLog *)log;
+            day = (NSNumber *)dayLog.day;
+        }
+        if(log.type == VLOLogTypeMap) {
+            [placeList addObject:log.place];
+            [transportList addObject:@"NO"];
+            [dayList addObject:day];
+        } else if(log.type == VLOLogTypeRoute) {
+            for (VLORouteNode *node in ((VLORouteLog *)log).nodes) {
+                [placeList addObject:node.place];
+                NSString *transport_name = [VLORouteLog imageNameOf:node.transportType];
+                [transportList addObject:transport_name];
+                [dayList addObject:day];
+                
+            }
+            
+        }
+    }
     
-    VLOSummaryMarker *marker2 = [[VLOSummaryMarker alloc] init];
-    NSString *name2 = @"보스턴";
-    marker2.x = 130;
-    marker2.y = 100;
-    marker2.name = name2;
-    marker2.color = VOLO_COLOR;
-    marker2.country = [[VLOCountry alloc] initWithCode:name2 country:name2];
-    marker2.day = @2;
-    marker2.hasMarkerContent = YES;
+    if (placeList.count < 1) {
+        return;
+    }
     
-    VLOSummaryMarker *marker3 = [[VLOSummaryMarker alloc] init];
-    NSString *name3 = @"서울";
-    marker3.x = 210;
-    marker3.y = 100;
-    marker3.name = name3;
-    marker3.color = VOLO_COLOR;
-    marker3.country = [[VLOCountry alloc] initWithCode:name3 country:name3];
-    marker3.day = @1;
-    marker3.hasMarkerContent = NO;
+    // 연속으로 중복되거나 불량한 인풋, 군집된 로케이션 정리
+    NSArray *organized_placeList = [self sanitizeInput:placeList :dayList];
     
-    VLOSummaryMarker *marker4 = [[VLOSummaryMarker alloc] init];
-    NSString *name4 = @"방콕";
-    marker4.x = 250;
-    marker4.y = 200;
-    marker4.name = name4;
-    marker4.color = VOLO_COLOR;
-    marker4.country = [[VLOCountry alloc] initWithCode:name4 country:name4];
-    marker4.day = @1;
-    marker4.hasMarkerContent = YES;
+    // 각 마커의 x 좌표를 설정하기 위해 경도 분포를 확인합니다.
+    [self initDistanceList:organized_placeList];
     
-    VLOSummaryMarker *marker5 = [[VLOSummaryMarker alloc] init];
-    NSString *name5 = @"바그다드";
-    marker5.x = 180;
-    marker5.y = 200;
-    marker5.name = name4;
-    marker5.color = VOLO_COLOR;
-    marker5.country = [[VLOCountry alloc] initWithCode:name5 country:name5];
-    marker5.day = @1;
-    marker5.hasMarkerContent = YES;
-    [marker5 setMarkerContentImage:@"78_DE"];
+    NSInteger markerNum = organized_placeList.count;
+    NSInteger lineNum = (markerNum % LINE_MAX_MARKER == 0) ? markerNum / LINE_MAX_MARKER : (markerNum / LINE_MAX_MARKER) + 1;
     
-    VLOSummaryMarker *marker6 = [[VLOSummaryMarker alloc] init];
-    NSString *name6 = @"시드니";
-    marker6.x = 110;
-    marker6.y = 200;
-    marker6.name = name6;
-    marker6.color = VOLO_COLOR;
-    marker6.country = [[VLOCountry alloc] initWithCode:name6 country:name6];
-    marker6.day = @1;
-    marker6.hasMarkerContent = YES;
+    // 첫 VLOMarker의 좌표.
+    CGFloat leftover = _actualWidth - (@(MARKER_CONTENT_SIZE).intValue * LINE_MAX_MARKER);
+    if (leftover < 0) {
+        leftover = 0;
+    }
     
-    VLOSummaryMarker *marker7 = [[VLOSummaryMarker alloc] init];
-    NSString *name7 = @"피츠버그";
-    marker7.x = 80;
-    marker7.y = 300;
-    marker7.name = name7;
-    marker7.color = VOLO_COLOR;
-    marker7.country = [[VLOCountry alloc] initWithCode:name7 country:name7];
-    marker7.day = @1;
-    marker7.hasMarkerContent = YES;
+    CGFloat standardX = _actualWidth / LINE_MAX_MARKER;
+    CGFloat standartY = MARKER_CONTENT_SIZE;
+    CGFloat newX = (markerNum == 1) ? [VLOUtilities screenWidth] / 2 : (markerNum == 2)? ([VLOUtilities screenWidth] / 2) - (standardX / 2) : (_summaryWidth / 2) - standardX;
+    CGFloat newY = standartY;
+    UIColor *color = VOLO_COLOR;
     
-    VLOSummarySegment *segment1 = [[VLOSummarySegment alloc] initFrom:marker1 to:marker2];
-    segment1.leftToRight = YES;
-    segment1.curved = NO;
-    segment1.hasSegmentContent = YES;
+    for (NSInteger i = 0; i < organized_placeList.count; i++) {
+        
+        VLOPlace *curPlace = [organized_placeList objectAtIndex:i];
+        VLOSummaryMarker *newMarker = [[VLOSummaryMarker alloc] init];
+        NSNumber *dayNum = [dayList objectAtIndex:i];
+        
+        if (i > 0) {
+            if (i % LINE_MAX_MARKER == 0) {
+                line_cnt++;
+                newY += (standartY * LINE_MAX_MARKER);
+                
+                if(line_cnt % 2 == 0) {
+                    newX -= MARKER_SIZE;
+                }
+                else {
+                    newX += MARKER_SIZE;
+                }
+            }
+            else {
+                if (line_cnt % 2 == 0) {
+                    newX -= standardX;
+                }
+                else {
+                    newX += standardX;
+                }
+            }
+        }
+        newMarker.x = newX;
+        newMarker.y = newY;
+        newMarker.name = curPlace.name;
+        newMarker.country = curPlace.country;
+        newMarker.day = dayNum;
+        newMarker.color = color;
+        
+        [_markers addObject:newMarker];
+    }
     
-    VLOSummarySegment *segment2 = [[VLOSummarySegment alloc] initFrom:marker2 to:marker3];
-    segment2.leftToRight = YES;
-    segment2.curved = NO;
-    segment2.hasSegmentContent = YES;
-    [segment2 setSegmentContentImage:@"train"];
+    line_cnt = 1;
     
-    VLOSummarySegment *segment3 = [[VLOSummarySegment alloc] initFrom:marker3 to:marker4];
-    segment3.leftToRight = NO;
-    segment3.curved = YES;
-    segment3.hasSegmentContent = YES;
-    [segment3 setSegmentContentImage:@"tram"];
+    for(NSInteger i = 0; i < _markers.count - 1; i++) {
+        VLOSummarySegment *segment = [[VLOSummarySegment alloc] initFrom:[_markers objectAtIndex:i] to:[_markers objectAtIndex:i+1]];
+        NSString *transportType = [transportList objectAtIndex:i];
+        
+        if (i > 0 && i % LINE_MAX_MARKER == 0) {
+            line_cnt++;
+        }
+        if(line_cnt % 2 == 0) {
+            if(i % 3 == 2) {
+                segment.curved = YES;
+                segment.leftToRight = YES;
+            }
+            else {
+                segment.curved = NO;
+                segment.leftToRight = NO;
+            }
+        }
+        else {
+            if(i % 3 == 2) {
+                segment.curved = YES;
+                segment.leftToRight = NO;
+            }
+            else {
+                segment.curved = NO;
+                segment.leftToRight = YES;
+            }
+        }
+        
+        if (![transportType isEqualToString:@"NO"]) {
+            [segment setSegmentContentImage:transportType];
+        }
+        else {
+            segment.hasSegmentContent = NO;
+        }
+        
+        [_segments addObject:segment];
+        
+    }
     
-    VLOSummarySegment *segment4 = [[VLOSummarySegment alloc] initFrom:marker4 to:marker5];
-    segment4.leftToRight = NO;
-    segment4.curved = NO;
-    segment4.hasSegmentContent = YES;
-    [segment4 setSegmentContentImage:@"tram"];
-    
-    VLOSummarySegment *segment5 = [[VLOSummarySegment alloc] initFrom:marker5 to:marker6];
-    segment5.leftToRight = NO;
-    segment5.curved = NO;
-    segment5.hasSegmentContent = YES;
-    [segment5 setSegmentContentImage:@"plane"];
-    
-    VLOSummarySegment *segment6 = [[VLOSummarySegment alloc] initFrom:marker6 to:marker7];
-    segment6.leftToRight = YES;
-    segment6.curved = YES;
-    segment6.hasSegmentContent = YES;
-    [segment6 setSegmentContentImage:@"plane"];
-    
-    // 마커를 나중에 그림.
-    [_drawables addObject:[segment1 getDrawableView]];
-    [_drawables addObject:[segment2 getDrawableView]];
-    [_drawables addObject:[segment3 getDrawableView]];
-    [_drawables addObject:[segment4 getDrawableView]];
-    [_drawables addObject:[segment5 getDrawableView]];
-    [_drawables addObject:[segment6 getDrawableView]];
-    [_drawables addObject:[marker1 getDrawableView]];
-    [_drawables addObject:[marker2 getDrawableView]];
-    [_drawables addObject:[marker3 getDrawableView]];
-    [_drawables addObject:[marker4 getDrawableView]];
-    [_drawables addObject:[marker5 getDrawableView]];
-    [_drawables addObject:[marker6 getDrawableView]];
-    [_drawables addObject:[marker7 getDrawableView]];
+    for(NSInteger i = 0; i < _segments.count; i++) {
+        [_drawables addObject:[[_segments objectAtIndex:i] getDrawableView]];
+    }
+    for(NSInteger i = 0; i < _markers.count; i++) {
+        [_drawables addObject:[[_markers objectAtIndex:i] getDrawableView]];
+    }
    
+    
 }
 
 - (void) drawSummary {
     for (UIView *drawable in _drawables) {
         [_summaryView addSubview:drawable];
     }
+}
+
+- (NSArray *) sanitizeInput:(NSArray *)placeList :(NSMutableArray *)dayList {
+    
+    NSMutableIndexSet *indicesToRemove = [NSMutableIndexSet indexSet];
+    NSMutableArray *newPlaceList = [[NSMutableArray alloc] initWithArray:placeList copyItems:YES];
+    NSInteger overlap_cnt = 0;
+    
+    for (NSInteger i = 1; i < placeList.count; i++) {
+        
+        VLOPlace *prevPlace = [placeList objectAtIndex:i-1];
+        VLOPlace *currPlace = [placeList objectAtIndex:i];
+        
+        BOOL sameLat = prevPlace.coordinates.latitude.floatValue == currPlace.coordinates.latitude.floatValue;
+        BOOL sameLong = prevPlace.coordinates.longitude.floatValue == currPlace.coordinates.longitude.floatValue;
+        
+        // 중복되는 마커 검사. 중복되는 기준은 같은 coordinate.
+        if (sameLat & sameLong) {
+            overlap_cnt ++;
+            [indicesToRemove addIndex:i];
+        }
+        
+    }
+    
+    // 중복마커 제거
+    [newPlaceList removeObjectsAtIndexes:indicesToRemove];
+    [dayList removeObjectsAtIndexes:indicesToRemove];
+    
+    return newPlaceList;
+}
+
+- (void) initDistanceList:(NSArray *)placeList{
+    _distanceList = [[NSMutableArray alloc] initWithCapacity:placeList.count-1];
+    _distanceSum = 0;
+    
+    for (NSInteger i = 1; i < placeList.count; i++) {
+        
+        VLOPlace *prevPlace = [placeList objectAtIndex:i-1];
+        VLOPlace *currPlace = [placeList objectAtIndex:i];
+        CGFloat distance = [self distance:prevPlace:currPlace];
+        _distanceSum += distance;
+        [_distanceList addObject: @(distance)];
+    }
+    
+}
+
+- (CGFloat) distance:(VLOPlace *)from :(VLOPlace *)to {
+    
+    CGFloat latitudeDiff = [to.coordinates.latitude floatValue] - [from.coordinates.latitude floatValue];
+    CGFloat longitudeDiff = [to.coordinates.longitude floatValue] - [from.coordinates.longitude floatValue];
+    
+    return sqrt(pow(latitudeDiff,2) + pow(longitudeDiff,2));
 }
 
 @end
