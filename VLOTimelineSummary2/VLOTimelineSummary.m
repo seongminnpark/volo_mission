@@ -135,11 +135,13 @@
     segment4.leftToRight = NO;
     segment4.curved = NO;
     segment4.hasSegmentContent = YES;
+    [segment4 setSegmentContentImage:@"tram"];
     
     VLOSummarySegment *segment5 = [[VLOSummarySegment alloc] initFrom:marker5 to:marker6];
     segment5.leftToRight = NO;
     segment5.curved = NO;
     segment5.hasSegmentContent = YES;
+    [segment5 setSegmentContentImage:@"plane"];
     
     VLOSummarySegment *segment6 = [[VLOSummarySegment alloc] initFrom:marker6 to:marker7];
     segment6.leftToRight = YES;

@@ -138,7 +138,7 @@
                                 CGRectMake(0, 0, MARKER_CONTENT_SIZE, MARKER_CONTENT_SIZE)];
     CAShapeLayer *contentLayer = [CAShapeLayer layer];
     [contentLayer setPath:circlePath.CGPath];
-    [contentLayer setStrokeColor:[VOLO_COLOR CGColor]];
+    [contentLayer setStrokeColor:[_color CGColor]];
     [contentLayer setFillColor:[[UIColor clearColor] CGColor]];
     [contentLayer setLineWidth:LINE_WIDTH];
     
@@ -155,7 +155,7 @@
     [lineLayer setPath:linePath.CGPath];
     
     [_markerContentView.layer addSublayer:lineLayer];
-    [lineLayer setStrokeColor:[VOLO_COLOR CGColor]];
+    [lineLayer setStrokeColor:[_color CGColor]];
     [lineLayer setLineWidth:LINE_WIDTH];
 }
 
