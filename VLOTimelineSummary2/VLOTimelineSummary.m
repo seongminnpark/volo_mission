@@ -71,7 +71,7 @@
     VLOSummaryMarker *marker4 = [[VLOSummaryMarker alloc] init];
     NSString *name4 = @"방콕";
     marker4.x = 250;
-    marker4.y = 200;
+    marker4.y = 175;
     marker4.name = name4;
     marker4.country = [[VLOCountry alloc] initWithCode:name4 country:name4];
     marker4.day = @1;
@@ -79,7 +79,7 @@
     VLOSummaryMarker *marker5 = [[VLOSummaryMarker alloc] init];
     NSString *name5 = @"바그다드";
     marker5.x = 180;
-    marker5.y = 200;
+    marker5.y = 175;
     marker5.name = name5;
     marker5.country = [[VLOCountry alloc] initWithCode:name5 country:name5];
     marker5.day = @1;
@@ -88,7 +88,7 @@
     VLOSummaryMarker *marker6 = [[VLOSummaryMarker alloc] init];
     NSString *name6 = @"시드니";
     marker6.x = 110;
-    marker6.y = 200;
+    marker6.y = 175;
     marker6.name = name6;
     marker6.country = [[VLOCountry alloc] initWithCode:name6 country:name6];
     marker6.day = @1;
@@ -97,7 +97,7 @@
     VLOSummaryMarker *marker7 = [[VLOSummaryMarker alloc] init];
     NSString *name7 = @"피츠버그";
     marker7.x = 80;
-    marker7.y = 300;
+    marker7.y = 250;
     marker7.name = name7;
     marker7.country = [[VLOCountry alloc] initWithCode:name7 country:name7];
     marker7.day = @1;
