@@ -165,7 +165,7 @@
 
 - (void) initializeMarkerLabel {
     if (_markerLabel) return;
-    _markerLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, _drawableHeight - MARKER_LABEL, _drawableWidth, MARKER_LABEL)];
+    _markerLabel = [[UILabel alloc] initWithFrame:CGRectMake(-_drawableWidth/2, _drawableHeight - MARKER_LABEL, _drawableWidth*2, MARKER_LABEL)];
     _markerLabel.text = _name;
     _markerLabel.textAlignment = NSTextAlignmentCenter;
     _markerLabel.textColor = [UIColor grayColor];
