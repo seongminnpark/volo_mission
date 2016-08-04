@@ -7,6 +7,7 @@
 #import "VLOCoordinateConverter.h"
 #import "VLOLog.h"
 #import "VLODayLog.h"
+#import "VLOSummaryConverter.h"
 
 #define SUMMARY_HEIGHT 130
 
