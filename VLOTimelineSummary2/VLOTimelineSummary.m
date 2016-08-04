@@ -92,7 +92,7 @@
     marker6.name = name6;
     marker6.country = [[VLOCountry alloc] initWithCode:name6 country:name6];
     marker6.day = @1;
-    [marker6 setMarkerContentImage:@"tabbar-menu-discover-selected" isFlag:NO];
+    [marker6 setMarkerContentImage:@"gy_dinner" isFlag:NO];
     
     VLOSummaryMarker *marker7 = [[VLOSummaryMarker alloc] init];
     NSString *name7 = @"피츠버그";

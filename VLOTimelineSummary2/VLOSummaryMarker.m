@@ -131,7 +131,15 @@
         
         UIImage *contentImage = [UIImage imageNamed:_contentImageName];
         UIImageView *contentImageView = [[UIImageView alloc] initWithImage:contentImage];
-        contentImageView.frame = CGRectMake(contentViewLeft, contentViewTop, imageViewSize, imageViewSize);
+        
+        if (!_markerContentIsFlag ) {
+            CGFloat imageWidthHeightRatio = contentImage.size.height / contentImage.size.width;
+            CGFloat imageHeight = imageWidthHeightRatio * MARKER_CONTENT_SIZE;
+            contentViewTop += (MARKER_CONTENT_SIZE - imageHeight);
+            contentImageView.frame = CGRectMake(contentViewLeft, contentViewTop, imageViewSize, imageHeight);
+        } else {
+            contentImageView.frame = CGRectMake(contentViewLeft, contentViewTop, imageViewSize, imageViewSize);
+        }
         
         [_markerContentView addSubview:contentImageView];
         
