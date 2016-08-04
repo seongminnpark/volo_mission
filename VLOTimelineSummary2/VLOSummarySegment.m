@@ -64,11 +64,11 @@
     if (_curved) {
         _drawableLeft = _leftToRight? _leftMarker.x - curveRadius - SEGMENT_CONTENT_SIZE/2 : _leftMarker.x;
     } else {
-        _drawableLeft = _leftToRight? _fromMarker.x : _toMarker.x;
+        _drawableLeft = _leftMarker.x;
     }
-    _drawableTop    = _curved? _fromMarker.y : _fromMarker.y - SEGMENT_CONTENT_SIZE;
+    _drawableTop    = _curved? _fromMarker.y - SEGMENT_HEIGHT/2.0: _fromMarker.y - SEGMENT_CONTENT_SIZE + SEGMENT_HEIGHT/2.0;
     _drawableWidth  = _curved? xDiff + curveRadius + SEGMENT_CONTENT_SIZE/2 : xDiff;
-    _drawableHeight = _curved? MAX(_toMarker.y - _fromMarker.y, SEGMENT_CONTENT_SIZE) : SEGMENT_CONTENT_SIZE;
+    _drawableHeight = _curved? _toMarker.y - _fromMarker.y + SEGMENT_HEIGHT : MAX(SEGMENT_CONTENT_SIZE, SEGMENT_HEIGHT);
     
     // 선과 선 장식 생성.
     [self initializeSegmentView];
@@ -88,17 +88,17 @@
     CGFloat curveRadius = fabs(_toMarker.y - _fromMarker.y) / 2;
     
     CGFloat segmentLeft   = 0;
-    CGFloat segmentTop    = 0;
-    CGFloat segmentWidth  = _curved? _drawableWidth - SEGMENT_CONTENT_SIZE/2 : _drawableWidth;
-    CGFloat segmentHeight = _curved? curveRadius * 2 : 0;
+    CGFloat segmentTop    = _curved? 0 : _drawableHeight - SEGMENT_HEIGHT;
+    CGFloat segmentWidth  = _curved? _drawableWidth - SEGMENT_CONTENT_SIZE/2.0 : _drawableWidth;
+    CGFloat segmentHeight = _curved? curveRadius * 2 : SEGMENT_HEIGHT;
     
     // (0,0)에서 시작하는 프레임에 맞춘 fromMarker과 toMarker 좌표.
     CGFloat fromMarkerX = _fromMarker.x - _drawableLeft;
-    CGFloat fromMarkerY = _curved? 0 : SEGMENT_CONTENT_SIZE;
+    CGFloat fromMarkerY = SEGMENT_HEIGHT/2.0;
     CGPoint fromMarker  = CGPointMake(fromMarkerX, fromMarkerY);
     
     CGFloat toMarkerX   = _toMarker.x - _drawableLeft;
-    CGFloat toMarkerY   = _curved? _drawableHeight : SEGMENT_CONTENT_SIZE;
+    CGFloat toMarkerY   = _curved? _drawableHeight - SEGMENT_HEIGHT/2.0 : SEGMENT_HEIGHT/2.0;
     CGPoint toMarker    = CGPointMake(toMarkerX, toMarkerY);
     
     // _segmentView 생성.
@@ -128,8 +128,8 @@
         
         CAShapeLayer *segmentLayer = [CAShapeLayer layer];
         [segmentLayer setPath:segmentPath.CGPath];
-        [segmentLayer setStrokeColor:[_fromMarker.color CGColor]];
-        [segmentLayer setLineWidth:3.0];
+        [segmentLayer setStrokeColor:[LINE_COLOR CGColor]];
+        [segmentLayer setLineWidth:LINE_WIDTH];
         [segmentLayer setFillColor:[[UIColor clearColor] CGColor]];
         
         [_segmentView.layer addSublayer:segmentLayer];
