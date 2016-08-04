@@ -44,7 +44,7 @@
     NSNumber *day = @(1);
     NSInteger line_cnt = 1;
     NSInteger st_marker_num = 0;
-    
+    NSLog(@"count: %li", logList.count);
     for(NSInteger i = 0; i < logList.count; i++) {
         VLOLog *log = [logList objectAtIndex:i];
         
