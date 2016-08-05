@@ -17,6 +17,8 @@
 		3E9198421D4F22E1003D5588 /* VLOSummarySegment.m in Sources */ = {isa = PBXBuildFile; fileRef = 3E91983E1D4F22E1003D5588 /* VLOSummarySegment.m */; };
 		3E9198431D4F22E1003D5588 /* VLOTimelineSummary.m in Sources */ = {isa = PBXBuildFile; fileRef = 3E9198401D4F22E1003D5588 /* VLOTimelineSummary.m */; };
 		3E9198461D4F2352003D5588 /* VLOCountry.m in Sources */ = {isa = PBXBuildFile; fileRef = 3E9198451D4F2352003D5588 /* VLOCountry.m */; };
+		3E9198491D5076EA003D5588 /* Flags.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3E9198471D5076EA003D5588 /* Flags.xcassets */; };
+		3E91984A1D5076EA003D5588 /* VLOBoardingPassEditorAssets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3E9198481D5076EA003D5588 /* VLOBoardingPassEditorAssets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,6 +40,8 @@
 		3E9198401D4F22E1003D5588 /* VLOTimelineSummary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLOTimelineSummary.m; sourceTree = "<group>"; };
 		3E9198441D4F2352003D5588 /* VLOCountry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLOCountry.h; sourceTree = "<group>"; };
 		3E9198451D4F2352003D5588 /* VLOCountry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLOCountry.m; sourceTree = "<group>"; };
+		3E9198471D5076EA003D5588 /* Flags.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Flags.xcassets; sourceTree = "<group>"; };
+		3E9198481D5076EA003D5588 /* VLOBoardingPassEditorAssets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = VLOBoardingPassEditorAssets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -78,6 +82,8 @@
 				3E9198451D4F2352003D5588 /* VLOCountry.m */,
 				3E91982C1D4F22A8003D5588 /* Main.storyboard */,
 				3E91982F1D4F22A8003D5588 /* Assets.xcassets */,
+				3E9198471D5076EA003D5588 /* Flags.xcassets */,
+				3E9198481D5076EA003D5588 /* VLOBoardingPassEditorAssets.xcassets */,
 				3E9198311D4F22A8003D5588 /* LaunchScreen.storyboard */,
 				3E9198341D4F22A8003D5588 /* Info.plist */,
 				3E91983A1D4F22E1003D5588 /* VLOTimelineSummary2 */,
@@ -165,9 +171,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3E91984A1D5076EA003D5588 /* VLOBoardingPassEditorAssets.xcassets in Resources */,
 				3E9198331D4F22A8003D5588 /* LaunchScreen.storyboard in Resources */,
 				3E9198301D4F22A8003D5588 /* Assets.xcassets in Resources */,
 				3E91982E1D4F22A8003D5588 /* Main.storyboard in Resources */,
+				3E9198491D5076EA003D5588 /* Flags.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

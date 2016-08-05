@@ -21,13 +21,7 @@
 #define LINE_MAX_MARKER     3
 
 
-@interface VLOTimelineSummary : NSObject
-
-@property (strong, nonatomic) NSMutableArray *distanceList;
-@property () CGFloat actualWidth;
-@property () CGFloat summaryWidth;
-@property () CGFloat summaryHeight;
-@property () CGFloat distanceSum;
+@interface VLOSummaryViewController : UIViewController
 
 - (id) initWithLogs:(NSArray *)logList andView:(UIView *)view;
 - (void) drawSummary;

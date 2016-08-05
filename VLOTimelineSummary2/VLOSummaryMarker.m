@@ -60,21 +60,26 @@
     
     // 모든 컴포넌트에 공유되는 Frame 변수들.
     _drawableLeft   = MIN(_x - MARKER_SIZE/2, _x - MARKER_CONTENT_SIZE/2);
-    _drawableTop    = _y - MARKER_SIZE/2 - MARKER_FLAG_GAP - MARKER_CONTENT_SIZE;
+    _drawableTop    = _y - SEGMENT_HEIGHT/2 - MARKER_FLAG_GAP - MARKER_CONTENT_SIZE*1.5;
     _drawableWidth  = MAX(MARKER_SIZE, MARKER_CONTENT_SIZE);
     _drawableHeight = MARKER_CONTENT_SIZE + MARKER_FLAG_GAP + MARKER_SIZE + MARKER_FLAG_GAP + MARKER_LABEL; // 순서대로
 
-    // 마커, 마커 레이블, 마커 장식 생성.
-    [self initializeMarkerView];
+    // 마커 레이블.
     [self initializeMarkerLabel];
-    if (_hasMarkerContent) [self initializeMarkerContentView];
 
     // 마커와 마커 장식 묶음이 담길 뷰 생성.
     UIView *drawableView = [[UIView alloc] initWithFrame:CGRectMake(_drawableLeft, _drawableTop, _drawableWidth, _drawableHeight)];
-    [drawableView addSubview:_markerView];
+
     [drawableView addSubview:_markerLabel];
-    if (_hasMarkerContent) [drawableView addSubview:_markerContentView];
     
+    if (_hasMarkerContent) {
+        [self initializeMarkerContentView];
+        [drawableView addSubview:_markerContentView];
+    } else {
+        [self initializeMarkerView];
+        [drawableView addSubview:_markerView];
+    }
+    //[drawableView setBackgroundColor:[UIColor redColor]];
     return drawableView;
 }
 
@@ -131,12 +136,14 @@
         
         UIImage *contentImage = [UIImage imageNamed:_contentImageName];
         UIImageView *contentImageView = [[UIImageView alloc] initWithImage:contentImage];
-        
+
         if (!_markerContentIsFlag ) {
-            CGFloat imageWidthHeightRatio = contentImage.size.height / contentImage.size.width;
-            CGFloat imageHeight = imageWidthHeightRatio * MARKER_CONTENT_SIZE;
-            contentViewTop += (MARKER_CONTENT_SIZE - imageHeight);
+//            CGFloat imageWidthHeightRatio = contentImage.size.height / contentImage.size.width;
+//            CGFloat imageHeight = imageWidthHeightRatio * MARKER_CONTENT_SIZE;
+             CGFloat imageHeight = 1.5 * MARKER_CONTENT_SIZE;
+            contentViewTop += SEGMENT_HEIGHT;
             contentImageView.frame = CGRectMake(contentViewLeft, contentViewTop, imageViewSize, imageHeight);
+//            NSLog(@"imageHeight: %f, contentViewTop: %f", imageHeight, contentViewTop);
         } else {
             contentImageView.frame = CGRectMake(contentViewLeft, contentViewTop, imageViewSize, imageViewSize);
         }
