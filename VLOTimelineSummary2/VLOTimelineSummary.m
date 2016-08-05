@@ -101,7 +101,6 @@
         newMarker.day = dayNum;
         newMarker.color = color;
         
-        NSLog(@"x -> %f, y-> %f\n",newMarker.x,newMarker.y);
         [_markers addObject:newMarker];
         
         st_marker_num++;
@@ -147,6 +146,7 @@
         else {
             segment.hasSegmentContent = NO;
         }
+        
         [_segments addObject:segment];
         
     }
@@ -216,7 +216,7 @@
 }
 
 - (NSMutableArray *) getStandardXCoordinate:(NSInteger)markerNum :(NSInteger)lineNum {
-    CGFloat standardX = _actualWidth / LINE_MAX_MARKER;
+    CGFloat standardX = (_actualWidth / LINE_MAX_MARKER) - MARKER_SIZE;
     CGFloat newX = (markerNum == 1) ? _summaryWidth / 2 : (markerNum == 2)? (_summaryWidth / 2) - (standardX / 2) : (_summaryWidth / 2) - standardX - (MARKER_FLAG_GAP);
     NSMutableArray *standard_coordinates = [NSMutableArray array];
     
