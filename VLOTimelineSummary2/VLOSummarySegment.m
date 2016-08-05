@@ -142,7 +142,6 @@
             [_segmentView addSubview:curveSegImageView];
             [_segmentView addSubview:shortSegImageView];
 
-            [_segmentView setBackgroundColor:[UIColor redColor]];
         } else { // 긴 선 이미지
             UIImage *segmentImage= [UIImage imageNamed:_longImageName];
             _segmentView = [[UIImageView alloc] initWithImage:segmentImage];
