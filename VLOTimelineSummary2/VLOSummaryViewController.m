@@ -6,9 +6,9 @@
 //  Copyright © 2016 SK Planet. All rights reserved.
 //
 
-#import "VLOTimelineSummary.h"
+#import "VLOSummaryViewController.h"
 
-@interface VLOTimelineSummary ()
+@interface VLOSummaryViewController ()
 
 @property (strong, nonatomic) NSArray *logList;
 @property (strong, nonatomic) NSMutableArray *markers;
@@ -16,9 +16,15 @@
 @property (strong, nonatomic) NSMutableArray *drawables;
 @property (strong, nonatomic) UIView  *summaryView;
 
+@property (strong, nonatomic) NSMutableArray *distanceList;
+@property () CGFloat actualWidth;
+@property () CGFloat summaryWidth;
+@property () CGFloat summaryHeight;
+@property () CGFloat distanceSum;
+
 @end
 
-@implementation VLOTimelineSummary
+@implementation VLOSummaryViewController
 
 - (id) initWithLogs:(NSArray *)logList andView:(UIView *)view {
     self = [super init];
@@ -44,7 +50,7 @@
     NSNumber *day = @(1);
     NSInteger line_cnt = 1;
     NSInteger st_marker_num = 0;
-    NSLog(@"count: %li", logList.count);
+  
     for(NSInteger i = 0; i < logList.count; i++) {
         VLOLog *log = [logList objectAtIndex:i];
         
@@ -101,7 +107,11 @@
         newMarker.day = dayNum;
         newMarker.color = color;
         
+        [newMarker setMarkerContentImage:@"markerContent" isFlag:NO];
+        //[newMarker setMarkerContentImage:@"78_AF" isFlag:YES];
+
         [_markers addObject:newMarker];
+        [_drawables addObject:[[_markers objectAtIndex:i] getDrawableView]];
         
         st_marker_num++;
         
@@ -147,14 +157,18 @@
             segment.hasSegmentContent = NO;
         }
         
+        [segment setSegmentImageLong:@"longSegment"
+                              middle:@"middleSegment"
+                               shortt:@"shortSegment"
+                               curve:@"curveSegment"];
+        
+        [segment setSegmentContentImage:@"segmentContent"];
+
         [_segments addObject:segment];
+        [_drawables addObject:[[_segments objectAtIndex:i] getDrawableView]];
         
     }
     
-    for(NSInteger i = 0; i < _markers.count - 1; i++) {
-        [_drawables addObject:[[_markers objectAtIndex:i] getDrawableView]];
-        [_drawables addObject:[[_segments objectAtIndex:i] getDrawableView]];
-    }
     // 마지막 marker 추가
     [_drawables addObject:[[_markers objectAtIndex:_markers.count-1] getDrawableView]];
     
@@ -216,8 +230,11 @@
 }
 
 - (NSMutableArray *) getStandardXCoordinate:(NSInteger)markerNum :(NSInteger)lineNum {
-    CGFloat standardX = (_actualWidth / LINE_MAX_MARKER) - MARKER_SIZE;
-    CGFloat newX = (markerNum == 1) ? _summaryWidth / 2 : (markerNum == 2)? (_summaryWidth / 2) - (standardX / 2) : (_summaryWidth / 2) - standardX - (MARKER_FLAG_GAP);
+
+    CGFloat standardX = _actualWidth / LINE_MAX_MARKER;
+    CGFloat newX = (markerNum == 1) ? _summaryWidth / 2 :
+    (markerNum == 2)? (_summaryWidth / 2) - (standardX / 2) :
+                      (_summaryWidth / 2) - standardX - 10;
     NSMutableArray *standard_coordinates = [NSMutableArray array];
     
     for(NSInteger i = 0; i < (2 * LINE_MAX_MARKER); i++) {
@@ -226,10 +243,10 @@
                 lineNum++;
                 
                 if(lineNum % 2 == 0) {
-                    newX += MARKER_CONTENT_SIZE / 2;
+                    newX += (MIDDLE_SEGMENT - SHORT_SEGMENT);
                 }
                 else {
-                    newX -= MARKER_CONTENT_SIZE / 2;
+                    newX -= (MIDDLE_SEGMENT - SHORT_SEGMENT);
                 }
             }
             else {
