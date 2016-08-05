@@ -30,7 +30,7 @@
     _summaryView = view;
     _summaryWidth = _summaryView.bounds.size.width;
     _summaryHeight = _summaryView.bounds.size.height;
-    _actualWidth = _summaryWidth - MARKER_CONTENT_SIZE;
+    _actualWidth = _summaryWidth - (SEGMENT_CONTENT_SIZE * 2);
     
     [self parseLogList:logList];
     
@@ -101,6 +101,7 @@
         newMarker.day = dayNum;
         newMarker.color = color;
         
+        NSLog(@"x -> %f, y-> %f\n",newMarker.x,newMarker.y);
         [_markers addObject:newMarker];
         
         st_marker_num++;
@@ -228,7 +229,7 @@
                     newX += MARKER_CONTENT_SIZE / 2;
                 }
                 else {
-                    newX -= MARKER_CONTENT_SIZE;
+                    newX -= MARKER_CONTENT_SIZE / 2;
                 }
             }
             else {
@@ -242,6 +243,7 @@
         }
         [standard_coordinates addObject:@(newX)];
     }
+    
     return standard_coordinates;
     
 }
