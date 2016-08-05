@@ -106,12 +106,10 @@
         newMarker.country = curPlace.country;
         newMarker.day = dayNum;
         newMarker.color = color;
-<<<<<<< HEAD:VLOTimelineSummary2/VLOSummaryViewController.m
+        
         [newMarker setMarkerContentImage:@"markerContent" isFlag:NO];
         //[newMarker setMarkerContentImage:@"78_AF" isFlag:YES];
-=======
-        
->>>>>>> wanderworld/master:VLOTimelineSummary2/VLOTimelineSummary.m
+
         [_markers addObject:newMarker];
         [_drawables addObject:[[_markers objectAtIndex:i] getDrawableView]];
         
@@ -159,15 +157,13 @@
             segment.hasSegmentContent = NO;
         }
         
-<<<<<<< HEAD:VLOTimelineSummary2/VLOSummaryViewController.m
         [segment setSegmentImageLong:@"longSegment"
                               middle:@"middleSegment"
                                shortt:@"shortSegment"
                                curve:@"curveSegment"];
         
         [segment setSegmentContentImage:@"segmentContent"];
-=======
->>>>>>> wanderworld/master:VLOTimelineSummary2/VLOTimelineSummary.m
+
         [_segments addObject:segment];
         [_drawables addObject:[[_segments objectAtIndex:i] getDrawableView]];
         
