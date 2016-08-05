@@ -6,9 +6,9 @@
 //  Copyright © 2016 SK Planet. All rights reserved.
 //
 
-#import "VLOTimelineSummary.h"
+#import "VLOSummaryViewController.h"
 
-@interface VLOTimelineSummary ()
+@interface VLOSummaryViewController ()
 
 @property (strong, nonatomic) NSArray *logList;
 @property (strong, nonatomic) NSMutableArray *markers;
@@ -16,9 +16,15 @@
 @property (strong, nonatomic) NSMutableArray *drawables;
 @property (strong, nonatomic) UIView  *summaryView;
 
+@property (strong, nonatomic) NSMutableArray *distanceList;
+@property () CGFloat actualWidth;
+@property () CGFloat summaryWidth;
+@property () CGFloat summaryHeight;
+@property () CGFloat distanceSum;
+
 @end
 
-@implementation VLOTimelineSummary
+@implementation VLOSummaryViewController
 
 - (id) initWithLogs:(NSArray *)logList andView:(UIView *)view {
     self = [super init];
@@ -44,7 +50,7 @@
     NSNumber *day = @(1);
     NSInteger line_cnt = 1;
     NSInteger st_marker_num = 0;
-    NSLog(@"count: %li", logList.count);
+  
     for(NSInteger i = 0; i < logList.count; i++) {
         VLOLog *log = [logList objectAtIndex:i];
         
@@ -100,7 +106,7 @@
         newMarker.country = curPlace.country;
         newMarker.day = dayNum;
         newMarker.color = color;
-        
+        [newMarker setMarkerContentImage:@"markerContent" isFlag:NO];
         [_markers addObject:newMarker];
         
         st_marker_num++;
@@ -146,6 +152,10 @@
         else {
             segment.hasSegmentContent = NO;
         }
+        
+        if (!segment.curved) [segment setSegmentImage:@"longSegment"];
+        else [segment setSegmentImage:@"short+curveSegment"];
+        [segment setSegmentContentImage:@"segmentContent"];
         [_segments addObject:segment];
         
     }
