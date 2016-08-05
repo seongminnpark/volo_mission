@@ -19,8 +19,14 @@
 @property () BOOL hasSegmentContent;
 
 - (id) initFrom:(VLOSummaryMarker *)fromMarker to:(VLOSummaryMarker *)toMarker;
-- (void) setSegmentImage:(NSString *)segmentImageName;
+
+- (void) setSegmentImageLong:(NSString *)longImage
+                      middle:(NSString *)middleImage
+                       shortt:(NSString *)shortImage
+                       curve:(NSString *)curveImage;
+
 - (void) setSegmentContentImage:(NSString *)contentImageName;
+
 - (UIView *) getDrawableView;
 
 @end
