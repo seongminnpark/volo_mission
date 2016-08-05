@@ -12,6 +12,7 @@
 
 #define MARKER_SIZE         5.0
 #define MARKER_CONTENT_SIZE 50.0
+
 #define MARKER_FLAG_SIZE    30.0
 #define MARKER_FLAG_GAP     10.0
 #define MARKER_LABEL        10.0

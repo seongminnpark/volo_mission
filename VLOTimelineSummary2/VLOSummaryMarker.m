@@ -59,10 +59,10 @@
 - (UIView *) getDrawableView {
     
     // 모든 컴포넌트에 공유되는 Frame 변수들.
-    _drawableLeft   = MIN(_x - MARKER_SIZE/2, _x - MARKER_CONTENT_SIZE/2);
-    _drawableTop    = _y - SEGMENT_HEIGHT/2 - MARKER_FLAG_GAP - MARKER_CONTENT_SIZE*1.5;
-    _drawableWidth  = MAX(MARKER_SIZE, MARKER_CONTENT_SIZE);
-    _drawableHeight = MARKER_CONTENT_SIZE + MARKER_FLAG_GAP + MARKER_SIZE + MARKER_FLAG_GAP + MARKER_LABEL; // 순서대로
+    _drawableLeft   = _x - MARKER_CONTENT_SIZE/2;
+    _drawableTop    = _y + SEGMENT_HEIGHT/2 - MARKER_CONTENT_SIZE * 1.5;
+    _drawableWidth  = MARKER_CONTENT_SIZE;
+    _drawableHeight = MARKER_CONTENT_SIZE * 1.5 + MARKER_LABEL; // 순서대로
 
     // 마커 레이블.
     [self initializeMarkerLabel];
@@ -131,19 +131,16 @@
         
         CGFloat contentViewLeft = _markerContentIsFlag? _drawableWidth/2.0 - MARKER_FLAG_SIZE/2 : 0;
         CGFloat contentViewTop  = _markerContentIsFlag?
-            (MARKER_CONTENT_SIZE - MARKER_FLAG_SIZE) : MARKER_FLAG_GAP; // 국기가 아닌 경우 마커로부터 국기까지의 선이 없다.
+            (MARKER_CONTENT_SIZE * 1.5 - SEGMENT_HEIGHT - MARKER_FLAG_SIZE - MARKER_FLAG_GAP) : 0;
+        // 국기가 아닌 경우 마커로부터 국기까지의 선이 없다.
         CGFloat imageViewSize   = _markerContentIsFlag? MARKER_FLAG_SIZE : MARKER_CONTENT_SIZE;
         
         UIImage *contentImage = [UIImage imageNamed:_contentImageName];
         UIImageView *contentImageView = [[UIImageView alloc] initWithImage:contentImage];
 
         if (!_markerContentIsFlag ) {
-//            CGFloat imageWidthHeightRatio = contentImage.size.height / contentImage.size.width;
-//            CGFloat imageHeight = imageWidthHeightRatio * MARKER_CONTENT_SIZE;
              CGFloat imageHeight = 1.5 * MARKER_CONTENT_SIZE;
-            contentViewTop += SEGMENT_HEIGHT;
             contentImageView.frame = CGRectMake(contentViewLeft, contentViewTop, imageViewSize, imageHeight);
-//            NSLog(@"imageHeight: %f, contentViewTop: %f", imageHeight, contentViewTop);
         } else {
             contentImageView.frame = CGRectMake(contentViewLeft, contentViewTop, imageViewSize, imageViewSize);
         }
