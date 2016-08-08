@@ -16,11 +16,8 @@
 @property (strong, nonatomic) NSMutableArray *drawables;
 @property (strong, nonatomic) UIView  *summaryView;
 
-@property (strong, nonatomic) NSMutableArray *distanceList;
 @property () CGFloat actualWidth;
 @property () CGFloat summaryWidth;
-@property () CGFloat summaryHeight;
-@property () CGFloat distanceSum;
 
 @end
 
@@ -35,8 +32,7 @@
     _drawables = [NSMutableArray array]; // 이미지 리소스 캐싱.
     _summaryView = view;
     _summaryWidth = _summaryView.bounds.size.width;
-    _summaryHeight = _summaryView.bounds.size.height;
-    _actualWidth = _summaryWidth - (SEGMENT_CONTENT_SIZE * 2);
+    _actualWidth = _summaryWidth - (SEGMENT_ICON_SIZE * 2);
     
     [self parseLogList:logList];
     
@@ -44,29 +40,24 @@
 }
 
 - (void) parseLogList:(NSArray *)logList {
-    NSMutableArray *placeList = [[NSMutableArray alloc] init];
-    NSMutableArray *dayList = [[NSMutableArray alloc] init];
-    NSMutableArray *transportList = [[NSMutableArray alloc] init];
+    NSMutableArray *placeList = [NSMutableArray array];
+    NSMutableArray *dayList = [NSMutableArray array];
+
     NSNumber *day = @(1);
-    NSInteger line_cnt = 1;
-    NSInteger st_marker_num = 0;
   
+    // 로그 리스트에서 VLOPlace를 추출.
     for(NSInteger i = 0; i < logList.count; i++) {
         VLOLog *log = [logList objectAtIndex:i];
         
         if(log.type == VLOLogTypeDay) {
             VLODayLog *dayLog = (VLODayLog *)log;
             day = (NSNumber *)dayLog.day;
-        }
-        if(log.type == VLOLogTypeMap) {
+        } else if(log.type == VLOLogTypeMap) {
             [placeList addObject:log.place];
-            [transportList addObject:@"NO"];
             [dayList addObject:day];
         } else if(log.type == VLOLogTypeRoute) {
             for (VLORouteNode *node in ((VLORouteLog *)log).nodes) {
                 [placeList addObject:node.place];
-                NSString *transport_name = [VLORouteLog imageNameOf:node.transportType];
-                [transportList addObject:transport_name];
                 [dayList addObject:day];
             }
         }
@@ -77,101 +68,16 @@
     }
     
     // 연속으로 중복되거나 불량한 인풋 정리
-    NSArray *organized_placeList = [self sanitizeInput:placeList :dayList];
+    NSArray *new_placeList = [self sanitizeInput:placeList:dayList];
     
-    // 각 마커의 x 좌표를 설정하기 위해 경도 분포를 확인합니다.
-    [self initDistanceList:organized_placeList];
+    // 마커와 세그먼트 생성.
+    [self initializeMarkerList:new_placeList:dayList];
+    [self initializeSegmentList];
     
-    NSInteger markerNum = organized_placeList.count;
-    NSMutableArray *tmp_arr = [self getStandardXCoordinate:markerNum :line_cnt];
-    
-    CGFloat standartY = MARKER_CONTENT_SIZE / 2;
-    CGFloat newY = standartY;
-    UIColor *color = VOLO_COLOR;
-    
-    for (NSInteger i = 0; i < organized_placeList.count; i++) {
-        
-        VLOPlace *curPlace = [organized_placeList objectAtIndex:i];
-        VLOSummaryMarker *newMarker = [[VLOSummaryMarker alloc] init];
-        CGFloat xCoordinate = [[tmp_arr objectAtIndex:st_marker_num] floatValue];
-        NSNumber *dayNum = [dayList objectAtIndex:i];
-        
-        if(i != 0 && i % LINE_MAX_MARKER == 0) {
-            newY += (MARKER_CONTENT_SIZE + MARKER_LABEL + MARKER_FLAG_SIZE);
-        }
-        
-        newMarker.x = xCoordinate;
-        newMarker.y = newY;
-        newMarker.name = curPlace.name;
-        newMarker.country = curPlace.country;
-        newMarker.day = dayNum;
-        newMarker.color = color;
-        
-        [newMarker setMarkerContentImage:@"markerContent" isFlag:NO];
-        //[newMarker setMarkerContentImage:@"78_AF" isFlag:YES];
-
-        [_markers addObject:newMarker];
-        [_drawables addObject:[[_markers objectAtIndex:i] getDrawableView]];
-        
-        st_marker_num++;
-        
-        if(st_marker_num >= (2 * LINE_MAX_MARKER)) {
-            st_marker_num = 0;
-        }
+    // 레이서 순서를 위해 마커 drawable를 drawables에 추가한다. Segment의 drawable은 initializeSegmentList에서 추가된다.
+    for (VLOSummaryMarker *marker in _markers) {
+        [_drawables addObject:[marker getDrawableView]];
     }
-    
-    line_cnt = 1;
-    
-    for(NSInteger i = 0; i < _markers.count - 1; i++) {
-        VLOSummarySegment *segment = [[VLOSummarySegment alloc] initFrom:[_markers objectAtIndex:i] to:[_markers objectAtIndex:i+1]];
-        NSString *transportType = [transportList objectAtIndex:i];
-        
-        if (i > 0 && i % LINE_MAX_MARKER == 0) {
-            line_cnt++;
-        }
-        if(line_cnt % 2 == 0) {
-            if(i % 3 == 2) {
-                segment.curved = YES;
-                segment.leftToRight = YES;
-            }
-            else {
-                segment.curved = NO;
-                segment.leftToRight = NO;
-            }
-        }
-        else {
-            if(i % 3 == 2) {
-                segment.curved = YES;
-                segment.leftToRight = NO;
-            }
-            else {
-                segment.curved = NO;
-                segment.leftToRight = YES;
-            }
-        }
-        
-        if (![transportType isEqualToString:@"NO"]) {
-            [segment setSegmentContentImage:transportType];
-        }
-        else {
-            segment.hasSegmentContent = NO;
-        }
-        
-        [segment setSegmentImageLong:@"longSegment"
-                              middle:@"middleSegment"
-                               shortt:@"shortSegment"
-                               curve:@"curveSegment"];
-        
-        [segment setSegmentContentImage:@"segmentContent"];
-
-        [_segments addObject:segment];
-        [_drawables addObject:[[_segments objectAtIndex:i] getDrawableView]];
-        
-    }
-    
-    // 마지막 marker 추가
-    [_drawables addObject:[[_markers objectAtIndex:_markers.count-1] getDrawableView]];
-    
 }
 
 - (void) drawSummary {
@@ -180,11 +86,12 @@
     }
 }
 
-- (NSArray *) sanitizeInput:(NSArray *)placeList :(NSMutableArray *)dayList {
+- (NSArray *) sanitizeInput:(NSArray *)placeList :(NSArray *)dayList {
     
     NSMutableIndexSet *indicesToRemove = [NSMutableIndexSet indexSet];
     NSMutableArray *newPlaceList = [[NSMutableArray alloc] initWithArray:placeList copyItems:YES];
-    
+    NSMutableArray *newDayList = [[NSMutableArray alloc] initWithArray:dayList copyItems:YES];
+                                  
     for (NSInteger i = 1; i < placeList.count; i++) {
         
         VLOPlace *prevPlace = [placeList objectAtIndex:i-1];
@@ -197,72 +104,88 @@
         if (sameLat & sameLong) {
             [indicesToRemove addIndex:i];
         }
-        
     }
+    
     // 중복마커 제거
     [newPlaceList removeObjectsAtIndexes:indicesToRemove];
-    [dayList removeObjectsAtIndexes:indicesToRemove];
+    [newDayList removeObjectsAtIndexes:indicesToRemove];
     
     return newPlaceList;
 }
 
-- (void) initDistanceList:(NSArray *)placeList{
-    _distanceList = [[NSMutableArray alloc] initWithCapacity:placeList.count-1];
-    _distanceSum = 0;
+- (void) initializeMarkerList:(NSArray *)placeList :(NSArray *)dayList {
     
-    for (NSInteger i = 1; i < placeList.count; i++) {
+    CGFloat columnWidth = LONG_SEGMENT;
+    CGFloat rowChangeXdiff = MIDDLE_SEGMENT - SHORT_SEGMENT;
+    CGFloat firstMarkerY = MARKER_ICON_HEIGHT / 2.0;
+    CGFloat firstMarkerX;
+    
+    switch (placeList.count) {
+        case (1): firstMarkerX = _summaryWidth / 2.0;                     break;
+        case (2): firstMarkerX = _summaryWidth / 2.0 - columnWidth / 2.0; break;
+        default : firstMarkerX = _summaryWidth / 2.0 - columnWidth;       break;
+    }
+    
+    for (NSInteger i = 0; i < placeList.count; i++) {
         
-        VLOPlace *prevPlace = [placeList objectAtIndex:i-1];
+        NSInteger row = i / MARKERS_PER_LINE;
+        NSInteger col = i % MARKERS_PER_LINE;
+        
+        BOOL oddLine = row % 2 == 0; // 0번째 줄 부터 시작하기 때문에 lineNum이 짝수일 때 홀수 줄이다.
+        
+        CGFloat newX;
+        if (oddLine) newX = firstMarkerX + col * columnWidth;
+        else         newX = firstMarkerX + (MARKERS_PER_LINE - col - 1) * columnWidth;
+        CGFloat newY = firstMarkerY + row * LINE_GAP;
+        
+        if (!oddLine) newX += rowChangeXdiff;
+        
         VLOPlace *currPlace = [placeList objectAtIndex:i];
-        CGFloat distance = [self distance:prevPlace:currPlace];
-        _distanceSum += distance;
-        [_distanceList addObject: @(distance)];
+        VLOSummaryMarker *newMarker = [[VLOSummaryMarker alloc] init];
+        
+        newMarker.x = newX;
+        newMarker.y = newY;
+        newMarker.name = currPlace.name;
+        newMarker.country = currPlace.country;
+        newMarker.day = [dayList objectAtIndex:i];
+        newMarker.color = VOLO_COLOR;
+        
+        if (oddLine) [newMarker setMarkerImage:@"marker_flag_cn"];
+        //else [newMarker setMarkerImage:@"marker_day"];
+
+        [newMarker setMarkerIconImage:@"marker-icon-sample01" isFlag:NO];
+        
+        [_markers addObject:newMarker];
+        //[_drawables addObject:[newMarker getDrawableView]];
     }
-    
 }
 
-- (CGFloat) distance:(VLOPlace *)from :(VLOPlace *)to {
+- (void) initializeSegmentList {
     
-    CGFloat latitudeDiff = [to.coordinates.latitude floatValue] - [from.coordinates.latitude floatValue];
-    CGFloat longitudeDiff = [to.coordinates.longitude floatValue] - [from.coordinates.longitude floatValue];
-    
-    return sqrt(pow(latitudeDiff,2) + pow(longitudeDiff,2));
-}
-
-- (NSMutableArray *) getStandardXCoordinate:(NSInteger)markerNum :(NSInteger)lineNum {
-
-    CGFloat standardX = _actualWidth / LINE_MAX_MARKER;
-    CGFloat newX = (markerNum == 1) ? _summaryWidth / 2 :
-    (markerNum == 2)? (_summaryWidth / 2) - (standardX / 2) :
-                      (_summaryWidth / 2) - standardX - 10;
-    NSMutableArray *standard_coordinates = [NSMutableArray array];
-    
-    for(NSInteger i = 0; i < (2 * LINE_MAX_MARKER); i++) {
-        if (i > 0) {
-            if (i % LINE_MAX_MARKER == 0) {
-                lineNum++;
-                
-                if(lineNum % 2 == 0) {
-                    newX += (MIDDLE_SEGMENT - SHORT_SEGMENT);
-                }
-                else {
-                    newX -= (MIDDLE_SEGMENT - SHORT_SEGMENT);
-                }
-            }
-            else {
-                if (lineNum % 2 == 0) {
-                    newX -= standardX;
-                }
-                else {
-                    newX += standardX;
-                }
-            }
-        }
-        [standard_coordinates addObject:@(newX)];
+    for(NSInteger i = 0; i < _markers.count - 1; i++) {
+        VLOSummarySegment *segment = [[VLOSummarySegment alloc] initFrom:[_markers objectAtIndex:i] to:[_markers objectAtIndex:i+1]];
+        
+        NSInteger row = i / MARKERS_PER_LINE;
+        
+        BOOL oddLine = row % 2 == 0; // 0번째 줄 부터 시작하기 때문에 lineNum이 짝수일 때 홀수 줄이다.
+        BOOL curved  = i % MARKERS_PER_LINE == MARKERS_PER_LINE - 1;
+        
+        segment.curved = curved;
+        segment.leftToRight = (oddLine && !curved) || (!oddLine && curved);
+        
+        if (segment.leftToRight && !curved) [segment setSegmentIconImage:@"line-icon-left-sample01"];
+        if (segment.leftToRight && curved) [segment setSegmentIconImage:@"curve-line-icon-left"];
+        
+        segment.hasSegmentIcon = YES;
+        
+        [segment setSegmentImageLong:@"line-long"
+                              middle:@"line-middle"
+                              shortt:@"line-short"
+                               curve:@"line-curve"];
+        
+        [_segments addObject:segment];
+        [_drawables addObject:[segment getDrawableView]];
     }
-    
-    return standard_coordinates;
-    
 }
 
 @end
