@@ -17,9 +17,7 @@
 #import "VLOLocationCoordinate.h"
 #import "VLOUtilities.h"
 
-#define SUMMARY_HEIGHT      300
-#define LINE_MAX_MARKER     3
-
+#define SUMMARY_HEIGHT       300
 
 @interface VLOSummaryViewController : UIViewController
 

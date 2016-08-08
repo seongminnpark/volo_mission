@@ -9,25 +9,32 @@
 #import <Foundation/Foundation.h>
 #import <UIkit/UIkit.h>
 #import "VLOCountry.h"
+#import "VLOUtilities.h"
 
-#define MARKER_SIZE         5.0
-#define MARKER_IMAGE_SIZE   20.0
-#define MARKER_CONTENT_SIZE 50.0 // 가로사이즈.
-#define MARKER_CONTENT_HEIGHT MARKER_CONTENT_SIZE * 1.5
-#define MARKER_LABEL        10.0
+#define MARKER_SIZE          5.0 * [VLOUtilities screenRatioWith6]
+#define MARKER_IMAGE_SIZE   20.0 * [VLOUtilities screenRatioWith6]
+#define MARKER_ICON_WIDTH   60.0 * [VLOUtilities screenRatioWith6]
+#define MARKER_ICON_HEIGHT  70.0 * [VLOUtilities screenRatioWith6]
+#define MARKER_LABEL        10.0 * [VLOUtilities screenRatioWith6]
+#define MARKERS_PER_LINE       3
 
-#define MARKER_FLAG_SIZE    30.0
-#define MARKER_FLAG_GAP     10.0
-#define LINE_WIDTH          1.0
+#define MARKER_FLAG_SIZE    30.0 * [VLOUtilities screenRatioWith6]
+#define MARKER_FLAG_GAP     10.0 * [VLOUtilities screenRatioWith6]
+#define LINE_WIDTH           3.0 * [VLOUtilities screenRatioWith6]
 
-#define SEGMENT_HEIGHT       20
-#define SEGMENT_CONTENT_SIZE 45
-#define LONG_SEGMENT         103 // 자동으로 정해짐.
-#define MIDDLE_SEGMENT       25
-#define SHORT_SEGMENT        10
+#define SEGMENT_HEIGHT      50.0 * [VLOUtilities screenRatioWith6]
+#define SEGMENT_OFFSET      10.0 * [VLOUtilities screenRatioWith6]
+#define LONG_SEGMENT       100.0 * [VLOUtilities screenRatioWith6]
+#define MIDDLE_SEGMENT      30.0 * [VLOUtilities screenRatioWith6]
+#define SHORT_SEGMENT       20.0 * [VLOUtilities screenRatioWith6]
+
+#define SEGMENT_ICON_SIZE   45.0 * [VLOUtilities screenRatioWith6]
+
+#define LINE_GAP            80.0 * [VLOUtilities screenRatioWith6]
 
 #define VOLO_COLOR          [UIColor colorWithRed:200/255.0 green:240/255.0 blue:235/255.0 alpha:1]
 #define LINE_COLOR          [UIColor colorWithRed:211/255.0 green:213/255.0 blue:212/255.0 alpha:1]
+
 
 
 @interface VLOSummaryMarker : NSObject
@@ -41,7 +48,7 @@
 
 + (CGFloat) distanceBetweenMarker1:(VLOSummaryMarker *)marker1 Marker2:(VLOSummaryMarker *)marker2;
 - (void) setMarkerImage:(NSString *)markerImageName;
-- (void) setMarkerContentImage:(NSString *)contentImageName isFlag:(BOOL)isFlag;
+- (void) setMarkerIconImage:(NSString *)iconImageName isFlag:(BOOL)isFlag;
 - (UIView *) getDrawableView;
 
 

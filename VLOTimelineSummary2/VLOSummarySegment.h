@@ -16,7 +16,7 @@
 @property (strong, nonatomic) VLOSummaryMarker *toMarker;
 @property () BOOL curved;
 @property () BOOL leftToRight;
-@property () BOOL hasSegmentContent;
+@property () BOOL hasSegmentIcon;
 
 - (id) initFrom:(VLOSummaryMarker *)fromMarker to:(VLOSummaryMarker *)toMarker;
 
@@ -25,7 +25,7 @@
                        shortt:(NSString *)shortImage
                        curve:(NSString *)curveImage;
 
-- (void) setSegmentContentImage:(NSString *)contentImageName;
+- (void) setSegmentIconImage:(NSString *)iconImageName;
 
 - (UIView *) getDrawableView;
 
