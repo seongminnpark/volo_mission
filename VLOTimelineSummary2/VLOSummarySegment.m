@@ -130,6 +130,7 @@
             UIImageView *curveSegImageView =
                 [[UIImageView alloc] initWithFrame:CGRectMake(curveSegLeft, 0, curveRadius, segmentHeight)];
             curveSegImageView.image = [UIImage imageNamed:_curveImageName];
+            if (_leftToRight) curveSegImageView.transform = CGAffineTransformMakeScale(-1, 1);
             
             // 짧은 선 이미지뷰.
             CGFloat shortSegLeft = _leftToRight? curveRadius : MIDDLE_SEGMENT - SHORT_SEGMENT;

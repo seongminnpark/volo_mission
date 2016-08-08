@@ -11,6 +11,7 @@
 #import "VLOCountry.h"
 
 #define MARKER_SIZE         5.0
+#define MARKER_IMAGE_SIZE   20.0
 #define MARKER_CONTENT_SIZE 50.0 // 가로사이즈.
 #define MARKER_CONTENT_HEIGHT MARKER_CONTENT_SIZE * 1.5
 #define MARKER_LABEL        10.0
@@ -21,7 +22,7 @@
 
 #define SEGMENT_HEIGHT       20
 #define SEGMENT_CONTENT_SIZE 45
-#define LONG_SEGMENT         103
+#define LONG_SEGMENT         103 // 자동으로 정해짐.
 #define MIDDLE_SEGMENT       25
 #define SHORT_SEGMENT        10
 

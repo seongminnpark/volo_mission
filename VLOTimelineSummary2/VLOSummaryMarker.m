@@ -89,16 +89,19 @@
 - (void) initializeMarkerView {
     if (_markerView) return;
     
-    CGFloat markerLeft = _drawableWidth/2.0 - MARKER_SIZE/2.0;
+    
     CGFloat markerTop  = _drawableHeight - MARKER_LABEL - MARKER_FLAG_GAP - MARKER_SIZE;
     
     if (_markerUsesCustomImage) {
         
+        CGFloat markerLeft = _drawableWidth/2.0 - MARKER_IMAGE_SIZE/2.0;
         UIImage *markerImage = [UIImage imageNamed:_markerImageName];
         _markerView = [[UIImageView alloc] initWithImage:markerImage];
-        _markerView.frame = CGRectMake(markerLeft, markerTop, MARKER_SIZE, MARKER_SIZE);
+        _markerView.frame = CGRectMake(markerLeft, markerTop, MARKER_IMAGE_SIZE, MARKER_IMAGE_SIZE);
         
     } else {
+        CGFloat markerLeft = _drawableWidth/2.0 - MARKER_SIZE/2.0;
+        
         _markerView = [[UIView alloc] initWithFrame:CGRectMake(markerLeft, markerTop, MARKER_SIZE, MARKER_SIZE)];
         
         UIBezierPath *circlePath = [UIBezierPath bezierPathWithOvalInRect:CGRectMake(0, 0, MARKER_SIZE, MARKER_SIZE)];

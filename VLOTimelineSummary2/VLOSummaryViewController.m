@@ -16,11 +16,9 @@
 @property (strong, nonatomic) NSMutableArray *drawables;
 @property (strong, nonatomic) UIView  *summaryView;
 
-@property (strong, nonatomic) NSMutableArray *distanceList;
 @property () CGFloat actualWidth;
 @property () CGFloat summaryWidth;
 @property () CGFloat summaryHeight;
-@property () CGFloat distanceSum;
 
 @end
 
@@ -79,9 +77,6 @@
     // 연속으로 중복되거나 불량한 인풋 정리
     NSArray *organized_placeList = [self sanitizeInput:placeList :dayList];
     
-    // 각 마커의 x 좌표를 설정하기 위해 경도 분포를 확인합니다.
-    [self initDistanceList:organized_placeList];
-    
     NSInteger markerNum = organized_placeList.count;
     NSMutableArray *tmp_arr = [self getStandardXCoordinate:markerNum :line_cnt];
     
@@ -107,6 +102,7 @@
         newMarker.day = dayNum;
         newMarker.color = color;
         
+        [newMarker setMarkerImage:@"marker"];
         [newMarker setMarkerContentImage:@"markerContent" isFlag:NO];
         //[newMarker setMarkerContentImage:@"78_AF" isFlag:YES];
 
@@ -129,40 +125,44 @@
         if (i > 0 && i % LINE_MAX_MARKER == 0) {
             line_cnt++;
         }
-        if(line_cnt % 2 == 0) {
-            if(i % 3 == 2) {
+        if(line_cnt % 2 == 0) { // 짝수줄.
+            if(i % 3 == 2) { // 짝수줄에서 짝수줄로 내려가는 커브.
                 segment.curved = YES;
                 segment.leftToRight = YES;
+                [segment setSegmentContentImage:@"segmentContentLeftToRight"];
             }
-            else {
+            else { // 짝수줄의 직선.
                 segment.curved = NO;
                 segment.leftToRight = NO;
+                [segment setSegmentContentImage:@"segmentContentRightToLeft"];
             }
         }
-        else {
-            if(i % 3 == 2) {
+        else { // 홀수줄.
+            if(i % 3 == 2) { // 홀수줄에서 짝수줄로 내려가는 커브.
                 segment.curved = YES;
                 segment.leftToRight = NO;
+                [segment setSegmentContentImage:@"segmentContentRightToLeft"];
             }
-            else {
+            else { // 짝수줄의 직선.
                 segment.curved = NO;
                 segment.leftToRight = YES;
+                [segment setSegmentContentImage:@"segmentContentLeftToRight"];
             }
         }
         
-        if (![transportType isEqualToString:@"NO"]) {
-            [segment setSegmentContentImage:transportType];
-        }
-        else {
-            segment.hasSegmentContent = NO;
-        }
+//        if (![transportType isEqualToString:@"NO"]) {
+//            [segment setSegmentContentImage:transportType];
+//        }
+//        else {
+//            segment.hasSegmentContent = NO;
+//        }
+        
+        segment.hasSegmentContent = YES;
         
         [segment setSegmentImageLong:@"longSegment"
                               middle:@"middleSegment"
                                shortt:@"shortSegment"
                                curve:@"curveSegment"];
-        
-        [segment setSegmentContentImage:@"segmentContent"];
 
         [_segments addObject:segment];
         [_drawables addObject:[[_segments objectAtIndex:i] getDrawableView]];
@@ -204,21 +204,6 @@
     [dayList removeObjectsAtIndexes:indicesToRemove];
     
     return newPlaceList;
-}
-
-- (void) initDistanceList:(NSArray *)placeList{
-    _distanceList = [[NSMutableArray alloc] initWithCapacity:placeList.count-1];
-    _distanceSum = 0;
-    
-    for (NSInteger i = 1; i < placeList.count; i++) {
-        
-        VLOPlace *prevPlace = [placeList objectAtIndex:i-1];
-        VLOPlace *currPlace = [placeList objectAtIndex:i];
-        CGFloat distance = [self distance:prevPlace:currPlace];
-        _distanceSum += distance;
-        [_distanceList addObject: @(distance)];
-    }
-    
 }
 
 - (CGFloat) distance:(VLOPlace *)from :(VLOPlace *)to {
