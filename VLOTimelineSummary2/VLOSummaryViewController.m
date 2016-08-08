@@ -73,6 +73,11 @@
     // 마커와 세그먼트 생성.
     [self initializeMarkerList:new_placeList:dayList];
     [self initializeSegmentList];
+    
+    // 레이서 순서를 위해 마커 drawable를 drawables에 추가한다. Segment의 drawable은 initializeSegmentList에서 추가된다.
+    for (VLOSummaryMarker *marker in _markers) {
+        [_drawables addObject:[marker getDrawableView]];
+    }
 }
 
 - (void) drawSummary {
@@ -146,11 +151,12 @@
         newMarker.color = VOLO_COLOR;
         
         if (oddLine) [newMarker setMarkerImage:@"marker_flag_cn"];
-        else [newMarker setMarkerImage:@"marker_day"];
+        //else [newMarker setMarkerImage:@"marker_day"];
+
         [newMarker setMarkerIconImage:@"marker-icon-sample01" isFlag:NO];
         
         [_markers addObject:newMarker];
-        [_drawables addObject:[[_markers objectAtIndex:i] getDrawableView]];
+        //[_drawables addObject:[newMarker getDrawableView]];
     }
 }
 
@@ -178,10 +184,8 @@
                                curve:@"line-curve"];
         
         [_segments addObject:segment];
-        [_drawables addObject:[[_segments objectAtIndex:i] getDrawableView]];
-        
+        [_drawables addObject:[segment getDrawableView]];
     }
-
 }
 
 @end
