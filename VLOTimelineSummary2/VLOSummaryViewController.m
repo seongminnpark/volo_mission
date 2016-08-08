@@ -71,6 +71,7 @@
     NSArray *new_placeList = [self sanitizeInput:placeList:dayList];
     
     // 마커와 세그먼트 생성.
+    [self initializeBackgroundView];
     [self initializeMarkerList:new_placeList:dayList];
     [self initializeSegmentList];
     
@@ -113,11 +114,18 @@
     return newPlaceList;
 }
 
+- (void) initializeBackgroundView {
+    UIImage *backgroundImage = [UIImage imageNamed:@"background-1"];
+    UIImageView *backgroundImageView = [[UIImageView alloc] initWithImage:backgroundImage];
+    backgroundImageView.frame = CGRectMake(0, 0, BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
+    [_drawables addObject:backgroundImageView];
+}
+
 - (void) initializeMarkerList:(NSArray *)placeList :(NSArray *)dayList {
     
     CGFloat columnWidth = LONG_SEGMENT;
     CGFloat rowChangeXdiff = MIDDLE_SEGMENT - SHORT_SEGMENT;
-    CGFloat firstMarkerY = MARKER_ICON_HEIGHT / 2.0;
+    CGFloat firstMarkerY = BACKGROUND_HEIGHT;
     CGFloat firstMarkerX;
     
     switch (placeList.count) {
