@@ -123,7 +123,7 @@
     switch (placeList.count) {
         case (1): firstMarkerX = _summaryWidth / 2.0;                     break;
         case (2): firstMarkerX = _summaryWidth / 2.0 - columnWidth / 2.0; break;
-        default : firstMarkerX = _summaryWidth / 2.0 - columnWidth;       break;
+        default : firstMarkerX = _summaryWidth / 2.0 - columnWidth - 5;   break;
     }
     
     for (NSInteger i = 0; i < placeList.count; i++) {
@@ -175,6 +175,8 @@
         
         if (segment.leftToRight && !curved) [segment setSegmentIconImage:@"line-icon-left-sample01"];
         if (segment.leftToRight && curved) [segment setSegmentIconImage:@"curve-line-icon-left"];
+        if (!segment.leftToRight && !curved) [segment setSegmentIconImage:@"line-icon-right-sample01"];
+        if (!segment.leftToRight && curved) [segment setSegmentIconImage:@"curve-line-icon-right"];
         
         segment.hasSegmentIcon = YES;
         

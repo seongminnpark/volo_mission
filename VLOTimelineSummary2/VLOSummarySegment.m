@@ -70,13 +70,9 @@
     CGFloat curveRadius = fabs(_toMarker.y - _fromMarker.y)/2.0;
     
     // 모든 컴포넌트에 공유되는 Frame 변수들.
-    if (_curved) {
-        _drawableLeft = _leftToRight? _leftMarker.x - SHORT_SEGMENT - curveRadius - SEGMENT_ICON_SIZE/2 : _leftMarker.x;
-    } else {
-        _drawableLeft = _leftMarker.x;
-    }
+    _drawableLeft =  (_curved && _leftToRight)?  _rightMarker.x - MIDDLE_SEGMENT - CURVE_WIDTH : _leftMarker.x;
     _drawableTop    = _curved? _fromMarker.y - curveRadius: _fromMarker.y - SEGMENT_HEIGHT + SEGMENT_OFFSET;
-    _drawableWidth  = _curved? MIDDLE_SEGMENT + curveRadius + 58 : LONG_SEGMENT; // 58 상수로 바꿔야함
+    _drawableWidth  = _curved? CURVE_WIDTH + MIDDLE_SEGMENT : LONG_SEGMENT;
     _drawableHeight = _curved? LINE_GAP + SEGMENT_HEIGHT : SEGMENT_HEIGHT;
     
     // 선과 선 장식 생성.
@@ -95,9 +91,9 @@
     if (_segmentView) return;
     
     CGFloat curveRadius = fabs(_toMarker.y - _fromMarker.y) / 2.0;
-    CGFloat segmentLeft   = (_curved && _leftToRight)? SEGMENT_ICON_SIZE/2.0: 0;
+    CGFloat segmentLeft   = 0;
     CGFloat segmentTop    = _curved? 0 : _drawableHeight - SEGMENT_HEIGHT;
-    CGFloat segmentWidth  = _curved? _drawableWidth - SEGMENT_ICON_SIZE/2.0 : _drawableWidth;
+    CGFloat segmentWidth  = _drawableWidth;
     CGFloat segmentHeight = _curved? _drawableHeight : SEGMENT_HEIGHT;
     
     // (0,0)에서 시작하는 drawable 프레임에 맞춘 fromMarker과 toMarker 좌표.
@@ -119,7 +115,7 @@
             _segmentView = [[UIView alloc] initWithFrame:CGRectMake(segmentLeft, segmentTop, segmentWidth, segmentHeight)];
             
             // 중간 선 이미지뷰.
-            CGFloat middleSegLeft = _leftToRight? curveRadius : 0;
+            CGFloat middleSegLeft = _leftToRight? CURVE_WIDTH : 0;
             UIImageView *middleSegImageView =
                 [[UIImageView alloc] initWithFrame:CGRectMake(middleSegLeft, 0, MIDDLE_SEGMENT, SEGMENT_HEIGHT)];
             middleSegImageView.image = [UIImage imageNamed:_middleImageName];
@@ -127,12 +123,12 @@
             // 곡선 이미지뷰.
             CGFloat curveSegLeft = _leftToRight? 0 : MIDDLE_SEGMENT;
             UIImageView *curveSegImageView =
-                [[UIImageView alloc] initWithFrame:CGRectMake(curveSegLeft, 0, curveRadius, segmentHeight)];
+                [[UIImageView alloc] initWithFrame:CGRectMake(curveSegLeft, 0, segmentWidth - MIDDLE_SEGMENT, segmentHeight)];
             curveSegImageView.image = [UIImage imageNamed:_curveImageName];
             if (!_leftToRight) curveSegImageView.transform = CGAffineTransformMakeScale(-1, 1);
             
             // 짧은 선 이미지뷰.
-            CGFloat shortSegLeft = _leftToRight? curveRadius : MIDDLE_SEGMENT - SHORT_SEGMENT;
+            CGFloat shortSegLeft = _leftToRight? CURVE_WIDTH : MIDDLE_SEGMENT - SHORT_SEGMENT;
             CGFloat shortSegTop = segmentHeight - SEGMENT_HEIGHT;
             UIImageView *shortSegImageView =
                 [[UIImageView alloc] initWithFrame:CGRectMake(shortSegLeft, shortSegTop, SHORT_SEGMENT, SEGMENT_HEIGHT)];

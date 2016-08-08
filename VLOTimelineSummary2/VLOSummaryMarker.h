@@ -27,6 +27,7 @@
 #define LONG_SEGMENT       100.0 * [VLOUtilities screenRatioWith6]
 #define MIDDLE_SEGMENT      30.0 * [VLOUtilities screenRatioWith6]
 #define SHORT_SEGMENT       20.0 * [VLOUtilities screenRatioWith6]
+#define CURVE_WIDTH         58.0 * [VLOUtilities screenRatioWith6]
 
 #define SEGMENT_ICON_SIZE   45.0 * [VLOUtilities screenRatioWith6]
 
