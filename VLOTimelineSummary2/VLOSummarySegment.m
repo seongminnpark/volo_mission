@@ -11,16 +11,16 @@
 @interface VLOSummarySegment ()
 
 @property (nonatomic, strong) UIView *segmentView;
-@property (nonatomic, strong) UIView *segmentContentView;
+@property (nonatomic, strong) UIView *segmentIconView;
 
 @property () BOOL segmentUsesCustomImage;
-@property () BOOL segmentContentUsesCustomImage;
+@property () BOOL segmentIconUsesCustomImage;
 
 @property () NSString *longImageName;
 @property () NSString *middleImageName;
 @property () NSString *shortImageName;
 @property () NSString *curveImageName;
-@property () NSString *contentImageName;
+@property () NSString *iconImageName;
 
 @property () CGFloat drawableLeft;
 @property () CGFloat drawableTop;
@@ -40,7 +40,7 @@
     _toMarker = toMarker;
     _curved = NO;
     _leftToRight = YES;
-    _hasSegmentContent = NO;
+    _hasSegmentIcon = NO;
     _leftMarker  = (fromMarker.x < toMarker.x) ? fromMarker : toMarker;
     _rightMarker = (fromMarker.x < toMarker.x) ? toMarker : fromMarker;
     return self;
@@ -59,35 +59,34 @@
     _curveImageName = curveImage;
 }
 
-- (void) setSegmentContentImage:(NSString *)contentImageName {
-    _hasSegmentContent = YES;
-    _segmentContentUsesCustomImage = YES;
-    _contentImageName = contentImageName;
+- (void) setSegmentIconImage:(NSString *)iconImageName {
+    _hasSegmentIcon = YES;
+    _segmentIconUsesCustomImage = YES;
+    _iconImageName = iconImageName;
 }
 
 - (UIView *) getDrawableView {
     
-    CGFloat xDiff = fabs(_toMarker.x - _fromMarker.x);
     CGFloat curveRadius = fabs(_toMarker.y - _fromMarker.y)/2.0;
     
     // 모든 컴포넌트에 공유되는 Frame 변수들.
     if (_curved) {
-        _drawableLeft = _leftToRight? _leftMarker.x - SHORT_SEGMENT - curveRadius - SEGMENT_CONTENT_SIZE/2 : _leftMarker.x;
+        _drawableLeft = _leftToRight? _leftMarker.x - SHORT_SEGMENT - curveRadius - SEGMENT_ICON_SIZE/2 : _leftMarker.x;
     } else {
         _drawableLeft = _leftMarker.x;
     }
-    _drawableTop    = _curved? _fromMarker.y - SEGMENT_HEIGHT/2.0: _fromMarker.y - SEGMENT_CONTENT_SIZE + SEGMENT_HEIGHT/2.0;
-    _drawableWidth  = _curved? MIDDLE_SEGMENT + curveRadius + SEGMENT_CONTENT_SIZE/2.0 : xDiff;
-    _drawableHeight = _curved? _toMarker.y - _fromMarker.y + SEGMENT_HEIGHT : MAX(SEGMENT_CONTENT_SIZE, SEGMENT_HEIGHT);
+    _drawableTop    = _curved? _fromMarker.y - curveRadius: _fromMarker.y - SEGMENT_HEIGHT + SEGMENT_OFFSET;
+    _drawableWidth  = _curved? MIDDLE_SEGMENT + curveRadius + 58 : LONG_SEGMENT; // 58 상수로 바꿔야함
+    _drawableHeight = _curved? LINE_GAP + SEGMENT_HEIGHT : SEGMENT_HEIGHT;
     
     // 선과 선 장식 생성.
     [self initializeSegmentView];
-    if (_hasSegmentContent) [self initializeSegmentContentView];
+    if (_hasSegmentIcon) [self initializeSegmentIconView];
     
     // 선과 선 장식 묶음이 담길 뷰 생성.
     UIView *drawableView = [[UIView alloc] initWithFrame:CGRectMake(_drawableLeft, _drawableTop, _drawableWidth, _drawableHeight)];
     [drawableView addSubview:_segmentView];
-    if (_hasSegmentContent) [drawableView addSubview:_segmentContentView];
+    if (_hasSegmentIcon) [drawableView addSubview:_segmentIconView];
 
     return drawableView;
 }
@@ -96,18 +95,18 @@
     if (_segmentView) return;
     
     CGFloat curveRadius = fabs(_toMarker.y - _fromMarker.y) / 2.0;
-    CGFloat segmentLeft   = (_curved && _leftToRight)? SEGMENT_CONTENT_SIZE/2.0: 0;
+    CGFloat segmentLeft   = (_curved && _leftToRight)? SEGMENT_ICON_SIZE/2.0: 0;
     CGFloat segmentTop    = _curved? 0 : _drawableHeight - SEGMENT_HEIGHT;
-    CGFloat segmentWidth  = _curved? _drawableWidth - SEGMENT_CONTENT_SIZE/2.0 : _drawableWidth;
+    CGFloat segmentWidth  = _curved? _drawableWidth - SEGMENT_ICON_SIZE/2.0 : _drawableWidth;
     CGFloat segmentHeight = _curved? _drawableHeight : SEGMENT_HEIGHT;
     
     // (0,0)에서 시작하는 drawable 프레임에 맞춘 fromMarker과 toMarker 좌표.
     CGFloat fromMarkerX = _fromMarker.x - _drawableLeft;
-    CGFloat fromMarkerY = SEGMENT_HEIGHT/2.0;
+    CGFloat fromMarkerY = SEGMENT_OFFSET;
     CGPoint fromMarker  = CGPointMake(fromMarkerX, fromMarkerY);
     
     CGFloat toMarkerX   = _toMarker.x - _drawableLeft;
-    CGFloat toMarkerY   = _curved? _drawableHeight - SEGMENT_HEIGHT/2.0 : SEGMENT_HEIGHT/2.0;
+    CGFloat toMarkerY   = _curved? _drawableHeight - SEGMENT_OFFSET : SEGMENT_OFFSET;
     CGPoint toMarker    = CGPointMake(toMarkerX, toMarkerY);
     
     CGFloat rightMarkerX = _rightMarker.x - _drawableLeft;
@@ -130,6 +129,7 @@
             UIImageView *curveSegImageView =
                 [[UIImageView alloc] initWithFrame:CGRectMake(curveSegLeft, 0, curveRadius, segmentHeight)];
             curveSegImageView.image = [UIImage imageNamed:_curveImageName];
+            if (!_leftToRight) curveSegImageView.transform = CGAffineTransformMakeScale(-1, 1);
             
             // 짧은 선 이미지뷰.
             CGFloat shortSegLeft = _leftToRight? curveRadius : MIDDLE_SEGMENT - SHORT_SEGMENT;
@@ -178,43 +178,40 @@
     }
 }
 
-- (void) initializeSegmentContentView {
-    if (_segmentContentView) return;
+- (void) initializeSegmentIconView {
+    if (_segmentIconView) return;
     
-    // Segment Content의 frame을 구하는 로직.
-    CGFloat contentLeft;
+    // Segment Icon의 frame을 구하는 로직.
+    CGFloat iconLeft;
     if (_curved) {
-        contentLeft = _leftToRight? 0 : _drawableWidth - SEGMENT_CONTENT_SIZE;
+        iconLeft = _leftToRight? 0 : _drawableWidth - SEGMENT_ICON_SIZE;
     } else {
-        contentLeft = _drawableWidth/2 - SEGMENT_CONTENT_SIZE/2.0;
+        iconLeft = _drawableWidth/2 - SEGMENT_ICON_SIZE/2.0;
     }
     
-    CGFloat contentTop;
+    CGFloat iconTop;
     
-    // _segmentContentView 생성.
-    if (_segmentContentUsesCustomImage) {
+    // _segmentIconView 생성.
+    if (_segmentIconUsesCustomImage) {
         
-        UIImage *contentImage = [UIImage imageNamed:_contentImageName];
-        CGFloat imageWidthHeightRatio = contentImage.size.height / contentImage.size.width;
-        CGFloat imageHeight = imageWidthHeightRatio * SEGMENT_CONTENT_SIZE;
+        UIImage *iconImage = [UIImage imageNamed:_iconImageName];
         
         if (_curved) {
-            contentTop = _drawableHeight/2.0 - imageHeight/2.0;
+            iconTop = LINE_GAP - SEGMENT_ICON_SIZE/2.0; // 0 + LINE_GAP == 커브 vertical 중간.
         } else {
-            contentTop = _drawableHeight - imageHeight;
-            if (!_segmentUsesCustomImage) contentTop -= LINE_WIDTH; // Segment와 겹쳐서 LINE_WIDTH만큼 빼준다.
+            iconTop = _drawableHeight - SEGMENT_ICON_SIZE;
+            if (!_segmentUsesCustomImage) iconTop -= LINE_WIDTH; // Segment와 겹쳐서 LINE_WIDTH만큼 빼준다.
         }
         
-        _segmentContentView = [[UIImageView alloc] initWithImage:contentImage];
-        _segmentContentView.frame = CGRectMake(contentLeft, contentTop, SEGMENT_CONTENT_SIZE, imageHeight);
-        if (!_leftToRight) _segmentContentView.transform = CGAffineTransformMakeScale(-1, 1);
+        _segmentIconView = [[UIImageView alloc] initWithImage:iconImage];
+        _segmentIconView.frame = CGRectMake(iconLeft, iconTop, SEGMENT_ICON_SIZE, SEGMENT_ICON_SIZE);
         
-        [_segmentContentView setBackgroundColor:[UIColor whiteColor]];
+        [_segmentIconView setBackgroundColor:[UIColor clearColor]];
         
     } else {
-        contentTop = _curved? _drawableHeight/2 - SEGMENT_CONTENT_SIZE/2.0 : 0;
-        _segmentContentView = [[UIView alloc] initWithFrame:
-                               CGRectMake(contentLeft, contentTop, SEGMENT_CONTENT_SIZE, SEGMENT_CONTENT_SIZE)];
+        iconTop = _curved? _drawableHeight/2 - SEGMENT_ICON_SIZE/2.0 : 0;
+        _segmentIconView = [[UIView alloc] initWithFrame:
+                               CGRectMake(iconLeft, iconTop, SEGMENT_ICON_SIZE, SEGMENT_ICON_SIZE)];
     }
 
 }
