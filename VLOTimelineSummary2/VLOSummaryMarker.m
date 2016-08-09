@@ -138,12 +138,13 @@
         
     } else {
         
-        markerLeft = _drawableWidth/2.0 - MARKER_SIZE/2.0;
-        markerTop  = _drawableHeight - MARKER_LABEL_HEIGHT - MARKER_SIZE;
+        markerLeft = _drawableWidth/2.0 - MARKER_IMAGE_SIZE/2.0;
+        markerTop  = _drawableHeight - MARKER_LABEL_HEIGHT - MARKER_IMAGE_SIZE;
         
-        _markerView = [[UIView alloc] initWithFrame:CGRectMake(markerLeft, markerTop, MARKER_SIZE, MARKER_SIZE)];
+        _markerView = [[UIView alloc] initWithFrame:CGRectMake(markerLeft, markerTop, MARKER_IMAGE_SIZE, MARKER_IMAGE_SIZE)];
         
-        UIBezierPath *circlePath = [UIBezierPath bezierPathWithOvalInRect:CGRectMake(0, 0, MARKER_SIZE, MARKER_SIZE)];
+        CGFloat circleCenter = MARKER_IMAGE_SIZE/2.0 - MARKER_SIZE/2.0;
+        UIBezierPath *circlePath = [UIBezierPath bezierPathWithOvalInRect:CGRectMake(circleCenter, circleCenter, MARKER_SIZE, MARKER_SIZE)];
         
         CAShapeLayer *markerLayer = [CAShapeLayer layer];
         [markerLayer setPath:circlePath.CGPath];

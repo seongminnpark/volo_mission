@@ -83,7 +83,7 @@
     UIView *drawableView = [[UIView alloc] initWithFrame:CGRectMake(_drawableLeft, _drawableTop, _drawableWidth, _drawableHeight)];
     [drawableView addSubview:_segmentView];
     if (_hasSegmentIcon) [drawableView addSubview:_segmentIconView];
-
+    
     return drawableView;
 }
 
@@ -98,11 +98,11 @@
     
     // (0,0)에서 시작하는 drawable 프레임에 맞춘 fromMarker과 toMarker 좌표.
     CGFloat fromMarkerX = _fromMarker.x - _drawableLeft;
-    CGFloat fromMarkerY = SEGMENT_OFFSET;
+    CGFloat fromMarkerY = _curved? curveRadius : _drawableHeight - SEGMENT_OFFSET;
     CGPoint fromMarker  = CGPointMake(fromMarkerX, fromMarkerY);
     
     CGFloat toMarkerX   = _toMarker.x - _drawableLeft;
-    CGFloat toMarkerY   = _curved? _drawableHeight - SEGMENT_OFFSET : SEGMENT_OFFSET;
+    CGFloat toMarkerY   = _drawableHeight - SEGMENT_OFFSET;
     CGPoint toMarker    = CGPointMake(toMarkerX, toMarkerY);
     
     CGFloat rightMarkerX = _rightMarker.x - _drawableLeft;

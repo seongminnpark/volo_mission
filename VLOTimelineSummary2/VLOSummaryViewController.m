@@ -158,10 +158,10 @@
         newMarker.day = [dayList objectAtIndex:i];
         newMarker.color = VOLO_COLOR;
         
-        if (oddLine) [newMarker setMarkerImage:@"marker_flag_cn" isDay:NO isFlag:YES];
-        else [newMarker setMarkerImage:@"marker_day" isDay:YES isFlag:NO];
-
-        [newMarker setMarkerIconImage:@"marker-icon-sample01"];
+//        if (oddLine) [newMarker setMarkerImage:@"marker_flag_cn" isDay:NO isFlag:YES];
+//        else [newMarker setMarkerImage:@"marker_day" isDay:YES isFlag:NO];
+//
+//        [newMarker setMarkerIconImage:@"marker-icon-sample01"];
         
         [_markers addObject:newMarker];
         //[_drawables addObject:[newMarker getDrawableView]];
@@ -188,10 +188,10 @@
         
         segment.hasSegmentIcon = YES;
         
-        [segment setSegmentImageLong:@"line-long"
-                              middle:@"line-middle"
-                              shortt:@"line-short"
-                               curve:@"line-curve"];
+//        [segment setSegmentImageLong:@"line-long"
+//                              middle:@"line-middle"
+//                              shortt:@"line-short"
+//                               curve:@"line-curve"];
         
         [_segments addObject:segment];
         [_drawables addObject:[segment getDrawableView]];
