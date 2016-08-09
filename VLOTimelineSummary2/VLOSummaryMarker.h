@@ -21,7 +21,7 @@
 
 #define SEGMENT_HEIGHT       20
 #define SEGMENT_CONTENT_SIZE 45
-#define LONG_SEGMENT         103
+#define LONG_SEGMENT         100
 #define MIDDLE_SEGMENT       25
 #define SHORT_SEGMENT        10
 

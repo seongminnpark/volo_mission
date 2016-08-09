@@ -8,21 +8,23 @@
 
 #import "VLOSummaryViewController.h"
 
-@interface VLOSummaryViewController ()
+@interface VLOSummaryViewController()
 
 @property (strong, nonatomic) NSArray *logList;
 @property (strong, nonatomic) NSMutableArray *markers;
 @property (strong, nonatomic) NSMutableArray *segments;
 @property (strong, nonatomic) NSMutableArray *drawables;
 @property (strong, nonatomic) UIView  *summaryView;
-
+@property (nonatomic) NSInteger lineNum;
 @property (strong, nonatomic) NSMutableArray *distanceList;
 @property () CGFloat actualWidth;
 @property () CGFloat summaryWidth;
 @property () CGFloat summaryHeight;
 @property () CGFloat distanceSum;
 
+
 @end
+
 
 @implementation VLOSummaryViewController
 
@@ -37,6 +39,7 @@
     _summaryWidth = _summaryView.bounds.size.width;
     _summaryHeight = _summaryView.bounds.size.height;
     _actualWidth = _summaryWidth - (SEGMENT_CONTENT_SIZE * 2);
+    _lineNum = 1;
     
     [self parseLogList:logList];
     
@@ -48,9 +51,8 @@
     NSMutableArray *dayList = [[NSMutableArray alloc] init];
     NSMutableArray *transportList = [[NSMutableArray alloc] init];
     NSNumber *day = @(1);
-    NSInteger line_cnt = 1;
     NSInteger st_marker_num = 0;
-  
+
     for(NSInteger i = 0; i < logList.count; i++) {
         VLOLog *log = [logList objectAtIndex:i];
         
@@ -65,8 +67,7 @@
         } else if(log.type == VLOLogTypeRoute) {
             for (VLORouteNode *node in ((VLORouteLog *)log).nodes) {
                 [placeList addObject:node.place];
-                NSString *transport_name = [VLORouteLog imageNameOf:node.transportType];
-                [transportList addObject:transport_name];
+                [transportList addObject:[VLORouteLog imageNameOf:node.transportType]];
                 [dayList addObject:day];
             }
         }
@@ -82,18 +83,19 @@
     // 각 마커의 x 좌표를 설정하기 위해 경도 분포를 확인합니다.
     [self initDistanceList:organized_placeList];
     
+    // 기본 x좌표 세트를 구합니다.
     NSInteger markerNum = organized_placeList.count;
-    NSMutableArray *tmp_arr = [self getStandardXCoordinate:markerNum :line_cnt];
+    NSMutableArray *standardX_arr = [self getStandardXCoordinate:markerNum :_lineNum];
     
-    CGFloat standartY = MARKER_CONTENT_SIZE / 2;
-    CGFloat newY = standartY;
+    CGFloat yVariation = MARKER_CONTENT_SIZE / 2;
+    CGFloat newY = yVariation;
     UIColor *color = VOLO_COLOR;
     
     for (NSInteger i = 0; i < organized_placeList.count; i++) {
         
         VLOPlace *curPlace = [organized_placeList objectAtIndex:i];
         VLOSummaryMarker *newMarker = [[VLOSummaryMarker alloc] init];
-        CGFloat xCoordinate = [[tmp_arr objectAtIndex:st_marker_num] floatValue];
+        CGFloat xCoordinate = [[standardX_arr objectAtIndex:st_marker_num] floatValue];
         NSNumber *dayNum = [dayList objectAtIndex:i];
         
         if(i != 0 && i % LINE_MAX_MARKER == 0) {
@@ -114,26 +116,23 @@
         [_drawables addObject:[[_markers objectAtIndex:i] getDrawableView]];
         
         st_marker_num++;
-        
         if(st_marker_num >= (2 * LINE_MAX_MARKER)) {
             st_marker_num = 0;
         }
     }
-    
-    line_cnt = 1;
     
     for(NSInteger i = 0; i < _markers.count - 1; i++) {
         VLOSummarySegment *segment = [[VLOSummarySegment alloc] initFrom:[_markers objectAtIndex:i] to:[_markers objectAtIndex:i+1]];
         NSString *transportType = [transportList objectAtIndex:i];
         
         if (i > 0 && i % LINE_MAX_MARKER == 0) {
-            line_cnt++;
+            _lineNum++;
         }
-        if(line_cnt % 2 == 0) {
+        if(_lineNum % 2 == 0) {
             if(i % 3 == 2) {
                 segment.curved = YES;
                 segment.leftToRight = YES;
-            }
+            } //짝수줄일 때 곡선구간
             else {
                 segment.curved = NO;
                 segment.leftToRight = NO;
@@ -143,7 +142,7 @@
             if(i % 3 == 2) {
                 segment.curved = YES;
                 segment.leftToRight = NO;
-            }
+            } //홀수줄일 때 곡선구간
             else {
                 segment.curved = NO;
                 segment.leftToRight = YES;
@@ -157,20 +156,19 @@
             segment.hasSegmentContent = NO;
         }
         
-        [segment setSegmentImageLong:@"longSegment"
+     /*   [segment setSegmentImageLong:@"longSegment"
                               middle:@"middleSegment"
                                shortt:@"shortSegment"
-                               curve:@"curveSegment"];
+                               curve:@"curveSegment"]; */
         
-        [segment setSegmentContentImage:@"segmentContent"];
+       // [segment setSegmentContentImage:@"segmentContent"];
 
         [_segments addObject:segment];
         [_drawables addObject:[[_segments objectAtIndex:i] getDrawableView]];
-        
     }
     
     // 마지막 marker 추가
-    [_drawables addObject:[[_markers objectAtIndex:_markers.count-1] getDrawableView]];
+   // [_drawables addObject:[[_markers objectAtIndex:_markers.count-1] getDrawableView]];
     
 }
 
@@ -235,12 +233,13 @@
     CGFloat newX = (markerNum == 1) ? _summaryWidth / 2 :
     (markerNum == 2)? (_summaryWidth / 2) - (standardX / 2) :
                       (_summaryWidth / 2) - standardX - 10;
+    
     NSMutableArray *standard_coordinates = [NSMutableArray array];
     
     for(NSInteger i = 0; i < (2 * LINE_MAX_MARKER); i++) {
         if (i > 0) {
             if (i % LINE_MAX_MARKER == 0) {
-                lineNum++;
+                _lineNum++;
                 
                 if(lineNum % 2 == 0) {
                     newX += (MIDDLE_SEGMENT - SHORT_SEGMENT);
@@ -250,17 +249,18 @@
                 }
             }
             else {
-                if (lineNum % 2 == 0) {
-                    newX -= standardX;
+                if (_lineNum % 2 == 0) {
+                    newX -= LONG_SEGMENT;
                 }
                 else {
-                    newX += standardX;
+                    newX += LONG_SEGMENT;
                 }
             }
         }
         [standard_coordinates addObject:@(newX)];
     }
-    
+    _lineNum = 1;
+  
     return standard_coordinates;
     
 }
