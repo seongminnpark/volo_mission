@@ -116,7 +116,13 @@
         if (_markerImageIsDay) {
             
             // "몇 일차" 레이블
+            UILabel *dayLabel = [[UILabel alloc] initWithFrame:markerImageView.frame];
+            dayLabel.text = [NSString stringWithFormat:@"%@일차", _day];
+            dayLabel.textColor = [UIColor whiteColor];
+            _markerLabel.textAlignment = NSTextAlignmentCenter;
+            [dayLabel setFont:[UIFont systemFontOfSize:MARKER_LABEL_HEIGHT]];
             
+            [_markerView addSubview: dayLabel];
             
         } else if (_markerImageIsFlag) {
             
@@ -125,6 +131,7 @@
             CAShapeLayer *rimLayer = [CAShapeLayer layer];
             [rimLayer setFillColor:[UIColor clearColor].CGColor];
             [rimLayer setPath:rimPath.CGPath];
+            [rimLayer setLineWidth:LINE_WIDTH];
             
             [_markerView.layer addSublayer:rimLayer];
         }
