@@ -13,8 +13,9 @@
 @property (nonatomic, strong) UIView *markerView;
 @property (nonatomic, strong) UIView *markerIconView;
 @property (nonatomic, strong) UILabel *markerLabel;
+@property () BOOL markerImageIsDay;
 @property () BOOL hasMarkericon;
-@property () BOOL markericonIsFlag;
+@property () BOOL markerImageIsFlag;
 @property () BOOL markerUsesCustomImage;
 @property () NSString *markerImageName;
 @property () NSString *iconImageName;
@@ -39,20 +40,21 @@
     self = [super init];
     
     _markerUsesCustomImage = NO;
+    _markerImageIsDay = NO;
     _hasMarkericon = NO;
-    _markericonIsFlag = NO;
-    
+
     return self;
 }
 
-- (void) setMarkerImage:(NSString *)markerImageName {
+- (void) setMarkerImage:(NSString *)markerImageName isDay:(BOOL)isDay isFlag:(BOOL)isFlag {
+    _markerImageIsDay = isDay;
+    _markerImageIsFlag = isFlag;
     _markerUsesCustomImage = YES;
     _markerImageName = markerImageName;
 }
 
-- (void) setMarkerIconImage:(NSString *)iconImageName isFlag:(BOOL)isFlag {
+- (void) setMarkerIconImage:(NSString *)iconImageName {
     _hasMarkericon = YES;
-    _markericonIsFlag = isFlag;
     _iconImageName = iconImageName;
 }
 
@@ -62,7 +64,7 @@
     _drawableLeft   = _x - MARKER_ICON_WIDTH/2.0;
     _drawableTop    = _y + SEGMENT_OFFSET - MARKER_ICON_HEIGHT;
     _drawableWidth  = MARKER_ICON_WIDTH;
-    _drawableHeight = MARKER_ICON_HEIGHT + MARKER_LABEL; // 순서대로
+    _drawableHeight = MARKER_ICON_HEIGHT + MARKER_LABEL_HEIGHT;
 
     // 마커와 마커 장식 묶음이 담길 뷰 생성.
     UIView *drawableView = [[UIView alloc] initWithFrame:CGRectMake(_drawableLeft, _drawableTop, _drawableWidth, _drawableHeight)];
@@ -82,7 +84,7 @@
         [self initializeMarkerView];
         [drawableView addSubview:_markerView];
     }
-    
+
     return drawableView;
 }
 
@@ -90,19 +92,47 @@
     if (_markerView) return;
     
     
-    CGFloat markerTop, markerLeft;
+    CGFloat markerTop, markerLeft, markerWidth, markerImageWidth;
     
     if (_markerUsesCustomImage) {
         
-        markerTop  = _drawableHeight - MARKER_LABEL - MARKER_IMAGE_SIZE;
-        markerLeft = _drawableWidth/2.0 - MARKER_IMAGE_SIZE/2.0;
+        markerLeft  = _markerImageIsDay? _drawableWidth/2.0 - MARKER_DAY_WIDTH/2.0 : _drawableWidth/2.0 - MARKER_FLAG_SIZE/2.0;
+        markerTop   = _drawableHeight - MARKER_LABEL_HEIGHT - MARKER_IMAGE_SIZE;
+        markerWidth = _markerImageIsDay? MARKER_DAY_WIDTH : MARKER_IMAGE_SIZE;
+        
+        _markerView = [[UIView alloc] initWithFrame:CGRectMake(markerLeft, markerTop, markerWidth, MARKER_IMAGE_SIZE)];
+        
+        // 마커 그림
+        markerImageWidth = _markerImageIsDay? MARKER_DAY_WIDTH : MARKER_IMAGE_SIZE;
         UIImage *markerImage = [UIImage imageNamed:_markerImageName];
-        _markerView = [[UIImageView alloc] initWithImage:markerImage];
-        _markerView.frame = CGRectMake(markerLeft, markerTop, MARKER_IMAGE_SIZE, MARKER_IMAGE_SIZE);
+        UIImageView *markerImageView = [[UIImageView alloc] initWithImage:markerImage];
+        CGFloat markerImageHeight = markerImage.size.height * [VLOUtilities screenRatioWith6];
+        CGFloat imageViewLeft = markerWidth/2.0 - markerImageWidth/2.0;
+        CGFloat imageViewTop = MARKER_IMAGE_SIZE/2.0 - markerImageHeight/2.0;
+        markerImageView.frame = CGRectMake(imageViewLeft, imageViewTop, markerImageWidth, markerImageHeight);
+        
+        [_markerView addSubview:markerImageView];
+        
+        if (_markerImageIsDay) {
+            
+            // "몇 일차" 레이블
+            
+            
+        } else if (_markerImageIsFlag) {
+            
+            // 마커 테두리.
+            UIBezierPath *rimPath = [UIBezierPath bezierPathWithOvalInRect:CGRectMake(0, 0, MARKER_IMAGE_SIZE, MARKER_IMAGE_SIZE)];
+            CAShapeLayer *rimLayer = [CAShapeLayer layer];
+            [rimLayer setFillColor:[UIColor clearColor].CGColor];
+            [rimLayer setPath:rimPath.CGPath];
+            
+            [_markerView.layer addSublayer:rimLayer];
+        }
         
     } else {
-        markerTop  = _drawableHeight - MARKER_LABEL - MARKER_FLAG_GAP - MARKER_SIZE;
+        
         markerLeft = _drawableWidth/2.0 - MARKER_SIZE/2.0;
+        markerTop  = _drawableHeight - MARKER_LABEL_HEIGHT - MARKER_SIZE;
         
         _markerView = [[UIView alloc] initWithFrame:CGRectMake(markerLeft, markerTop, MARKER_SIZE, MARKER_SIZE)];
         
@@ -133,50 +163,21 @@
     UIImageView *iconImageView = [[UIImageView alloc] initWithImage:iconImage];
     [iconImageView setBackgroundColor:[UIColor clearColor]];
     
-    if (_markericonIsFlag) {
-        
-        // 국기 이미지 위치 설정.
-        imageViewLeft = _drawableWidth/2.0 - MARKER_FLAG_SIZE/2.0;
-        imageViewTop  = MARKER_ICON_HEIGHT - SEGMENT_HEIGHT - MARKER_FLAG_SIZE - MARKER_FLAG_GAP;
-        iconImageView.frame = CGRectMake(imageViewLeft, imageViewTop, MARKER_FLAG_SIZE, MARKER_FLAG_SIZE);
-        
-        // 마커 컨텐츠 테두리.
-        UIBezierPath *circlePath = [UIBezierPath bezierPathWithOvalInRect:
-                                    CGRectMake(0, 0, MARKER_FLAG_SIZE, MARKER_FLAG_SIZE)];
-        CAShapeLayer *iconLayer = [CAShapeLayer layer];
-        [iconLayer setPath:circlePath.CGPath];
-        [iconLayer setStrokeColor:[VOLO_COLOR CGColor]];
-        [iconLayer setFillColor:[[UIColor clearColor] CGColor]];
-        [iconLayer setLineWidth:LINE_WIDTH];
-        [iconImageView.layer addSublayer:iconLayer];
-        
-        // 마커와 국기를 잇는 선.
-        UIBezierPath *linePath = [UIBezierPath bezierPath];
-        [linePath moveToPoint:CGPointMake(MARKER_FLAG_SIZE/2.0, MARKER_FLAG_SIZE)];
-        CGFloat topOfMarker = MARKER_FLAG_SIZE + MARKER_FLAG_GAP + SEGMENT_OFFSET - MARKER_SIZE/2.0;
-        [linePath addLineToPoint:CGPointMake(MARKER_FLAG_SIZE/2.0, topOfMarker)];
-        CAShapeLayer *lineLayer = [CAShapeLayer layer];
-        [lineLayer setPath:linePath.CGPath];
-        [iconImageView.layer addSublayer:lineLayer];
-        [lineLayer setStrokeColor:[VOLO_COLOR CGColor]];
-        [lineLayer setLineWidth:LINE_WIDTH];
-        
-    } else {
-        imageViewLeft = _drawableWidth/2 - MARKER_ICON_WIDTH/2.0;
-        imageViewTop  = 0;
-        iconImageView.frame = CGRectMake(imageViewLeft, imageViewTop, MARKER_ICON_WIDTH, MARKER_ICON_HEIGHT);
-    }
+    imageViewLeft = _drawableWidth/2 - MARKER_ICON_WIDTH/2.0;
+    imageViewTop  = 0;
+    iconImageView.frame = CGRectMake(imageViewLeft, imageViewTop, MARKER_ICON_WIDTH, MARKER_ICON_HEIGHT);
     
     _markerIconView = iconImageView;
 }
 
 - (void) initializeMarkerLabel {
     if (_markerLabel) return;
-    _markerLabel = [[UILabel alloc] initWithFrame:CGRectMake(-_drawableWidth/2.0, _drawableHeight - MARKER_LABEL, _drawableWidth*2, MARKER_LABEL)];
+    _markerLabel = [[UILabel alloc] initWithFrame:
+                    CGRectMake(-_drawableWidth/2.0, _drawableHeight - MARKER_LABEL_HEIGHT, _drawableWidth*2, MARKER_LABEL_HEIGHT)];
     _markerLabel.text = _name;
     _markerLabel.textAlignment = NSTextAlignmentCenter;
     _markerLabel.textColor = [UIColor grayColor];
-    [_markerLabel setFont:[UIFont systemFontOfSize:MARKER_LABEL]];
+    [_markerLabel setFont:[UIFont systemFontOfSize:MARKER_LABEL_HEIGHT]];
 }
 
 
