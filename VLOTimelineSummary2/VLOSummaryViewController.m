@@ -19,6 +19,8 @@
 @property (strong, nonatomic) NSMutableArray *segments;
 @property (strong, nonatomic) NSMutableArray *drawables;
 
+@property (strong, nonatomic) NSArray *poiIcons;
+
 
 @property () CGFloat actualWidth;
 @property () CGFloat summaryWidth;
@@ -35,9 +37,10 @@
     _markers   = [NSMutableArray array]; // 위치, 경로 정보에서 추출한 마커 리스트.
     _segments  = [NSMutableArray array]; // 마커 사이 선(세그먼트) 리스트.
     _drawables = [NSMutableArray array]; // 이미지 리소스 캐싱.
+    
+    _poiIcons = [VLOLocalStorage getPoiList];
 
     _summaryWidth = self.view.bounds.size.width;
-    
     _actualWidth = _summaryWidth - (SEGMENT_ICON_SIZE * 2);
     
     [self parseLogList:logList];
@@ -134,7 +137,7 @@
     }
     
     VLOSummaryMarker *marker = [self createMarkerFromLog:log andPlace:currPlace];
-    marker.day = day;
+    marker.day = @(day.integerValue + 1);
     marker.logIndex= logIndex;
     [_markers addObject:marker];
     
@@ -255,10 +258,10 @@
     if (markerIndex > 0) {
         VLOSummaryMarker *prevMarker = [_markers objectAtIndex:markerIndex-1];
         sameDay = _travel.hasDate && prevMarker.day == currMarker.day;
-        sameCountry = countryNil || prevPlace.country.country == currPlace.country.country;
+        sameCountry = countryNil || [prevPlace.country.country isEqualToString:currPlace.country.country];
     }
     
-    isDay  = (firstMarker && _travel.hasDate)  || !sameDay;
+    isDay  = (firstMarker || !sameDay) && _travel.hasDate;
     isFlag = (firstMarker && !_travel.hasDate) || !sameCountry || showCountry;
     
     if      (isDay)  markerImage = @"marker_day";
@@ -273,14 +276,13 @@
     VLOSummaryMarker *currMarker = [_markers objectAtIndex:markerIndex];
     
     NSString *markerIconImage;
-    NSArray *citiesWithIcon = [VLOLocalStorage getPoiList];
     
     BOOL newCity = NO;
     BOOL hasIcon = NO;
     
     VLOLocationCoordinate *coords = currPlace.coordinates;
     
-    for (VLOPoi *poi in citiesWithIcon) {
+    for (VLOPoi *poi in _poiIcons) {
         
         VLOLocationCoordinate *poiCoords = poi.coordinates;
         
