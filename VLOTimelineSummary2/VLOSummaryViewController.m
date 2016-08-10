@@ -125,35 +125,26 @@
     marker.logIndex= logIndex;
     [_markers addObject:marker];
     
+    [self setMarkerImage:currPlace :prevPlace :_markers.count-1];
+    
     if (_markers.count > 1) {
         
-        // _markers.count-2는 마지막에서 두 번째 마커의 인덱스.
-        VLOSummaryMarker *prevMarker = [_markers objectAtIndex:_markers.count-2];
-        if (day != nil && prevMarker.day != day) [marker setMarkerImage:@"marker_day" isDay:YES isFlag:NO];
-        else if (![prevPlace.country.country isEqualToString:currPlace.country.country])
-            [marker setMarkerImage:@"marker_flag_cn" isDay:NO isFlag:YES];
-        
-        NSLog(@"prevCountry: %@, currCountry: %@", prevPlace.country.country, currPlace.country.country);
-
+        // 세그먼트 생설.
         VLOSummarySegment *segment = [self createSegmentFromNthMarker:_markers.count-2];
-        [segment setSegmentImageLong:@"line-long" middle:@"line-middle" shortt:@"line-short" curve:@"line-curve"];
+        [segment setSegmentImageLong:@"line_a_01" middle:@"line_b_01" shortt:@"line_c_01" curve:@"line_round_left_01"];
         if (log.type == VLOLogTypeRoute) {
 //            [segment setSegmentIconImage:[VLORouteLog imageNameOf:transportType]];
-                 if (segment.curved  && segment.leftToRight)  [segment setSegmentIconImage:@"curve-line-icon-left"];
+            if      (segment.curved  && segment.leftToRight)  [segment setSegmentIconImage:@"curve-line-icon-left"];
             else if (!segment.curved && !segment.leftToRight) [segment setSegmentIconImage:@"line-icon-right-sample01"];
             else if (segment.curved  && !segment.leftToRight) [segment setSegmentIconImage:@"curve-line-icon-right"];
             else                                              [segment setSegmentIconImage:@"line-icon-left-sample01"];
         }
         [_segments addObject:segment];
         
-    } else { // 첫 마커.
-        _travel.hasDate && day != nil ?
-            [marker setMarkerImage:@"marker_day" isDay:YES isFlag:NO] :
-            [marker setMarkerImage:@"marker_flag_cn" isDay:NO  isFlag:YES];
     }
     
-    // 이 시점에서 플레이스로 마커 아이콘 넣을지 체크해서 셋 하면 됨.
-    [marker setMarkerIconImage:@"marker-icon-sample01"];
+    // 마커 아이콘 아미지 세팅하는 로직.
+    if (prevPlace.locality != currPlace.locality) [marker setMarkerIconImage:@"icon_marker_osaka"];
     
     return YES;
 }
@@ -237,5 +228,34 @@
         [_drawables addObject:[marker getDrawableView]];
     }
 }
+
+
+- (void) setMarkerImage:(VLOPlace *)currPlace :(VLOPlace *)prevPlace :(NSInteger)markerIndex {
+    
+    NSString *markerImage;
+    BOOL isDay = NO, isFlag = NO, sameDay = YES, sameCountry = YES;
+    BOOL firstMarker  = markerIndex == 0;
+    BOOL secondMarker = markerIndex == 1;
+    BOOL showCountry  = secondMarker && _travel.hasDate;
+    
+    VLOSummaryMarker *currMarker = [_markers objectAtIndex:markerIndex];
+    
+    if (markerIndex > 0) {
+        VLOSummaryMarker *prevMarker = [_markers objectAtIndex:markerIndex-1];
+        sameDay = _travel.hasDate && prevMarker.day == currMarker.day;
+        sameCountry = prevPlace.country.country == currPlace.country.country;
+    }
+    
+    isDay  = (firstMarker && _travel.hasDate)  || !sameDay;
+    isFlag = (firstMarker && !_travel.hasDate) || !sameCountry || showCountry;
+    
+    if      (isDay)  markerImage = @"marker_day";
+    else if (isFlag) markerImage = @"marker_flag_cn";
+    else             markerImage = @"icon_poi_marker";
+    
+    [currMarker setMarkerImage:markerImage isDay:isDay isFlag:isFlag];
+}
+
+
 
 @end
