@@ -14,7 +14,7 @@
 @property (nonatomic, strong) UIView *segmentIconView;
 
 @property () BOOL segmentUsesCustomImage;
-@property () BOOL segmentIconUsesCustomImage;
+@property () BOOL hasSegmentIcon;
 
 @property () NSString *longImageName;
 @property () NSString *middleImageName;
@@ -27,6 +27,9 @@
 @property () CGFloat drawableWidth;
 @property () CGFloat drawableHeight;
 
+@property (strong, nonatomic) VLOSummaryMarker *fromMarker;
+@property (strong, nonatomic) VLOSummaryMarker *toMarker;
+
 @property (strong, nonatomic) VLOSummaryMarker *leftMarker;
 @property (strong, nonatomic) VLOSummaryMarker *rightMarker;
 
@@ -36,14 +39,23 @@
 
 - (id) initFrom:(VLOSummaryMarker *)fromMarker to:(VLOSummaryMarker *)toMarker {
     self = [super init];
+    
     _fromMarker = fromMarker;
-    _toMarker = toMarker;
-    _curved = NO;
+    _toMarker   = toMarker;
+    
+    _curved      = NO;
     _leftToRight = YES;
+    
+    
+    _segmentUsesCustomImage = NO;
     _hasSegmentIcon = NO;
-    _leftMarker  = (fromMarker.x < toMarker.x) ? fromMarker : toMarker;
-    _rightMarker = (fromMarker.x < toMarker.x) ? toMarker : fromMarker;
+    
     return self;
+}
+
+- (void) updateMarkerPositions {
+    _leftMarker  = (_fromMarker.x < _toMarker.x) ? _fromMarker : _toMarker;
+    _rightMarker = (_fromMarker.x < _toMarker.x) ? _toMarker : _fromMarker;
 }
 
 - (void) setSegmentImageLong:(NSString *)longImage
@@ -61,7 +73,6 @@
 
 - (void) setSegmentIconImage:(NSString *)iconImageName {
     _hasSegmentIcon = YES;
-    _segmentIconUsesCustomImage = YES;
     _iconImageName = iconImageName;
 }
 
@@ -188,28 +199,19 @@
     CGFloat iconTop;
     
     // _segmentIconView 생성.
-    if (_segmentIconUsesCustomImage) {
-        
-        UIImage *iconImage = [UIImage imageNamed:_iconImageName];
-        
-        if (_curved) {
-            iconTop = LINE_GAP - SEGMENT_ICON_SIZE/2.0; // 0 + LINE_GAP == 커브 vertical 중간.
-        } else {
-            iconTop = _drawableHeight - SEGMENT_ICON_SIZE;
-            if (!_segmentUsesCustomImage) iconTop -= LINE_WIDTH; // Segment와 겹쳐서 LINE_WIDTH만큼 빼준다.
-        }
-        
-        _segmentIconView = [[UIImageView alloc] initWithImage:iconImage];
-        _segmentIconView.frame = CGRectMake(iconLeft, iconTop, SEGMENT_ICON_SIZE, SEGMENT_ICON_SIZE);
-        
-        [_segmentIconView setBackgroundColor:[UIColor clearColor]];
-        
+    UIImage *iconImage = [UIImage imageNamed:_iconImageName];
+    
+    if (_curved) {
+        iconTop = LINE_GAP - SEGMENT_ICON_SIZE/2.0; // 0 + LINE_GAP == 커브 vertical 중간.
     } else {
-        iconTop = _curved? _drawableHeight/2 - SEGMENT_ICON_SIZE/2.0 : 0;
-        _segmentIconView = [[UIView alloc] initWithFrame:
-                               CGRectMake(iconLeft, iconTop, SEGMENT_ICON_SIZE, SEGMENT_ICON_SIZE)];
+        iconTop = _drawableHeight - SEGMENT_ICON_SIZE;
+        if (!_segmentUsesCustomImage) iconTop -= LINE_WIDTH; // Segment와 겹쳐서 LINE_WIDTH만큼 빼준다.
     }
-
+    
+    _segmentIconView = [[UIImageView alloc] initWithImage:iconImage];
+    _segmentIconView.frame = CGRectMake(iconLeft, iconTop, SEGMENT_ICON_SIZE, SEGMENT_ICON_SIZE);
+    
+    [_segmentIconView setBackgroundColor:[UIColor clearColor]];
 }
 
 @end

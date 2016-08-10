@@ -10,15 +10,14 @@
 #import <UIkit/UIkit.h>
 #import "VLOSummaryMarker.h"
 
-@interface VLOSummarySegment : NSObject 
+@interface VLOSummarySegment : NSObject
 
-@property (strong, nonatomic) VLOSummaryMarker *fromMarker;
-@property (strong, nonatomic) VLOSummaryMarker *toMarker;
 @property () BOOL curved;
 @property () BOOL leftToRight;
-@property () BOOL hasSegmentIcon;
 
 - (id) initFrom:(VLOSummaryMarker *)fromMarker to:(VLOSummaryMarker *)toMarker;
+
+- (void) updateMarkerPositions;
 
 - (void) setSegmentImageLong:(NSString *)longImage
                       middle:(NSString *)middleImage

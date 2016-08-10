@@ -8,7 +8,8 @@
 
 #import <Foundation/Foundation.h>
 #import <UIkit/UIkit.h>
-#import "VLOCountry.h"
+#import "VLOLog.h"
+#import "VLOPlace.h"
 #import "VLOUtilities.h"
 
 #define MARKER_SIZE          5.0 * [VLOUtilities screenRatioWith6]
@@ -47,12 +48,9 @@
 
 @property (nonatomic) CGFloat x;
 @property (nonatomic) CGFloat y;
-@property (nonatomic) NSString *name;
-@property (nonatomic) UIColor *color;
-@property (nonatomic) VLOCountry *country;
 @property (nonatomic) NSNumber *day;
 
-+ (CGFloat) distanceBetweenMarker1:(VLOSummaryMarker *)marker1 Marker2:(VLOSummaryMarker *)marker2;
+- (id) initWithLog:(VLOLog *)log andPlace:(VLOPlace *)place;
 - (void) setMarkerImage:(NSString *)markerImageName isDay:(BOOL)isDay isFlag:(BOOL)isFlag;
 - (void) setMarkerIconImage:(NSString *)iconImageName;
 - (UIView *) getDrawableView;

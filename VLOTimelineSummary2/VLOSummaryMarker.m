@@ -10,13 +10,18 @@
 
 @interface VLOSummaryMarker ()
 
+@property (nonatomic) VLOLog *log;
+@property (nonatomic) VLOPlace *place;
+
 @property (nonatomic, strong) UIView *markerView;
 @property (nonatomic, strong) UIView *markerIconView;
 @property (nonatomic, strong) UILabel *markerLabel;
-@property () BOOL markerImageIsDay;
-@property () BOOL hasMarkericon;
-@property () BOOL markerImageIsFlag;
+
 @property () BOOL markerUsesCustomImage;
+@property () BOOL markerImageIsDay;
+@property () BOOL markerImageIsFlag;
+@property () BOOL hasMarkericon;
+
 @property () NSString *markerImageName;
 @property () NSString *iconImageName;
 
@@ -29,20 +34,17 @@
 
 @implementation VLOSummaryMarker
 
-+ (CGFloat) distanceBetweenMarker1:(VLOSummaryMarker *)marker1 Marker2:(VLOSummaryMarker *)marker2 {
-    CGFloat xDelta = marker2.x - marker1.x;
-    CGFloat yDelta = marker2.y - marker1.y;
-    CGFloat distance = sqrt(xDelta * xDelta + yDelta * yDelta);
-    return distance;
-}
-
-- (id) init {
+- (id) initWithLog:(VLOLog *)log andPlace:(VLOPlace *)place {
     self = [super init];
+    
+    _log = log;
+    _place = place;
     
     _markerUsesCustomImage = NO;
     _markerImageIsDay = NO;
+    _markerImageIsFlag = NO;
     _hasMarkericon = NO;
-
+    
     return self;
 }
 
@@ -119,8 +121,8 @@
             UILabel *dayLabel = [[UILabel alloc] initWithFrame:markerImageView.frame];
             dayLabel.text = [NSString stringWithFormat:@"%@일차", _day];
             dayLabel.textColor = [UIColor whiteColor];
-            _markerLabel.textAlignment = NSTextAlignmentCenter;
-            [dayLabel setFont:[UIFont systemFontOfSize:MARKER_LABEL_HEIGHT]];
+            dayLabel.textAlignment = NSTextAlignmentCenter;
+            [dayLabel setFont:[UIFont systemFontOfSize:MARKER_LABEL_HEIGHT*0.8]];
             
             [_markerView addSubview: dayLabel];
             
@@ -182,7 +184,7 @@
     if (_markerLabel) return;
     _markerLabel = [[UILabel alloc] initWithFrame:
                     CGRectMake(-_drawableWidth/2.0, _drawableHeight - MARKER_LABEL_HEIGHT, _drawableWidth*2, MARKER_LABEL_HEIGHT)];
-    _markerLabel.text = _name;
+    _markerLabel.text = _place.name;
     _markerLabel.textAlignment = NSTextAlignmentCenter;
     _markerLabel.textColor = [UIColor grayColor];
     [_markerLabel setFont:[UIFont systemFontOfSize:MARKER_LABEL_HEIGHT]];
