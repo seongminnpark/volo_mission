@@ -8,7 +8,7 @@
 
 #import "VLOSummaryViewController.h"
 
-@interface VLOSummaryViewController ()
+@interface VLOSummaryViewController() <VLOSummaryNavigationbarDelegate>
 
 @property (strong, nonatomic) VLOTravel *travel;
 @property (strong, nonatomic) NSArray *logList;
@@ -16,12 +16,13 @@
 @property (strong, nonatomic) NSMutableArray *markers;
 @property (strong, nonatomic) NSMutableArray *segments;
 @property (strong, nonatomic) NSMutableArray *drawables;
-
-
+@property (strong, nonatomic) VLOSummaryNavigationbar *navigationBar;
 @property () CGFloat actualWidth;
 @property () CGFloat summaryWidth;
 
+
 @end
+
 
 @implementation VLOSummaryViewController
 
@@ -39,11 +40,41 @@
     NSLog(@"Frame: %@", self.view);
     _actualWidth = _summaryWidth - (SEGMENT_ICON_SIZE * 2);
     
+    
+    _navigationBar = [[VLOSummaryNavigationbar alloc] initSummaryNavigationbar];
+    _navigationBar.delegate = self;
+    
+    
+    
+    [self.view addSubview:_navigationBar];
+    
+    [self makeAutoLayoutConstraints];
+
     [self parseLogList:logList];
     [self setMarkerCoordinates];
     [self initializeDrawables];
     
+
+    
     return self;
+}
+
+- (void)makeAutoLayoutConstraints
+{
+    
+    [_navigationBar mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.right.and.top.equalTo(@.0f);
+        make.height.equalTo(@([VLOUtilities customizedNavigationBarHeight]));
+    }];
+  
+}
+
+-(void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+    [UIApplication sharedApplication].statusBarHidden = NO;
+    [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleLightContent;
+
 }
 
 - (void) drawSummary {
@@ -136,13 +167,13 @@
         NSLog(@"prevCountry: %@, currCountry: %@", prevPlace.country.country, currPlace.country.country);
 
         VLOSummarySegment *segment = [self createSegmentFromNthMarker:_markers.count-2];
-        [segment setSegmentImageLong:@"line-long" middle:@"line-middle" shortt:@"line-short" curve:@"line-curve"];
+        [segment setSegmentImageLong:@"line_a_03" middle:@"line_b_03" shortt:@"line_c_03" curve:@"line_round_left_01"];
         if (log.type == VLOLogTypeRoute) {
 //            [segment setSegmentIconImage:[VLORouteLog imageNameOf:transportType]];
-                 if (segment.curved  && segment.leftToRight)  [segment setSegmentIconImage:@"curve-line-icon-left"];
-            else if (!segment.curved && !segment.leftToRight) [segment setSegmentIconImage:@"line-icon-right-sample01"];
-            else if (segment.curved  && !segment.leftToRight) [segment setSegmentIconImage:@"curve-line-icon-right"];
-            else                                              [segment setSegmentIconImage:@"line-icon-left-sample01"];
+                 if (segment.curved  && segment.leftToRight)  [segment setSegmentIconImage:@"icon_transport_airplane_01"];
+            else if (!segment.curved && !segment.leftToRight) [segment setSegmentIconImage:@"icon_transport_car_02"];
+            else if (segment.curved  && !segment.leftToRight) [segment setSegmentIconImage:@"icon_transport_walk_01"];
+            else                                              [segment setSegmentIconImage:@"line_transport_walk_04"];
         }
         [_segments addObject:segment];
         
@@ -153,7 +184,7 @@
     }
     
     // 이 시점에서 플레이스로 마커 아이콘 넣을지 체크해서 셋 하면 됨.
-    [marker setMarkerIconImage:@"marker-icon-sample01"];
+    [marker setMarkerIconImage:@"icon_marker_newyork"];
     
     return YES;
 }
@@ -218,6 +249,7 @@
     }
 }
 
+
 - (void) initializeBackgroundView {
     UIImage *backgroundImage = [UIImage imageNamed:@"background-1"];
     UIImageView *backgroundImageView = [[UIImageView alloc] initWithImage:backgroundImage];
@@ -238,4 +270,17 @@
     }
 }
 
+-(void)navigationbarDidSelectBackButton:(VLOSummaryNavigationbar *)bar {
+    if ([_delegate respondsToSelector:@selector(summaryControllerDidClosed:)]) {
+        [_delegate summaryControllerDidClosed:self];
+    }
+    [self dismissViewControllerAnimated:YES completion:nil];
+
+}
+-(void)navigationbarDidSelectShareButton:(VLOSummaryNavigationbar *)bar {
+    if([_delegate respondsToSelector:@selector(summarySheareDidSelected:)]) {
+        [_delegate summarySheareDidSelected:self];
+    }
+
+}
 @end
