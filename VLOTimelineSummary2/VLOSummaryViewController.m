@@ -7,6 +7,8 @@
 //
 
 #import "VLOSummaryViewController.h"
+#import "VLOLocalStorage.h"
+#import "VLOPoi.h"
 
 @interface VLOSummaryViewController ()
 
@@ -258,24 +260,24 @@
     VLOSummaryMarker *currMarker = [_markers objectAtIndex:markerIndex];
     
     NSString *markerIconImage;
-    NSArray *citiesWithIcon = 디비에서갖고옴.;
+    NSArray *citiesWithIcon = [VLOLocalStorage getPoiList];
     
     BOOL newCity = NO;
     BOOL hasIcon = NO;
     
     VLOLocationCoordinate *coords = currPlace.coordinates;
     
-    for (VLOPlace *city in citiesWithIcon) {
+    for (VLOPoi *poi in citiesWithIcon) {
         
-        VLOLocationCoordinate *cityCoords = city.coordinates;
+        VLOLocationCoordinate *poiCoords = poi.coordinates;
         
-        BOOL withinLongitude = (coords.longitude.floatValue >= cityCoords.longitude.floatValue - 0.1) &&
-                               (coords.longitude.floatValue <= cityCoords.longitude.floatValue + 0.1);
-        BOOL withinLatitude  = (coords.latitude.floatValue  >= cityCoords.latitude.floatValue  - 0.1) &&
-                               (coords.latitude.floatValue  <= cityCoords.latitude.floatValue  + 0.1);
+        BOOL withinLongitude = (coords.longitude.floatValue >= poiCoords.longitude.floatValue - 0.1) &&
+                               (coords.longitude.floatValue <= poiCoords.longitude.floatValue + 0.1);
+        BOOL withinLatitude  = (coords.latitude.floatValue  >= poiCoords.latitude.floatValue  - 0.1) &&
+                               (coords.latitude.floatValue  <= poiCoords.latitude.floatValue  + 0.1);
         
         hasIcon = withinLongitude && withinLatitude;
-        markerIconImage = 디비에서갖고옴;
+        if (hasIcon) markerIconImage = poi.imageName;
         break;
     }
     
