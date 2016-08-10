@@ -79,8 +79,10 @@
         [drawableView addSubview:_markerIconView];
     }
     
+    BOOL drawMarker = !_hasMarkerIcon || _markerImageIsDay || _markerImageIsFlag;
+    
     // 마커 점.
-    if (_markerUsesCustomImage || !_hasMarkerIcon) {
+    if (drawMarker) {
         [self initializeMarkerView];
         [drawableView addSubview:_markerView];
     }

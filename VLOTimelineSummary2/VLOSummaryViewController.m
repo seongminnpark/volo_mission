@@ -150,12 +150,21 @@
         VLOSummarySegment *segment = [self createSegmentFromNthMarker:_markers.count-2];
         [segment setSegmentImageLong:@"line_a_01" middle:@"line_b_01" shortt:@"line_c_01" curve:@"line_round_left_01"];
         if (log.type == VLOLogTypeRoute) {
-//            [segment setSegmentIconImage:[VLORouteLog imageNameOf:transportType]];
-            if      (segment.curved  && segment.leftToRight)  [segment setSegmentIconImage:@"curve-line-icon-left"];
-            else if (!segment.curved && !segment.leftToRight) [segment setSegmentIconImage:@"line-icon-right-sample01"];
-            else if (segment.curved  && !segment.leftToRight) [segment setSegmentIconImage:@"curve-line-icon-right"];
-            else                                              [segment setSegmentIconImage:@"line-icon-left-sample01"];
+            
+            NSString *suffix, *transport, *segmentImageName;
+            
+            if      (!segment.curved  && segment.leftToRight)  suffix = @"01";
+            else if (!segment.curved && !segment.leftToRight)  suffix = @"02";
+            else if (segment.curved  && !segment.leftToRight)  suffix = @"03";
+            else                                               suffix = @"04";
+            
+            transport = [VLORouteLog imageNameOf:transportType];
+            
+            segmentImageName = [NSString stringWithFormat:@"icon_transport_%@_%@", transport, suffix];
+            
+            [segment setSegmentIconImage:segmentImageName];
         }
+        
         [_segments addObject:segment];
         
     }
@@ -292,14 +301,18 @@
                                (coords.latitude.floatValue  <= poiCoords.latitude.floatValue  + 0.1);
         
         hasIcon = withinLongitude && withinLatitude;
-        if (hasIcon) markerIconImage = poi.imageName;
-        break;
+        if (hasIcon){
+            markerIconImage = poi.imageName;
+            break;
+        }
     }
     
     if (markerIndex > 0) {
         VLOSummaryMarker *prevMarker = [_markers objectAtIndex:markerIndex-1];
         BOOL sameIcon = [prevMarker.iconImageName isEqualToString:markerIconImage];
-        newCity = (prevMarker.hasMarkerIcon && sameIcon);
+        newCity = (prevMarker.hasMarkerIcon && !sameIcon);
+    } else {
+        newCity = currPlace.locality != nil;
     }
     
     if (newCity && hasIcon) [currMarker setMarkerIconImage:markerIconImage];
