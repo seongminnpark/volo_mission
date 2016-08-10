@@ -9,11 +9,14 @@
 #import <Foundation/Foundation.h>
 #import "VLOSummaryMarker.h"
 #import "VLOSummarySegment.h"
+#import "VLOTravel.h"
+#import "VLOTimezone.h"
 #import "VLOLog.h"
 #import "VLODayLog.h"
 #import "VLORouteNode.h"
 #import "VLORouteLog.h"
 #import "VLOPlace.h"
+#import "VLOCountry.h"
 #import "VLOLocationCoordinate.h"
 #import "VLOUtilities.h"
 
@@ -21,7 +24,7 @@
 
 @interface VLOSummaryViewController : UIViewController
 
-- (id) initWithLogs:(NSArray *)logList andView:(UIView *)view;
+- (id) initWithTravel:(VLOTravel *)travel logList:(NSArray *)logList view:(UIView *)view;
 - (void) drawSummary;
 
 @end
