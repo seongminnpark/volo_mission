@@ -51,6 +51,9 @@
 @property (nonatomic) NSNumber *day;
 @property (nonatomic) NSInteger logIndex;
 
+@property () BOOL hasMarkerIcon;
+@property () NSString *iconImageName;
+
 - (id) initWithLog:(VLOLog *)log andPlace:(VLOPlace *)place;
 - (void) setMarkerImage:(NSString *)markerImageName isDay:(BOOL)isDay isFlag:(BOOL)isFlag;
 - (void) setMarkerIconImage:(NSString *)iconImageName;

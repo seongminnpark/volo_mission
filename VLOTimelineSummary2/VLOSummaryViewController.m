@@ -36,7 +36,6 @@
 
     _summaryWidth = self.view.bounds.size.width;
     
-    NSLog(@"Frame: %@", self.view);
     _actualWidth = _summaryWidth - (SEGMENT_ICON_SIZE * 2);
     
     [self parseLogList:logList];
@@ -126,10 +125,11 @@
     [_markers addObject:marker];
     
     [self setMarkerImage:currPlace :prevPlace :_markers.count-1];
+    [self setMarkerIconImage:currPlace :prevPlace :_markers.count-1];
     
     if (_markers.count > 1) {
         
-        // 세그먼트 생설.
+        // 세그먼트 생성.
         VLOSummarySegment *segment = [self createSegmentFromNthMarker:_markers.count-2];
         [segment setSegmentImageLong:@"line_a_01" middle:@"line_b_01" shortt:@"line_c_01" curve:@"line_round_left_01"];
         if (log.type == VLOLogTypeRoute) {
@@ -142,9 +142,6 @@
         [_segments addObject:segment];
         
     }
-    
-    // 마커 아이콘 아미지 세팅하는 로직.
-    if (prevPlace.locality != currPlace.locality) [marker setMarkerIconImage:@"icon_marker_osaka"];
     
     return YES;
 }
@@ -254,6 +251,41 @@
     else             markerImage = @"icon_poi_marker";
     
     [currMarker setMarkerImage:markerImage isDay:isDay isFlag:isFlag];
+}
+
+- (void) setMarkerIconImage:(VLOPlace *)currPlace :(VLOPlace *)prevPlace :(NSInteger)markerIndex {
+    
+    VLOSummaryMarker *currMarker = [_markers objectAtIndex:markerIndex];
+    
+    NSString *markerIconImage;
+    NSArray *citiesWithIcon = 디비에서갖고옴.;
+    
+    BOOL newCity = NO;
+    BOOL hasIcon = NO;
+    
+    VLOLocationCoordinate *coords = currPlace.coordinates;
+    
+    for (VLOPlace *city in citiesWithIcon) {
+        
+        VLOLocationCoordinate *cityCoords = city.coordinates;
+        
+        BOOL withinLongitude = (coords.longitude.floatValue >= cityCoords.longitude.floatValue - 0.1) &&
+                               (coords.longitude.floatValue <= cityCoords.longitude.floatValue + 0.1);
+        BOOL withinLatitude  = (coords.latitude.floatValue  >= cityCoords.latitude.floatValue  - 0.1) &&
+                               (coords.latitude.floatValue  <= cityCoords.latitude.floatValue  + 0.1);
+        
+        hasIcon = withinLongitude && withinLatitude;
+        markerIconImage = 디비에서갖고옴;
+        break;
+    }
+    
+    if (markerIndex > 0) {
+        VLOSummaryMarker *prevMarker = [_markers objectAtIndex:markerIndex-1];
+        BOOL sameIcon = [prevMarker.iconImageName isEqualToString:markerIconImage];
+        newCity = (prevMarker.hasMarkerIcon && sameIcon);
+    }
+    
+    if (newCity && hasIcon) [currMarker setMarkerIconImage:markerIconImage];
 }
 
 

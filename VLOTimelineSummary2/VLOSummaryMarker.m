@@ -20,10 +20,8 @@
 @property () BOOL markerUsesCustomImage;
 @property () BOOL markerImageIsDay;
 @property () BOOL markerImageIsFlag;
-@property () BOOL hasMarkericon;
 
 @property () NSString *markerImageName;
-@property () NSString *iconImageName;
 
 @property () CGFloat drawableLeft;
 @property () CGFloat drawableTop;
@@ -43,7 +41,7 @@
     _markerUsesCustomImage = NO;
     _markerImageIsDay = NO;
     _markerImageIsFlag = NO;
-    _hasMarkericon = NO;
+    _hasMarkerIcon = NO;
     
     return self;
 }
@@ -56,7 +54,7 @@
 }
 
 - (void) setMarkerIconImage:(NSString *)iconImageName {
-    _hasMarkericon = YES;
+    _hasMarkerIcon = YES;
     _iconImageName = iconImageName;
 }
 
@@ -76,13 +74,13 @@
     [drawableView addSubview:_markerLabel];
     
     // 마커 그림.
-    if (_hasMarkericon) {
+    if (_hasMarkerIcon) {
         [self initializeMarkericonView];
         [drawableView addSubview:_markerIconView];
     }
     
     // 마커 점.
-    if (_markerUsesCustomImage || !_hasMarkericon) {
+    if (_markerUsesCustomImage || !_hasMarkerIcon) {
         [self initializeMarkerView];
         [drawableView addSubview:_markerView];
     }
@@ -153,7 +151,7 @@
         
         [_markerView.layer addSublayer:markerLayer];
         
-        if (_hasMarkericon) {
+        if (_hasMarkerIcon) {
             [markerLayer setStrokeColor:[VOLO_COLOR CGColor]];
             [markerLayer setFillColor:[VOLO_COLOR CGColor]];
         } else {
