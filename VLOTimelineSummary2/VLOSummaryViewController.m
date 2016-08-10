@@ -44,7 +44,19 @@
     [self setMarkerCoordinates];
     [self initializeDrawables];
     
+    // 테스트용 버튼.
+    UIButton *dismissButton =
+    [[UIButton alloc] initWithFrame:CGRectMake(0,self.view.bounds.size.height - 50, self.view.bounds.size.width, 50)];
+    [dismissButton addTarget:self action:@selector(dismiss) forControlEvents:UIControlEventTouchUpInside];
+    [dismissButton setBackgroundColor:[UIColor grayColor]];
+    [self.view addSubview:dismissButton];
+    
     return self;
+}
+
+// 테스트용 버튼.
+- (void) dismiss {
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void) drawSummary {
@@ -235,14 +247,15 @@
     BOOL isDay = NO, isFlag = NO, sameDay = YES, sameCountry = YES;
     BOOL firstMarker  = markerIndex == 0;
     BOOL secondMarker = markerIndex == 1;
-    BOOL showCountry  = secondMarker && _travel.hasDate;
+    BOOL countryNil   = currPlace.country.country == nil;
+    BOOL showCountry  = secondMarker && _travel.hasDate && !countryNil;
     
     VLOSummaryMarker *currMarker = [_markers objectAtIndex:markerIndex];
     
     if (markerIndex > 0) {
         VLOSummaryMarker *prevMarker = [_markers objectAtIndex:markerIndex-1];
         sameDay = _travel.hasDate && prevMarker.day == currMarker.day;
-        sameCountry = prevPlace.country.country == currPlace.country.country;
+        sameCountry = countryNil || prevPlace.country.country == currPlace.country.country;
     }
     
     isDay  = (firstMarker && _travel.hasDate)  || !sameDay;
