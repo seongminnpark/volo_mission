@@ -20,11 +20,9 @@
 #import "VLOLocationCoordinate.h"
 #import "VLOUtilities.h"
 
-#define SUMMARY_HEIGHT       300
-
 @interface VLOSummaryViewController : UIViewController
 
-- (id) initWithTravel:(VLOTravel *)travel logList:(NSArray *)logList view:(UIView *)view;
+- (id) initWithTravel:(VLOTravel *)travel andLogList:(NSArray *)logList;
 - (void) drawSummary;
 
 @end
