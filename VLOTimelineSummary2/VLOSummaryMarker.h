@@ -49,6 +49,7 @@
 @property (nonatomic) CGFloat x;
 @property (nonatomic) CGFloat y;
 @property (nonatomic) NSNumber *day;
+@property (nonatomic) NSInteger logIndex;
 
 - (id) initWithLog:(VLOLog *)log andPlace:(VLOPlace *)place;
 - (void) setMarkerImage:(NSString *)markerImageName isDay:(BOOL)isDay isFlag:(BOOL)isFlag;

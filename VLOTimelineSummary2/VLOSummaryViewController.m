@@ -54,7 +54,7 @@
 - (void) parseLogList: (NSArray *)logList {
 
     NSInteger GMTOffset = [_travel.timezone getNSTimezone].secondsFromGMT;
-    
+    NSInteger logIndex = 0;
     VLOPlace *currPlace, *prevPlace;
     
     for (VLOLog *log in logList) {
@@ -71,6 +71,7 @@
         if (log.type == VLOLogTypeMap) {
     
             if ([self createMarkerAndSegemnt:log
+                                   logIndex:logIndex
                                          day:day
                                    currPlace:currPlace
                                    prevPlace:prevPlace
@@ -85,6 +86,7 @@
             for (VLORouteNode *node in ((VLORouteLog *)log).nodes) {
                 
                 if ([self createMarkerAndSegemnt:log
+                                        logIndex:logIndex
                                              day:day
                                        currPlace:currPlace
                                        prevPlace:prevPlace
@@ -94,10 +96,13 @@
                 }
             }
         }
+        
+        logIndex ++;
     }
 }
 
 - (BOOL) createMarkerAndSegemnt:(VLOLog *)log
+                       logIndex:(NSInteger)logIndex
                             day:(NSNumber*)day
                       currPlace:(VLOPlace *)currPlace
                       prevPlace:(VLOPlace *)prevPlace
@@ -114,6 +119,7 @@
     
     VLOSummaryMarker *marker = [self createMarkerFromLog:log andPlace:currPlace];
     marker.day = day;
+    marker.logIndex= logIndex;
     [_markers addObject:marker];
     
     if (_markers.count > 1) {
