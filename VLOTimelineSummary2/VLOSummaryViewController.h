@@ -20,9 +20,19 @@
 #import "VLOLocationCoordinate.h"
 #import "VLOUtilities.h"
 
+@protocol VLOSummaryViewControllerDelegate <NSObject>
+
+- (void)scrollToLog:(NSInteger)logIndex;
+
+@end
+
 @interface VLOSummaryViewController : UIViewController
 
 - (id) initWithTravel:(VLOTravel *)travel andLogList:(NSArray *)logList;
 - (void) drawSummary;
 
+@property (weak, nonatomic) id<VLOSummaryViewControllerDelegate> delegate;
+
 @end
+
+

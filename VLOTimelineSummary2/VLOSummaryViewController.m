@@ -21,7 +21,6 @@
 
 @property (strong, nonatomic) NSArray *poiIcons;
 
-
 @property () CGFloat actualWidth;
 @property () CGFloat summaryWidth;
 
@@ -63,6 +62,9 @@
 }
 
 - (void) drawSummary {
+
+    [self initializeDrawables];
+    
     for (UIView *drawable in _drawables) {
         [self.view addSubview:drawable];
     }
@@ -245,11 +247,22 @@
     
     for (VLOSummarySegment *segment in _segments) {
         [_drawables addObject:[segment getDrawableView]];
+//        [_drawables addObject:[segment getSegmentView]];
+//        [_drawables addObject:[segment getSegmentIconView]];
     }
     
     for (VLOSummaryMarker *marker in _markers) {
-        [_drawables addObject:[marker getDrawableView]];
+        UIButton *markerDrawable = [marker getDrawableView];
+        markerDrawable.tag = marker.logIndex;
+        [_drawables addObject:markerDrawable];
+        if ([_delegate respondsToSelector:@selector(scrollToLog:)]) {
+            [markerDrawable addTarget:self action:@selector(callScrollToLog:) forControlEvents:UIControlEventTouchUpInside];
+        }
     }
+}
+
+- (void) callScrollToLog:(id)sender {
+    [_delegate scrollToLog:((UIButton *)sender).tag];
 }
 
 
@@ -274,7 +287,7 @@
     isFlag = (firstMarker && !_travel.hasDate) || !sameCountry || showCountry;
     
     if      (isDay)  markerImage = @"marker_day";
-    else if (isFlag) markerImage = @"marker_flag_cn";
+    else if (isFlag) markerImage = [NSString stringWithFormat:@"42_%@", currPlace.country.isoCountryCode];
     else             markerImage = @"icon_poi_marker";
     
     [currMarker setMarkerImage:markerImage isDay:isDay isFlag:isFlag];
@@ -310,7 +323,7 @@
     if (markerIndex > 0) {
         VLOSummaryMarker *prevMarker = [_markers objectAtIndex:markerIndex-1];
         BOOL sameIcon = [prevMarker.iconImageName isEqualToString:markerIconImage];
-        newCity = (prevMarker.hasMarkerIcon && !sameIcon);
+        newCity = (prevMarker.hasMarkerIcon && !sameIcon) || !prevMarker.hasMarkerIcon;
     } else {
         newCity = currPlace.locality != nil;
     }
