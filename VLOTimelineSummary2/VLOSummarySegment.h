@@ -28,4 +28,8 @@
 
 - (UIView *) getDrawableView;
 
+- (UIView *) getSegmentIconView;
+
+- (UIView *) getSegmentView;
+
 @end

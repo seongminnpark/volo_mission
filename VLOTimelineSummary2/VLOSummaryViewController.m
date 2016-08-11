@@ -7,6 +7,8 @@
 //
 
 #import "VLOSummaryViewController.h"
+#import "VLOLocalStorage.h"
+#import "VLOPoi.h"
 
 @interface VLOSummaryViewController() <VLOSummaryNavigationbarDelegate>
 
@@ -16,8 +18,11 @@
 @property (strong, nonatomic) NSMutableArray *markers;
 @property (strong, nonatomic) NSMutableArray *segments;
 @property (strong, nonatomic) NSMutableArray *drawables;
+
+@property (strong, nonatomic) NSArray *poiIcons;
+@property (strong, nonatomic) NSString *lastCountryCode;
 @property (strong, nonatomic) VLOSummaryNavigationbar *navigationBar;
-@property () CGFloat actualWidth;
+
 @property () CGFloat summaryWidth;
 
 
@@ -34,32 +39,18 @@
     _markers   = [NSMutableArray array]; // 위치, 경로 정보에서 추출한 마커 리스트.
     _segments  = [NSMutableArray array]; // 마커 사이 선(세그먼트) 리스트.
     _drawables = [NSMutableArray array]; // 이미지 리소스 캐싱.
+    
+    _poiIcons = [VLOLocalStorage getPoiList];
 
-    _summaryWidth = self.view.bounds.size.width;
-    
-    NSLog(@"Frame: %@", self.view);
-    _actualWidth = _summaryWidth - (SEGMENT_ICON_SIZE * 2);
-    
-    
-    _navigationBar = [[VLOSummaryNavigationbar alloc] initSummaryNavigationbar];
-    _navigationBar.delegate = self;
-    
-    
-    
-    [self.view addSubview:_navigationBar];
-    
-    [self makeAutoLayoutConstraints];
+    _summaryWidth = [VLOUtilities screenWidth];
 
     [self parseLogList:logList];
     [self setMarkerCoordinates];
-    [self initializeDrawables];
-    
-
-    
+ 
     return self;
 }
 
-- (void)makeAutoLayoutConstraints
+- (void) makeAutoLayoutConstraints
 {
     
     [_navigationBar mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -69,17 +60,63 @@
   
 }
 
--(void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
+- (void) viewDidLoad {
+    [super viewDidLoad];
     
-    [UIApplication sharedApplication].statusBarHidden = NO;
-    [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleLightContent;
-
+    _navigationBar = [[VLOSummaryNavigationbar alloc] initSummaryNavigationbar];
+    _navigationBar.delegate = self;
+    
+    [self.view addSubview:_navigationBar];
+    
+    [self makeAutoLayoutConstraints];
+    
+    [self.view setBackgroundColor:[UIColor whiteColor]];
+    
+    [self drawSummary];
 }
 
 - (void) drawSummary {
+    
+    [UIApplication sharedApplication].statusBarHidden = NO;
+    [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleLightContent;
+    
+    [self initializeDrawables];
+    
     for (UIView *drawable in _drawables) {
         [self.view addSubview:drawable];
+    }
+}
+
+-(void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+}
+
+- (void) initializeBackgroundView {
+    UIImage *backgroundImage = [UIImage imageNamed:@"background-1"];
+    UIImageView *backgroundImageView = [[UIImageView alloc] initWithImage:backgroundImage];
+    backgroundImageView.frame = CGRectMake(0, 0, BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
+    [_drawables addObject:backgroundImageView];
+}
+
+- (void) initializeDrawables {
+    
+    [self initializeBackgroundView];
+    
+    for (VLOSummarySegment *segment in _segments) {
+        [_drawables addObject:[segment getDrawableView]];
+        //        [_drawables addObject:[segment getSegmentView]];
+        //        [_drawables addObject:[segment getSegmentIconView]];
+    }
+    
+    BOOL respondsToScroll = [_delegate respondsToSelector:@selector(scrollToLog:)];
+    
+    for (VLOSummaryMarker *marker in _markers) {
+        UIButton *markerDrawable = [marker getDrawableView];
+        markerDrawable.tag = marker.logIndex;
+        [_drawables addObject:markerDrawable];
+        //if (respondsToScroll) {
+        [markerDrawable addTarget:self action:@selector(didClickMarker:) forControlEvents:UIControlEventTouchUpInside];
+        //}
     }
 }
 
@@ -152,40 +189,37 @@
     }
     
     VLOSummaryMarker *marker = [self createMarkerFromLog:log andPlace:currPlace];
-    marker.day = day;
+    marker.day = @(day.integerValue + 1);
     marker.logIndex= logIndex;
     [_markers addObject:marker];
     
+    [self setMarkerImage:currPlace :prevPlace :_markers.count-1];
+    [self setMarkerIconImage:currPlace :prevPlace :_markers.count-1];
+    
     if (_markers.count > 1) {
         
-        // _markers.count-2는 마지막에서 두 번째 마커의 인덱스.
-        VLOSummaryMarker *prevMarker = [_markers objectAtIndex:_markers.count-2];
-        if (day != nil && prevMarker.day != day) [marker setMarkerImage:@"marker_day" isDay:YES isFlag:NO];
-        else if (![prevPlace.country.country isEqualToString:currPlace.country.country])
-            [marker setMarkerImage:@"marker_flag_cn" isDay:NO isFlag:YES];
-        
-        NSLog(@"prevCountry: %@, currCountry: %@", prevPlace.country.country, currPlace.country.country);
-
+        // 세그먼트 생성.
         VLOSummarySegment *segment = [self createSegmentFromNthMarker:_markers.count-2];
-        [segment setSegmentImageLong:@"line_a_03" middle:@"line_b_03" shortt:@"line_c_03" curve:@"line_round_left_01"];
+        [segment setSegmentImageLong:@"line_a_01" middle:@"line_b_01" shortt:@"line_c_01" curve:@"line_round_left_01"];
         if (log.type == VLOLogTypeRoute) {
-//            [segment setSegmentIconImage:[VLORouteLog imageNameOf:transportType]];
-                 if (segment.curved  && segment.leftToRight)  [segment setSegmentIconImage:@"icon_transport_airplane_01"];
-            else if (!segment.curved && !segment.leftToRight) [segment setSegmentIconImage:@"icon_transport_car_02"];
-            else if (segment.curved  && !segment.leftToRight) [segment setSegmentIconImage:@"icon_transport_walk_01"];
-            else                                              [segment setSegmentIconImage:@"line_transport_walk_04"];
+            
+            NSString *suffix, *transport, *segmentImageName;
+            
+            if      (!segment.curved  && segment.leftToRight)  suffix = @"01";
+            else if (!segment.curved && !segment.leftToRight)  suffix = @"02";
+            else if (segment.curved  && !segment.leftToRight)  suffix = @"03";
+            else                                               suffix = @"04";
+            
+            transport = [VLORouteLog imageNameOf:transportType];
+            
+            segmentImageName = [NSString stringWithFormat:@"icon_transport_%@_%@", transport, suffix];
+            
+            [segment setSegmentIconImage:segmentImageName];
         }
+        
         [_segments addObject:segment];
         
-    } else { // 첫 마커.
-        _travel.hasDate && day != nil ?
-            [marker setMarkerImage:@"marker_day" isDay:YES isFlag:NO] :
-            [marker setMarkerImage:@"marker_flag_cn" isDay:NO  isFlag:YES];
     }
-    
-    // 이 시점에서 플레이스로 마커 아이콘 넣을지 체크해서 셋 하면 됨.
-    [marker setMarkerIconImage:@"icon_marker_newyork"];
-    
     return YES;
 }
 
@@ -249,38 +283,98 @@
     }
 }
 
-
-- (void) initializeBackgroundView {
-    UIImage *backgroundImage = [UIImage imageNamed:@"background-1"];
-    UIImageView *backgroundImageView = [[UIImageView alloc] initWithImage:backgroundImage];
-    backgroundImageView.frame = CGRectMake(0, 0, BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
-    [_drawables addObject:backgroundImageView];
-}
-
-- (void) initializeDrawables {
+- (void) setMarkerImage:(VLOPlace *)currPlace :(VLOPlace *)prevPlace :(NSInteger)markerIndex {
     
-    [self initializeBackgroundView];
+    NSString *markerImage;
+    BOOL isDay = NO, isFlag = NO, sameDay = YES, sameCountry = YES;
+    BOOL firstMarker  = markerIndex == 0;
+    BOOL secondMarker = markerIndex == 1;
+    BOOL countryNil   = currPlace.country.country == nil;
+    BOOL showCountry  = secondMarker && _travel.hasDate && !countryNil;
     
-    for (VLOSummarySegment *segment in _segments) {
-        [_drawables addObject:[segment getDrawableView]];
+    VLOSummaryMarker *currMarker = [_markers objectAtIndex:markerIndex];
+    
+    if (markerIndex > 0) {
+        VLOSummaryMarker *prevMarker = [_markers objectAtIndex:markerIndex-1];
+        sameDay = _travel.hasDate && prevMarker.day == currMarker.day;
+        sameCountry = countryNil || [_lastCountryCode isEqualToString:currPlace.country.isoCountryCode];
     }
     
-    for (VLOSummaryMarker *marker in _markers) {
-        [_drawables addObject:[marker getDrawableView]];
+    isDay  = (firstMarker || !sameDay) && _travel.hasDate;
+    isFlag = (firstMarker && !_travel.hasDate) || !sameCountry || showCountry;
+    
+    if      (isDay)  markerImage = @"marker_day";
+    else if (isFlag) {
+       markerImage = [NSString stringWithFormat:@"42_%@", currPlace.country.isoCountryCode];
+       _lastCountryCode = currPlace.country.isoCountryCode;
     }
+    else markerImage = @"icon_poi_marker";
+    
+    [currMarker setMarkerImage:markerImage isDay:isDay isFlag:isFlag];
 }
 
--(void)navigationbarDidSelectBackButton:(VLOSummaryNavigationbar *)bar {
-    if ([_delegate respondsToSelector:@selector(summaryControllerDidClosed:)]) {
-        [_delegate summaryControllerDidClosed:self];
+- (void) setMarkerIconImage:(VLOPlace *)currPlace :(VLOPlace *)prevPlace :(NSInteger)markerIndex {
+    
+    VLOSummaryMarker *currMarker = [_markers objectAtIndex:markerIndex];
+    
+    NSString *markerIconImage;
+    
+    BOOL newCity = NO;
+    BOOL hasIcon = NO;
+    
+    VLOLocationCoordinate *coords = currPlace.coordinates;
+    
+    for (VLOPoi *poi in _poiIcons) {
+        
+        VLOLocationCoordinate *poiCoords = poi.coordinates;
+        
+        hasIcon = [self samePOI:coords :poiCoords];
+        if (hasIcon){
+            markerIconImage = poi.imageName;
+            break;
+        }
+    }
+    
+    if (markerIndex > 0) {
+        VLOSummaryMarker *prevMarker = [_markers objectAtIndex:markerIndex-1];
+        newCity = ![self samePOI:coords :[prevMarker getPlace].coordinates];
+    } else {
+        newCity = YES;
+    }
+    
+    if (newCity && hasIcon) [currMarker setMarkerIconImage:markerIconImage];
+    //if (newCity && hasIcon) [currMarker setMarkerIconImage:@"icon_marker_seoul-1.white-stuffed"];
+}
+
+// 현재 정해진 도시 좌표에서 반경으로 테스트함. 추후에 폴리곤 로직 추가 해야함.
+- (BOOL) samePOI:(VLOLocationCoordinate *)coord1 :(VLOLocationCoordinate *)coord2 {
+    
+    BOOL withinLongitude = (coord1.longitude.floatValue >= coord2.longitude.floatValue - PROXIMITY_RADIUS) &&
+                           (coord1.longitude.floatValue <= coord2.longitude.floatValue + PROXIMITY_RADIUS);
+    BOOL withinLatitude  = (coord1.latitude.floatValue  >= coord2.latitude.floatValue  - PROXIMITY_RADIUS) &&
+                           (coord1.latitude.floatValue  <= coord2.latitude.floatValue  + PROXIMITY_RADIUS);
+    
+    return withinLongitude && withinLatitude;
+}
+
+
+- (void) didClickMarker:(id)sender {
+    [_delegate scrollToLog:((UIButton *)sender).tag];
+}
+
+- (void) navigationbarDidSelectBackButton:(VLOSummaryNavigationbar *)bar {
+    if ([_delegate respondsToSelector:@selector(summaryControllerClosed:)]) {
+        [_delegate summaryControllerClosed:self];
     }
     [self dismissViewControllerAnimated:YES completion:nil];
 
 }
--(void)navigationbarDidSelectShareButton:(VLOSummaryNavigationbar *)bar {
-    if([_delegate respondsToSelector:@selector(summarySheareDidSelected:)]) {
-        [_delegate summarySheareDidSelected:self];
+    
+- (void) navigationbarDidSelectShareButton:(VLOSummaryNavigationbar *)bar {
+    if([_delegate respondsToSelector:@selector(summaryShareSelected:)]) {
+        [_delegate summaryShareSelected:self];
     }
 
 }
+    
 @end

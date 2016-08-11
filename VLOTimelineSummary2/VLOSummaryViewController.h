@@ -27,15 +27,19 @@
 
 @protocol VLOSummaryViewControllerDelegate <NSObject>
 
--(void)summaryControllerDidClosed:(VLOSummaryViewController *)viewController;
--(void)summarySheareDidSelected:(VLOSummaryViewController *)viewController;
+- (void)summaryControllerClosed:(VLOSummaryViewController *)viewController;
+- (void)summaryShareSelected:(VLOSummaryViewController *)viewController;
+- (void)scrollToLog:(NSInteger)logIndex;
 
 @end
 
 @interface VLOSummaryViewController : UIViewController
 
 @property (weak, nonatomic) id<VLOSummaryViewControllerDelegate> delegate;
+
 - (id) initWithTravel:(VLOTravel *)travel andLogList:(NSArray *)logList;
 - (void) drawSummary;
 
 @end
+
+

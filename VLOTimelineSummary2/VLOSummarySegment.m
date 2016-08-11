@@ -99,7 +99,7 @@
 }
 
 - (void) initializeSegmentView {
-    if (_segmentView) return;
+    //if (_segmentView) return;
     
     CGFloat curveRadius = fabs(_toMarker.y - _fromMarker.y) / 2.0;
     CGFloat segmentLeft   = 0;
@@ -186,7 +186,7 @@
 }
 
 - (void) initializeSegmentIconView {
-    if (_segmentIconView) return;
+    //if (_segmentIconView) return;
     
     // Segment Icon의 frame을 구하는 로직.
     CGFloat iconLeft;
@@ -212,6 +212,21 @@
     _segmentIconView.frame = CGRectMake(iconLeft, iconTop, SEGMENT_ICON_SIZE, SEGMENT_ICON_SIZE);
     
     [_segmentIconView setBackgroundColor:[UIColor clearColor]];
+}
+
+- (UIView *) getSegmentView {
+    [self initializeSegmentView];
+    CGFloat left = _segmentIconView.frame.origin.x + _drawableLeft;
+    CGFloat top = _segmentIconView.frame.origin.y + _drawableTop;
+    CGFloat width = _segmentIconView.frame.size.width;
+    CGFloat height = _segmentIconView.frame.size.height;
+    _segmentIconView.frame = CGRectMake(left, top, width, height);
+    return _segmentView;
+}
+
+- (UIView *) getSegmentIconView {
+    [self initializeSegmentIconView];
+    return _segmentIconView;
 }
 
 @end
