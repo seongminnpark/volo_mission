@@ -327,9 +327,6 @@
     if (_isOpenedFromEditor) {
         self.navigationController.viewControllers = @[self];
     }
-    
-    _summaryViewController = [[VLOSummaryViewController alloc] initWithTravel:_travel andLogList:_tableViewController.logs];
-    _summaryViewController.delegate = self;
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -760,7 +757,16 @@
         [self.navigationController pushViewController:settingView animated:YES];
     }];
     
-    VLOActionSheetItem *summaryItem = [[VLOActionSheetItem alloc] initWithTitle:NSLocalizedString(@"actionSheet_summary", ) color:blackItemColor font:itemFont handler:^{[self presentViewController:_summaryViewController animated:YES completion:nil];}];
+    VLOActionSheetItem *summaryItem = [[VLOActionSheetItem alloc] initWithTitle:NSLocalizedString(@"actionSheet_summary", ) color:blackItemColor font:itemFont handler:^{
+            _isOpenView = YES;
+        
+        _summaryViewController = [[VLOSummaryViewController alloc] initWithTravel:_travel andLogList:_tableViewController.logs];
+        _summaryViewController.delegate = self;
+        
+        VLONavigationController *navigationViewController = [[VLONavigationController alloc] initWithRootViewController:_summaryViewController];
+        [navigationViewController setNavigationBarHidden:YES animated:NO];
+        [self presentViewController:navigationViewController animated:YES completion:nil];
+    }];
     
     NSString *removeTitle = (_travel.users.count > 1) ? NSLocalizedString(@"actionSheet_leaveTrip", ) : NSLocalizedString(@"actionSheet_removeTrip", );
     VLOActionSheetItem *removeItem = [[VLOActionSheetItem alloc] initWithTitle:removeTitle color:redItemColor font:itemFont handler:^{
@@ -1740,6 +1746,7 @@
     VLOLog *log = [_tableViewController.logs objectAtIndex:logIndex];
     NSIndexPath *indexPath = [NSIndexPath indexPathForRow:[_tableViewController.logs indexOfObject:log] inSection:0];
     [_tableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionMiddle animated:YES];
+    [self coverClose];
     [self showNavigationBar];
 }
 

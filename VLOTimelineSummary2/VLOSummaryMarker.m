@@ -177,7 +177,7 @@
     imageViewLeft = _drawableWidth/2 - MARKER_ICON_WIDTH/2.0;
     imageViewTop  = 0;
     iconImageView.frame = CGRectMake(imageViewLeft, imageViewTop, MARKER_ICON_WIDTH, MARKER_ICON_HEIGHT);
-    
+
     _markerIconView = iconImageView;
 }
 
