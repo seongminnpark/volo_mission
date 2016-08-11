@@ -343,6 +343,7 @@
     }
     
     if (newCity && hasIcon) [currMarker setMarkerIconImage:markerIconImage];
+    //if (newCity && hasIcon) [currMarker setMarkerIconImage:@"icon_marker_seoul-1.white-stuffed"];
 }
 
 // 현재 정해진 도시 좌표에서 반경으로 테스트함. 추후에 폴리곤 로직 추가 해야함.

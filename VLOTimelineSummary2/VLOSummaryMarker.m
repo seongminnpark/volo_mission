@@ -91,7 +91,7 @@
 }
 
 - (void) initializeMarkerView {
-    if (_markerView) return;
+    //if (_markerView) return;
     
     
     CGFloat markerTop, markerLeft, markerWidth, markerImageWidth, markerImageHeight;
@@ -108,7 +108,7 @@
         markerImageWidth = _markerImageIsDay? MARKER_DAY_WIDTH : _markerImageIsFlag?  MARKER_FLAG_SIZE : MARKER_IMAGE_SIZE;
         UIImage *markerImage = [UIImage imageNamed:_markerImageName];
         UIImageView *markerImageView = [[UIImageView alloc] initWithImage:markerImage];
-        markerImageHeight = (_markerImageIsDay? markerImage.size.height : markerImageWidth) * [VLOUtilities screenRatioWith6];
+        markerImageHeight = _markerImageIsDay? markerImage.size.height : markerImageWidth;
         CGFloat imageViewLeft = markerWidth/2.0 - markerImageWidth/2.0;
         CGFloat imageViewTop = MARKER_IMAGE_SIZE/2.0 - markerImageHeight/2.0;
         markerImageView.frame = CGRectMake(imageViewLeft, imageViewTop, markerImageWidth, markerImageHeight);
@@ -166,7 +166,7 @@
 }
 
 - (void) initializeMarkericonView {
-    if (_markerIconView) return;
+    //if (_markerIconView) return;
         
     CGFloat imageViewLeft, imageViewTop;
     

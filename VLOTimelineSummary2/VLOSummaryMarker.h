@@ -37,7 +37,7 @@
 #define LINE_GAP            80.0 * [VLOUtilities screenRatioWith6]
 
 #define BACKGROUND_WIDTH   375.0 * [VLOUtilities screenRatioWith6]
-#define BACKGROUND_HEIGHT  130.0 * [VLOUtilities screenRatioWith6]
+#define BACKGROUND_HEIGHT  130.0 //* [VLOUtilities screenRatioWith6]
 
 #define PROXIMITY_RADIUS     0.1
 
