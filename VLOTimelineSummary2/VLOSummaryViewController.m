@@ -20,6 +20,7 @@
 @property (strong, nonatomic) NSMutableArray *drawables;
 
 @property (strong, nonatomic) NSArray *poiIcons;
+@property (strong, nonatomic) NSString *lastCountryCode;
 
 @property () CGFloat actualWidth;
 @property () CGFloat summaryWidth;
@@ -44,7 +45,7 @@
     
     [self parseLogList:logList];
     [self setMarkerCoordinates];
-    [self initializeDrawables];
+    //[self initializeDrawables];
     
     // 테스트용 버튼.
     UIButton *dismissButton =
@@ -59,6 +60,11 @@
 // 테스트용 버튼.
 - (void) dismiss {
     [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (void)viewDidAppear {
+    [super viewDidLoad];
+    [self drawSummary];
 }
 
 - (void) drawSummary {
@@ -280,15 +286,18 @@
     if (markerIndex > 0) {
         VLOSummaryMarker *prevMarker = [_markers objectAtIndex:markerIndex-1];
         sameDay = _travel.hasDate && prevMarker.day == currMarker.day;
-        sameCountry = countryNil || [prevPlace.country.country isEqualToString:currPlace.country.country];
+        sameCountry = countryNil || [_lastCountryCode isEqualToString:currPlace.country.isoCountryCode];
     }
     
     isDay  = (firstMarker || !sameDay) && _travel.hasDate;
     isFlag = (firstMarker && !_travel.hasDate) || !sameCountry || showCountry;
     
     if      (isDay)  markerImage = @"marker_day";
-    else if (isFlag) markerImage = [NSString stringWithFormat:@"42_%@", currPlace.country.isoCountryCode];
-    else             markerImage = @"icon_poi_marker";
+    else if (isFlag) {
+       markerImage = [NSString stringWithFormat:@"42_%@", currPlace.country.isoCountryCode];
+       _lastCountryCode = currPlace.country.isoCountryCode;
+    }
+    else markerImage = @"icon_poi_marker";
     
     [currMarker setMarkerImage:markerImage isDay:isDay isFlag:isFlag];
 }
@@ -308,12 +317,7 @@
         
         VLOLocationCoordinate *poiCoords = poi.coordinates;
         
-        BOOL withinLongitude = (coords.longitude.floatValue >= poiCoords.longitude.floatValue - 0.1) &&
-                               (coords.longitude.floatValue <= poiCoords.longitude.floatValue + 0.1);
-        BOOL withinLatitude  = (coords.latitude.floatValue  >= poiCoords.latitude.floatValue  - 0.1) &&
-                               (coords.latitude.floatValue  <= poiCoords.latitude.floatValue  + 0.1);
-        
-        hasIcon = withinLongitude && withinLatitude;
+        hasIcon = [self samePOI:coords :poiCoords];
         if (hasIcon){
             markerIconImage = poi.imageName;
             break;
@@ -322,13 +326,23 @@
     
     if (markerIndex > 0) {
         VLOSummaryMarker *prevMarker = [_markers objectAtIndex:markerIndex-1];
-        BOOL sameIcon = [prevMarker.iconImageName isEqualToString:markerIconImage];
-        newCity = (prevMarker.hasMarkerIcon && !sameIcon) || !prevMarker.hasMarkerIcon;
+        newCity = ![self samePOI:coords :[prevMarker getPlace].coordinates];
     } else {
-        newCity = currPlace.locality != nil;
+        newCity = YES;
     }
     
     if (newCity && hasIcon) [currMarker setMarkerIconImage:markerIconImage];
+}
+
+// 현재 정해진 도시 좌표에서 반경으로 테스트함. 추후에 폴리곤 로직 추가 해야함.
+- (BOOL) samePOI:(VLOLocationCoordinate *)coord1 :(VLOLocationCoordinate *)coord2 {
+    
+    BOOL withinLongitude = (coord1.longitude.floatValue >= coord2.longitude.floatValue - PROXIMITY_RADIUS) &&
+                           (coord1.longitude.floatValue <= coord2.longitude.floatValue + PROXIMITY_RADIUS);
+    BOOL withinLatitude  = (coord1.latitude.floatValue  >= coord2.latitude.floatValue  - PROXIMITY_RADIUS) &&
+                           (coord1.latitude.floatValue  <= coord2.latitude.floatValue  + PROXIMITY_RADIUS);
+    
+    return withinLongitude && withinLatitude;
 }
 
 

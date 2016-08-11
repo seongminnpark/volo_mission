@@ -190,6 +190,10 @@
     [_markerLabel setFont:[UIFont systemFontOfSize:MARKER_LABEL_HEIGHT]];
 }
 
+- (VLOPlace *) getPlace {
+    return _place;
+}
+
 
 
 @end

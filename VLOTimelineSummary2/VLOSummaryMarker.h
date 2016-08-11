@@ -39,6 +39,8 @@
 #define BACKGROUND_WIDTH   375.0 * [VLOUtilities screenRatioWith6]
 #define BACKGROUND_HEIGHT  130.0 * [VLOUtilities screenRatioWith6]
 
+#define PROXIMITY_RADIUS     0.1
+
 #define VOLO_COLOR          [UIColor colorWithRed:200/255.0 green:240/255.0 blue:235/255.0 alpha:1]
 #define LINE_COLOR          [UIColor colorWithRed:211/255.0 green:213/255.0 blue:212/255.0 alpha:1]
 
@@ -58,7 +60,7 @@
 - (void) setMarkerImage:(NSString *)markerImageName isDay:(BOOL)isDay isFlag:(BOOL)isFlag;
 - (void) setMarkerIconImage:(NSString *)iconImageName;
 - (UIButton *) getDrawableView;
-
+- (VLOPlace *) getPlace;
 
 @end
 
