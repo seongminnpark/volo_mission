@@ -94,7 +94,7 @@
     if (_markerView) return;
     
     
-    CGFloat markerTop, markerLeft, markerWidth, markerImageSize;
+    CGFloat markerTop, markerLeft, markerWidth, markerImageWidth, markerImageHeight;
     
     if (_markerUsesCustomImage) {
         
@@ -105,12 +105,13 @@
         _markerView = [[UIView alloc] initWithFrame:CGRectMake(markerLeft, markerTop, markerWidth, MARKER_IMAGE_SIZE)];
         
         // 마커 그림
-        markerImageSize = _markerImageIsDay? MARKER_DAY_WIDTH : _markerImageIsFlag?  MARKER_FLAG_SIZE : MARKER_IMAGE_SIZE;
+        markerImageWidth = _markerImageIsDay? MARKER_DAY_WIDTH : _markerImageIsFlag?  MARKER_FLAG_SIZE : MARKER_IMAGE_SIZE;
         UIImage *markerImage = [UIImage imageNamed:_markerImageName];
         UIImageView *markerImageView = [[UIImageView alloc] initWithImage:markerImage];
-        CGFloat imageViewLeft = markerWidth/2.0 - markerImageSize/2.0;
-        CGFloat imageViewTop = MARKER_IMAGE_SIZE/2.0 - markerImageSize/2.0;
-        markerImageView.frame = CGRectMake(imageViewLeft, imageViewTop, markerImageSize, markerImageSize);
+        markerImageHeight = (_markerImageIsDay? markerImage.size.height : markerImageWidth) * [VLOUtilities screenRatioWith6];
+        CGFloat imageViewLeft = markerWidth/2.0 - markerImageWidth/2.0;
+        CGFloat imageViewTop = MARKER_IMAGE_SIZE/2.0 - markerImageHeight/2.0;
+        markerImageView.frame = CGRectMake(imageViewLeft, imageViewTop, markerImageWidth, markerImageHeight);
         
         [_markerView addSubview:markerImageView];
         

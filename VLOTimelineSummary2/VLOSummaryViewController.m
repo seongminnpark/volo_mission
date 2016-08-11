@@ -47,13 +47,6 @@
     [self setMarkerCoordinates];
     //[self initializeDrawables];
     
-    // 테스트용 버튼.
-    UIButton *dismissButton =
-    [[UIButton alloc] initWithFrame:CGRectMake(0,self.view.bounds.size.height - 50, self.view.bounds.size.width, 50)];
-    [dismissButton addTarget:self action:@selector(dismiss) forControlEvents:UIControlEventTouchUpInside];
-    [dismissButton setBackgroundColor:[UIColor grayColor]];
-    [self.view addSubview:dismissButton];
-    
     return self;
 }
 
@@ -69,6 +62,8 @@
 
 - (void) drawSummary {
 
+    [[self.view subviews] makeObjectsPerformSelector:@selector(removeFromSuperview)];
+    
     [self initializeDrawables];
     
     for (UIView *drawable in _drawables) {
