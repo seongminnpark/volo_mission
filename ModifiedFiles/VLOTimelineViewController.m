@@ -1,5 +1,5 @@
 
-//
+ //
 //  TimelineViewController.m
 //  Volo
 //
@@ -19,7 +19,6 @@
 #import "VLOFriendsListViewController.h"
 #import "VLOTagEditViewController.h"
 #import "VLOCellEditorViewController.h"
-#import "VLOSummaryViewController.h"
 // Map Editor
 #import "VLOMapEditorViewController.h"
 #import "VLOMapEditorNavigationController.h"
@@ -55,9 +54,6 @@
 #import "VLOTravelShareAndPrivacySettingViewController.h"
 #import "VLOTravelPrivacySettingViewController.h"
 #import "VLOAddCellMenuButton.h"
-#import "VLOShowSummaryViewController.h"
-#import "VLOSummaryViewController.h"
-#import "VLOSummaryView.h"
 
 // Models
 #import "VLOUser.h"
@@ -93,20 +89,20 @@
 #import "VLOAPNSManager.h"
 #import "VLOAnalyticsManager.h"
 #import "VLOShortcutManager.h"
+#import "VLOSummaryViewController.h"
 
 // Library
 #import <Masonry/Masonry.h>
 #import <AFNetworking/AFNetworking.h>
 
 
-
 @interface VLOTimelineViewController () <VLOTimelineTableViewDelegate, VLOTableViewPhotoCellDelegate, VLOTableViewMapCellDelegate,
-VLOTimelineCoverViewDelegate, VLOTravelListModificationDelegate, VLOTimelineTableViewControllerDelegate,
-VLORouteEditorDelegate, VLOMapEditorDelegate, VLOTextEditorDelegate,
-VLOPhotoLogEditorDelegate, VLOQuoteEditorDelegate,
-VLOSearchFriendsViewControllerDelegate, VLOTravelListAddViewControllerDelegate,
-VLOTimelineScrollIndicatorDelegate, VLOTimelineTableFooterDelegate,VLOMenuButtonDelegate, UIGestureRecognizerDelegate,
-VLOTagEditViewDelegate, VLOFriendsListDelegate>
+        VLOTimelineCoverViewDelegate, VLOTravelListModificationDelegate, VLOTimelineTableViewControllerDelegate,
+        VLORouteEditorDelegate, VLOMapEditorDelegate, VLOTextEditorDelegate,
+        VLOPhotoLogEditorDelegate, VLOQuoteEditorDelegate,
+        VLOSearchFriendsViewControllerDelegate, VLOTravelListAddViewControllerDelegate,
+        VLOTimelineScrollIndicatorDelegate, VLOTimelineTableFooterDelegate,VLOMenuButtonDelegate, UIGestureRecognizerDelegate,
+        VLOTagEditViewDelegate, VLOFriendsListDelegate, VLOSummaryViewControllerDelegate>
 {
     CGFloat lastY;
     
@@ -135,11 +131,9 @@ VLOTagEditViewDelegate, VLOFriendsListDelegate>
 
 @property (nonatomic) BOOL isViewMode;
 @property (nonatomic) BOOL isOpenView;
-@property (nonatomic) BOOL isSummary;
 
 @property (nonatomic, strong) VLOPrivateStatusBar *privateStatusBar;
 @property (nonatomic, strong) VLOSyncStatusBar *syncStatusBar;
-@property (strong, nonatomic) VLOSummaryViewController *summaryMaker;
 
 @end
 
@@ -150,7 +144,6 @@ VLOTagEditViewDelegate, VLOFriendsListDelegate>
     self = [super init];
     if(self){
         _isHidden = NO;
-        _isSummary = NO;
     }
     return self;
 }
@@ -160,7 +153,7 @@ VLOTagEditViewDelegate, VLOFriendsListDelegate>
     [super viewDidLoad];
     if (_shortcutTravel) {
         _travel = _shortcutTravel;
-        [(VLOMainTabBarController *)self.tabBarController hideTabBarWithAnimated:NO];
+        [(VLOMainTabBarController *)self.tabBarController setIsTimelineViewShown:YES withAnimated:NO];
     }
     
     if (_travel.serverId) {
@@ -251,46 +244,46 @@ VLOTagEditViewDelegate, VLOFriendsListDelegate>
     
     // init, set navbar
     self.automaticallyAdjustsScrollViewInsets = NO;
-    
-    
+
+
     BOOL isFromUserHome = NO;
     NSInteger selfIndex = [self.navigationController.viewControllers indexOfObject:self];
     if (selfIndex > 0 && !isnan(selfIndex)) {
         isFromUserHome = [[self.navigationController.viewControllers objectAtIndex:selfIndex-1] isKindOfClass:[VLOTravelListViewController class]];
     }
-    
+
     _timelineNavigationBar = [[VLOTimelineNavigationBar alloc] initWithIsViewMode:_isViewMode isFromUserHome:isFromUserHome];
     [_timelineNavigationBar.menuButton addTarget:self action:@selector(showStoryActionSheet) forControlEvents:UIControlEventTouchUpInside];
     [_timelineNavigationBar.shareButton addTarget:self action:@selector(showShareActionSheet) forControlEvents:UIControlEventTouchUpInside];
     [_timelineNavigationBar.backButton addTarget:self action:@selector(backToTravelListAtTimeline:) forControlEvents:UIControlEventTouchUpInside];
     [_timelineNavigationBar.syncButton addTarget:self action:@selector(manualSync:) forControlEvents:UIControlEventTouchUpInside];
-    
-    
+
+
     [self.view addSubview:_timelineNavigationBar];
     _tableViewController.syncDelegate = _timelineNavigationBar;
-    
+
     
     /*
-     _menu = [[VLOTimelineMenu alloc] init];
-     _menu.delegate = self;
+    _menu = [[VLOTimelineMenu alloc] init];
+    _menu.delegate = self;
      
-     // TODO: 이하 확인
+    // TODO: 이하 확인
      
-     _menuButton = [[VLOTimelineMenuButton alloc] initWithHandler:^(BOOL success) {
-     if (_tableViewController.isOrderChangeMode) {
-     [_tableView reloadData];
-     [_tableViewController endOrderChangeModeWithIsChanged:NO];
-     return;
-     }
-     _tableViewController.addToBelowPivotLog = nil;
-     [self presentViewController:_menu animated:NO completion:nil];
-     [self coverCloseAndHideDayIndicator:YES withComplete:^{
-     [self showNavigationBar];
-     }];
-     }];
-     _menuButton.hidden = _isViewMode;
-     [self.view addSubview:_menuButton];
-     */
+    _menuButton = [[VLOTimelineMenuButton alloc] initWithHandler:^(BOOL success) {
+        if (_tableViewController.isOrderChangeMode) {
+            [_tableView reloadData];
+            [_tableViewController endOrderChangeModeWithIsChanged:NO];
+            return;
+        }
+        _tableViewController.addToBelowPivotLog = nil;
+        [self presentViewController:_menu animated:NO completion:nil];
+        [self coverCloseAndHideDayIndicator:YES withComplete:^{
+            [self showNavigationBar];
+        }];
+    }];
+    _menuButton.hidden = _isViewMode;
+    [self.view addSubview:_menuButton];
+    */
     
     
     UIImage *addIcon = [UIImage imageNamed:@"TimelineMenuButton"];
@@ -318,7 +311,7 @@ VLOTagEditViewDelegate, VLOFriendsListDelegate>
     
     _scrollIndicator = [[VLOTimelineScrollIndicator alloc] initWithScrollView:_tableView];
     _scrollIndicator.delegate = self;
-    //    [_scrollIndicator hideWithAnimation:NO];
+//    [_scrollIndicator hideWithAnimation:NO];
     _scrollIndicator.scrollIndicator = _tableViewController.indicator;
     _scrollIndicator.isNoDateTravel = !_travel.hasDate;
     _tableViewController.indicator.delegate = _scrollIndicator;
@@ -335,8 +328,8 @@ VLOTagEditViewDelegate, VLOFriendsListDelegate>
         self.navigationController.viewControllers = @[self];
     }
     
-    //add
-    _summaryView = [[VLOSummaryView alloc] init];
+    _summaryViewController = [[VLOSummaryViewController alloc] initWithTravel:_travel andLogList:_tableViewController.logs];
+    _summaryViewController.delegate = self;
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -349,7 +342,7 @@ VLOTagEditViewDelegate, VLOFriendsListDelegate>
     }
     
     [self.navigationController setNavigationBarHidden:YES animated:YES];
-    [(VLOMainTabBarController *)self.tabBarController hideTabBar];
+    [(VLOMainTabBarController *)self.tabBarController setIsTimelineViewShown:YES withAnimated:YES];
     
     [self showCustomStatusBar];
     
@@ -357,7 +350,6 @@ VLOTagEditViewDelegate, VLOFriendsListDelegate>
         [[NSUserDefaults standardUserDefaults] setObject:VLOLastOpenedTimeline forKey:VLOLastOpenedHomeKey];
         [[NSUserDefaults standardUserDefaults] setObject:_travel.travelId forKey:VLOLastOpenedTimelineLastTravelIdKey];
     }
-    
 }
 
 
@@ -397,12 +389,12 @@ VLOTagEditViewDelegate, VLOFriendsListDelegate>
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    
+
     if(_isHidden){
         [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationFade];
     }
     [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleDefault;
-    
+
     [VLOAnalyticsManager reportGAScreenWithName:kVLOScreenNameTimeline];
     [_coverView resizeTextViewHeight];
     
@@ -410,30 +402,6 @@ VLOTagEditViewDelegate, VLOFriendsListDelegate>
         [VLOShortcutManager setShortcutWithTravel:_travel];
     }
     _isOpenView = NO;
-    
-    /*  UITapGestureRecognizer *tapSummary =
-     [[UITapGestureRecognizer alloc] initWithTarget:self
-     action:@selector(showSummary:)];
-     [tapSummary setNumberOfTapsRequired:1];
-     [_tableView.summaryView addGestureRecognizer:tapSummary];
-     
-     [self showSummary:_tableView.summaryView];*/
-}
-
-- (void)showSummary
-{
-    // summaryView 리셋.
-    // [[view subviews] makeObjectsPerformSelector:@selector(removeFromSuperview)];
-    // view.layer.sublayers = nil;
-    
-    NSArray *logs = _tableViewController.logs;
-    _summaryMaker = [[VLOSummaryViewController alloc] initWithTravel:_tableViewController.travel andLogList:logs];
-    [_summaryMaker drawSummary];
-    _summaryMaker.delegate = self;
-    
-    [self presentViewController:_summaryMaker animated:YES completion:nil];
-    
-    //[self showNavigationBar];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -444,7 +412,7 @@ VLOTagEditViewDelegate, VLOFriendsListDelegate>
         [_travelListViewController travelListSync];
         [_travelListViewController.tableView reloadData];
     }
-    
+
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     
     [self hideCustomStatusBar];
@@ -455,9 +423,10 @@ VLOTagEditViewDelegate, VLOFriendsListDelegate>
     [super viewDidDisappear:animated];
     
     if (!_isOpenedFromDiscover && !_isOpenView && _travelListViewController &&
-        ((VLOMainTabBarController *)_travelListViewController.tabBarController).selectedIndex != 0)
+            ((VLOMainTabBarController *)_travelListViewController.tabBarController).selectedIndex != 0)
     {
-        [(VLOMainTabBarController *)_travelListViewController.tabBarController showTabBar];
+        [(VLOMainTabBarController *)_travelListViewController.tabBarController setIsTagWrite:NO withTagWriteTitle:@""];
+        [(VLOMainTabBarController *)_travelListViewController.tabBarController setIsTimelineViewShown:NO];
     }
     
     [_privateStatusBar hide];
@@ -474,39 +443,38 @@ VLOTagEditViewDelegate, VLOFriendsListDelegate>
     }];
     
     /*
-     [_menuButton mas_makeConstraints:^(MASConstraintMaker *make) {
-     make.right.and.bottom.equalTo(@(-19.0f));
-     make.size.equalTo(@45.0f);
-     }];
-     */
+    [_menuButton mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.right.and.bottom.equalTo(@(-19.0f));
+        make.size.equalTo(@45.0f);
+    }];
+    */
     
     [_activityIndicator mas_makeConstraints:^(MASConstraintMaker *make) {
         make.size.equalTo(@60.0f);
         make.center.equalTo(self.view);
     }];
     
-    //    [_searchFriendsToolTip mas_makeConstraints:^(MASConstraintMaker *make) {
-    //        make.left.and.right.equalTo(@.0f);
-    //        make.top.equalTo(_timelineNavigationBar.mas_bottom);
-    //        make.bottom.equalTo(_searchFriendsToolTip.containerView);
-    //    }];
+//    [_searchFriendsToolTip mas_makeConstraints:^(MASConstraintMaker *make) {
+//        make.left.and.right.equalTo(@.0f);
+//        make.top.equalTo(_timelineNavigationBar.mas_bottom);
+//        make.bottom.equalTo(_searchFriendsToolTip.containerView);
+//    }];
     
     [_scrollIndicator mas_makeConstraints:^(MASConstraintMaker *make) {
         make.right.equalTo(@.0f);
         make.bottom.equalTo(@(-80.0f));
         make.top.equalTo(@85.0f);
         make.width.equalTo(@70.0f);
-        
     }];
 }
 
 #pragma mark - tag editor view delegate
 
-- (void)tagEditView:(VLOTagEditViewController *)tagEditView didDoneWithTags:(NSArray *)tags
-{
-    [_tableView reloadData];
-    [_tableView.tableFooterView setNeedsLayout];
-}
+ - (void)tagEditView:(VLOTagEditViewController *)tagEditView didDoneWithTags:(NSArray *)tags
+ {
+     [_tableView reloadData];
+     [_tableView.tableFooterView setNeedsLayout];
+ }
 
 #pragma mark - Timeline indicator delegate
 
@@ -519,7 +487,7 @@ VLOTagEditViewDelegate, VLOFriendsListDelegate>
         [_timelineNavigationBar show];
     }
     
-    //    [_scrollIndicator hideWithAnimation:YES];
+//    [_scrollIndicator hideWithAnimation:YES];
 }
 
 - (void)timelineScrollIndicatorDidBeginRecognizeGesture:(VLOTimelineScrollIndicator *)indicator
@@ -639,8 +607,8 @@ VLOTagEditViewDelegate, VLOFriendsListDelegate>
 
 - (void)moveCoverViewWithY:(CGFloat)moveY
 {
-    //    [_scrollIndicator hideWithAnimation:NO];
-    //    _searchFriendsToolTip.alpha = .0f;
+//    [_scrollIndicator hideWithAnimation:NO];
+//    _searchFriendsToolTip.alpha = .0f;
     if (_tableViewController.isOrderChangeMode) {
         _tableView.isScrollOnTop = NO;
     }
@@ -679,7 +647,7 @@ VLOTagEditViewDelegate, VLOFriendsListDelegate>
 
 - (void)coverOpen
 {
-    //    [_scrollIndicator hideWithAnimation:NO];
+//    [_scrollIndicator hideWithAnimation:NO];
     _isCoverOpen = YES;
     _coverTop = _coverView.frame.size.height;
     
@@ -732,7 +700,7 @@ VLOTagEditViewDelegate, VLOFriendsListDelegate>
         _isCoverOpen = NO;
     }];
     [self setNeedsStatusBarAppearanceUpdate];
-    //    [_scrollIndicator showWithAnimation:YES];
+//    [_scrollIndicator showWithAnimation:YES];
     //_dayIndicator.hidden = hideDayIndicator;
 }
 
@@ -747,54 +715,52 @@ VLOTagEditViewDelegate, VLOFriendsListDelegate>
     
     VLOActionSheet *actionSheet = [[VLOActionSheet alloc] init];
     VLOActionSheetSection *menuSection = [[VLOActionSheetSection alloc] init];
-    
+
     /*
-     VLOActionSheetItem *addTagItem = [[VLOActionSheetItem alloc] initWithTitle:NSLocalizedString(@"actionSheet_addTagItem", ) color:blackItemColor font:itemFont handler:^{
-     _isOpenView = YES;
-     VLOTagEditViewController *tagEditor = [[VLOTagEditViewController alloc] init];
-     tagEditor.modificationTravel = _travel;
-     tagEditor.isFromMenu = YES;
-     tagEditor.delegate = self;
-     tagEditor.tags = _travel.tags;
-     [self presentViewController:tagEditor animated:YES completion:nil];
-     
-     [VLOAnalyticsManager reportEventWithCategory:VLOCategoryTimeline action:VLOActionAddTag label:_travel.url andValue:nil];
-     }];
-     */
-    
+    VLOActionSheetItem *addTagItem = [[VLOActionSheetItem alloc] initWithTitle:NSLocalizedString(@"actionSheet_addTagItem", ) color:blackItemColor font:itemFont handler:^{
+        _isOpenView = YES;
+        VLOTagEditViewController *tagEditor = [[VLOTagEditViewController alloc] init];
+        tagEditor.modificationTravel = _travel;
+        tagEditor.isFromMenu = YES;
+        tagEditor.delegate = self;
+        tagEditor.tags = _travel.tags;
+        [self presentViewController:tagEditor animated:YES completion:nil];
+        
+        [VLOAnalyticsManager reportEventWithCategory:VLOCategoryTimeline action:VLOActionAddTag label:_travel.url andValue:nil];
+    }];
+    */
+
     VLOActionSheetItem *editItem = [[VLOActionSheetItem alloc] initWithTitle:NSLocalizedString(@"actionSheet_editItem", ) color:blackItemColor font:itemFont handler:^{
         [self editCoverViewWithPressType:VLOTimelineCoverPressedViewTypeDefault isLongPress:NO];
-        
+
         [VLOAnalyticsManager reportGAEventWithCategory:VLOCategoryTimeline action:VLOActionEditCover label:nil andValue:nil];
     }];
     VLOActionSheetItem *inviteFriendsItem = [[VLOActionSheetItem alloc] initWithTitle:NSLocalizedString(@"actionSheet_inviteFriends", ) color:blackItemColor font:itemFont handler:^{
         [self presentInviteFriendsView];
-        
+
         [VLOAnalyticsManager reportGAEventWithCategory:VLOCategoryTimeline action:VLOActionInviteFriends label:_travel.url andValue:nil];
     }];
-    
+
     VLOActionSheetItem *sharingItem = [[VLOActionSheetItem alloc] initWithTitle:NSLocalizedString(@"story_setting_sharing", )
                                                                           color:blackItemColor
                                                                            font:itemFont
                                                                         handler:^{
-                                                                            [self showShareActionSheet];
-                                                                        }];
-    
+        _isOpenView = YES;
+        [self showShareActionSheet];
+    }];
+
     VLOActionSheetItem *privacyItem = [[VLOActionSheetItem alloc] initWithTitle:NSLocalizedString(@"story_setting_privacy", )
-                                                                          color:blackItemColor
-                                                                           font:itemFont handler:^{
-                                                                               VLOTravelPrivacySettingViewController *settingView = [[VLOTravelPrivacySettingViewController alloc] init];
-                                                                               settingView.travel = _travel;
-                                                                               settingView.timelineViewController = self;
-                                                                               
-                                                                               _isOpenView = YES;
-                                                                               [self.navigationController pushViewController:settingView animated:YES];
-                                                                           }];
+                                                                                    color:blackItemColor
+                                                                                     font:itemFont handler:^{
+        VLOTravelPrivacySettingViewController *settingView = [[VLOTravelPrivacySettingViewController alloc] init];
+        settingView.travel = _travel;
+        settingView.timelineViewController = self;
+        
+        _isOpenView = YES;
+        [self.navigationController pushViewController:settingView animated:YES];
+    }];
     
-    //add
-    VLOActionSheetItem *summaryItem = [[VLOActionSheetItem alloc] initWithTitle:NSLocalizedString(@"actionSheet_summary", ) color:blackItemColor font:itemFont handler:^{
-        [self showSummary];}];
-    //add
+    VLOActionSheetItem *summaryItem = [[VLOActionSheetItem alloc] initWithTitle:NSLocalizedString(@"actionSheet_summary", ) color:blackItemColor font:itemFont handler:^{[self presentViewController:_summaryViewController animated:YES completion:nil];}];
     
     NSString *removeTitle = (_travel.users.count > 1) ? NSLocalizedString(@"actionSheet_leaveTrip", ) : NSLocalizedString(@"actionSheet_removeTrip", );
     VLOActionSheetItem *removeItem = [[VLOActionSheetItem alloc] initWithTitle:removeTitle color:redItemColor font:itemFont handler:^{
@@ -824,7 +790,7 @@ VLOTagEditViewDelegate, VLOFriendsListDelegate>
     [menuSection addItem:sharingItem];
     [menuSection addItem:privacyItem];
     [menuSection addItem:summaryItem];
-    
+
     [actionSheet addSection:menuSection];
     actionSheet.cancelSectionItems = [@[removeItem] mutableCopy];
     [actionSheet setCancelTitle:NSLocalizedString(@"actionSheet_cancel", ) andHandler:^{}];
@@ -834,7 +800,7 @@ VLOTagEditViewDelegate, VLOFriendsListDelegate>
 - (void)shareToFacebookWithTravel:(VLOTravel *)travel
 {
     if (_travel.serverId) {
-        
+
     }
 }
 
@@ -858,78 +824,73 @@ VLOTagEditViewDelegate, VLOFriendsListDelegate>
 
 - (void)showShareActionSheet
 {
-    
+
     BOOL isPublic = (_travel.privacyType == VLOTravelPrivacyPublicType);
-    
+
+    UIColor *blackItemColor = [UIColor vlo_blackColor];
     UIFont *itemFont = [UIFont ralewayMediumWithSize:15.0f];
     
     VLOActionSheet *actionSheet = [[VLOActionSheet alloc] init];
     VLOActionSheetSection *shareSection = [[VLOActionSheetSection alloc] init];
-    
+
     VLOActionSheetItem *shareItem =
     [[VLOActionSheetItem alloc]
      initWithTitle:NSLocalizedString(@"actionSheet_shareItem", )
-     color:[UIColor colorWithHexString:@"4468b4"]
-     font:itemFont
-     handler:^{
-         VLOShare *shareManager = [VLOShare sharedInstance];
-         [shareManager shareToFacebookWithTravel:_travel
-                              fromViewController:self
-                                      completion:nil
-                                         failure:nil
-                                        withUser:[_travel.users firstObject]];
-     }];
+             color:[UIColor colorWithHexString:@"4468b4"]
+              font:itemFont
+         handler:^{
+             VLOShare *shareManager = [VLOShare sharedInstance];
+             [shareManager shareToFacebookWithTravel:_travel
+                                  fromViewController:self
+                                          completion:nil
+                                             failure:nil
+                                            withUser:[_travel.users firstObject]];
+         }];
     
     VLOActionSheetItem *copyURLItem =
     [[VLOActionSheetItem alloc]
      initWithTitle:NSLocalizedString(@"actionSheet_copyURLItem", )
-     color:(isPublic? [UIColor vlo_blackColor]:[UIColor vlo_lightGrayColor])
-     font:itemFont
-     handler:^{
-         
-         NSInteger lastDay = [VLOLocalStorage lastDayOfTravel:_travel];
-         VLOShareAlert *alert = [[VLOShareAlert alloc] initWithURL:_travel.url
-                                                        andLastDay:lastDay
-                                                              type:VLOShareAlertTypeLinkCopy
-                                                        withTravel:_travel];
-         [alert showInViewController:self];
-         
-         [VLOAnalyticsManager facebookTrackingEvent:VLOFBLogShareTravelWithLink];
-         [VLOAnalyticsManager reportGAEventWithCategory:VLOCategoryTimeline action:VLOActionShareTimelineLink label:_travel.travelId andValue:nil];
-         [self copyURLWithTravel:_travel];
-     }];
-    
+             color:(isPublic? [UIColor vlo_blackColor]:[UIColor vlo_lightGrayColor])
+            font:itemFont
+         handler:^{
+
+             NSInteger lastDay = [VLOLocalStorage lastDayOfTravel:_travel];
+             VLOShareAlert *alert = [[VLOShareAlert alloc] initWithURL:_travel.url
+                                                            andLastDay:lastDay
+                                                                  type:VLOShareAlertTypeLinkCopy
+                                                              withTravel:_travel];
+             [alert showInViewController:self];
+
+             [VLOAnalyticsManager facebookTrackingEvent:VLOFBLogShareTravelWithLink];
+             [VLOAnalyticsManager reportGAEventWithCategory:VLOCategoryTimeline action:VLOActionShareTimelineLink label:_travel.travelId andValue:nil];
+             [self copyURLWithTravel:_travel];
+         }];
+
     if(isPublic) {
         actionSheet.message = nil;
     } else {
         NSString *privacyMessage = NSLocalizedString(@"story_setting_share_description_private_disabled", );
         actionSheet.message =  privacyMessage;
     }
-    
+
     shareItem.enabled = isPublic;
     copyURLItem.enabled = isPublic;
     
     [shareSection addItem:shareItem];
     [shareSection addItem:copyURLItem];
-    
+
     [actionSheet addSection:shareSection];
     [actionSheet setCancelTitle:NSLocalizedString(@"actionSheet_cancel", ) andHandler:^{
     }];
     
-    if(_isSummary) {
-        [actionSheet showInViewController:_summaryMaker];
-        _isSummary = NO;
-    }
-    else {
-        [actionSheet showInViewController:self];
-    }
-    
+    [actionSheet showInViewController:self];
 }
 
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
     if(buttonIndex == 1){
         if (!_isOpenedFromDiscover) {
-            [(VLOMainTabBarController *)_travelListViewController.tabBarController showTabBar];
+            [(VLOMainTabBarController *)_travelListViewController.tabBarController setIsTagWrite:NO withTagWriteTitle:@""];
+            [(VLOMainTabBarController *)_travelListViewController.tabBarController setIsTimelineViewShown:NO];
         }
         
         [self.navigationController popViewControllerAnimated:NO];
@@ -984,7 +945,7 @@ VLOTagEditViewDelegate, VLOFriendsListDelegate>
                     _travel.coverImage.cropRect = serverTravel.coverImage.cropRect;
                     [VLOLocalStorage insertPhoto:_travel.coverImage];
                     serverTravel.coverImage = _travel.coverImage;
-                    
+
                     coverChanged = YES;
                 } else {
                     serverTravel.coverImage = _travel.coverImage;
@@ -1219,17 +1180,17 @@ VLOTagEditViewDelegate, VLOFriendsListDelegate>
         
         
         /*
-         CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
-         animation.toValue = @((135.0f) / 180.0 * M_PI);
-         animation.fromValue = @(0);
-         animation.delegate = self;
-         _menuButton.transform = CGAffineTransformMakeRotation((135.0f) / 180.0 * M_PI);
-         [_menuButton.layer addAnimation:animation forKey:@"CloseButtonRotateAnimtaion"];
-         [UIView animateWithDuration:0.5f animations:^{
-         _menuButton.button.backgroundColor = [UIColor colorWithHexString:@"303a50"];
-         } completion:^(BOOL finished) {
-         }];
-         */
+        CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
+        animation.toValue = @((135.0f) / 180.0 * M_PI);
+        animation.fromValue = @(0);
+        animation.delegate = self;
+        _menuButton.transform = CGAffineTransformMakeRotation((135.0f) / 180.0 * M_PI);
+        [_menuButton.layer addAnimation:animation forKey:@"CloseButtonRotateAnimtaion"];
+        [UIView animateWithDuration:0.5f animations:^{
+            _menuButton.button.backgroundColor = [UIColor colorWithHexString:@"303a50"];
+        } completion:^(BOOL finished) {
+        }];
+        */
         
         [_addCellMenuButton rotateToXButton];
         
@@ -1252,7 +1213,7 @@ VLOTagEditViewDelegate, VLOFriendsListDelegate>
         _bottomGradient.frame = CGRectMake(0, -_bottomBounds.bounds.size.height/2.0f, _bottomBounds.bounds.size.width, _bottomBounds.bounds.size.height*3.0f/2.0f);
         _topBounds.alpha = 1.0f;
         _bottomBounds.alpha = 1.0f;
-        //        controller.indicator.hidden = YES;
+//        controller.indicator.hidden = YES;
     }
     else {
         _tableView.clipsToBounds = YES;
@@ -1260,23 +1221,23 @@ VLOTagEditViewDelegate, VLOFriendsListDelegate>
         [rearrangeTooltip hideTooltip];
         
         /*
-         CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
-         animation.toValue = @(0);
-         animation.fromValue = @((135.0f) / 180.0 * M_PI);
-         animation.delegate = self;
-         _menuButton.transform = CGAffineTransformMakeRotation(0);
-         [_menuButton.layer addAnimation:animation forKey:@"OpenButtonRotateAnimtaion"];
-         
-         [UIView animateWithDuration:0.5f animations:^{
-         _menuButton.button.backgroundColor = [UIColor colorWithHexString:@"35babc"];
-         }];
+        CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
+        animation.toValue = @(0);
+        animation.fromValue = @((135.0f) / 180.0 * M_PI);
+        animation.delegate = self;
+        _menuButton.transform = CGAffineTransformMakeRotation(0);
+        [_menuButton.layer addAnimation:animation forKey:@"OpenButtonRotateAnimtaion"];
+        
+        [UIView animateWithDuration:0.5f animations:^{
+            _menuButton.button.backgroundColor = [UIColor colorWithHexString:@"35babc"];
+        }];
          */
         
         [_addCellMenuButton rotateToPlusButton];
         
         _topBounds.alpha = 0.0f;
         _bottomBounds.alpha = 0.0f;
-        //        controller.indicator.hidden = NO;
+//        controller.indicator.hidden = NO;
     }
 }
 
@@ -1288,8 +1249,8 @@ VLOTagEditViewDelegate, VLOFriendsListDelegate>
     animation.delegate = self;
     
     /*
-     _menuButton.transform = CGAffineTransformMakeRotation((135.0f) / 180.0 * M_PI);
-     [_menuButton.layer addAnimation:animation forKey:@"CloseButtonRotateAnimtaion"];
+    _menuButton.transform = CGAffineTransformMakeRotation((135.0f) / 180.0 * M_PI);
+    [_menuButton.layer addAnimation:animation forKey:@"CloseButtonRotateAnimtaion"];
      */
 }
 
@@ -1309,15 +1270,15 @@ VLOTagEditViewDelegate, VLOFriendsListDelegate>
 {
     //[self presentViewController:_menu animated:NO completion:nil];
     [_addCellMenuButton expandToMenu];
-    //    [self coverCloseAndHideDayIndicator:YES withComplete:^{
-    //        [self showNavigationBar];
-    //    }];
+//    [self coverCloseAndHideDayIndicator:YES withComplete:^{
+//        [self showNavigationBar];
+//    }];
 }
 
-- (void)timelineTableViewController:(VLOTimelineTableViewController *)controller didUserProfileSelected:(VLOUser*)user
-{
-    [self showTravelListWithUser:user];
-}
+ - (void)timelineTableViewController:(VLOTimelineTableViewController *)controller didUserProfileSelected:(VLOUser*)user
+ {
+     [self showTravelListWithUser:user];
+ }
 
 - (void)timelineTableViewControllerDidShowEmptyView:(VLOTimelineTableViewController *)controller
 {
@@ -1353,7 +1314,7 @@ VLOTagEditViewDelegate, VLOFriendsListDelegate>
     [self presentViewController:navigation animated:animated completion:^{
         [self coverClose];
     }];
-    
+
     [VLOAnalyticsManager reportGAEventWithCategory:VLOCategoryTimeline action:VLOActionWriteCell label:[VLOLog typeStringWithType:VLOLogTypeText] andValue:nil];
 }
 
@@ -1368,7 +1329,7 @@ VLOTagEditViewDelegate, VLOFriendsListDelegate>
     [self presentViewController:navigationController animated:YES completion:^{
         [self coverClose];
     }];
-    
+
     [VLOAnalyticsManager reportGAEventWithCategory:VLOCategoryTimeline action:VLOActionWriteCell label:[VLOLog typeStringWithType:VLOLogTypeRoute] andValue:nil];
 }
 
@@ -1384,7 +1345,7 @@ VLOTagEditViewDelegate, VLOFriendsListDelegate>
     [self presentViewController:editor animated:NO completion:^{
         [self coverClose];
     }];
-    
+
     [VLOAnalyticsManager reportGAEventWithCategory:VLOCategoryTimeline action:VLOActionWriteCell label:[VLOLog typeStringWithType:VLOLogTypeTitle] andValue:nil];
 }
 
@@ -1407,7 +1368,7 @@ VLOTagEditViewDelegate, VLOFriendsListDelegate>
     [self presentViewController:navigation animated:animated completion:^{
         [_activityIndicator stopAnimating];
     }];
-    
+
     [VLOAnalyticsManager reportGAEventWithCategory:VLOCategoryTimeline action:VLOActionWriteCell label:[VLOLog typeStringWithType:VLOLogTypePhoto] andValue:nil];
 }
 
@@ -1427,7 +1388,7 @@ VLOTagEditViewDelegate, VLOFriendsListDelegate>
     [self presentViewController:navigation animated:animated completion:^{
         [self coverClose];
     }];
-    
+
     [VLOAnalyticsManager reportGAEventWithCategory:VLOCategoryTimeline action:VLOActionWriteCell label:[VLOLog typeStringWithType:VLOLogTypeMap] andValue:nil];
 }
 
@@ -1497,7 +1458,7 @@ VLOTagEditViewDelegate, VLOFriendsListDelegate>
     _scrollMovedOffset = 0.0;
     [_timelineNavigationBar hide];
     _isHidden = YES;
-    //    _searchFriendsToolTip.alpha = .0f;
+//    _searchFriendsToolTip.alpha = .0f;
     [self setNeedsStatusBarAppearanceUpdate];
 }
 
@@ -1506,9 +1467,9 @@ VLOTagEditViewDelegate, VLOFriendsListDelegate>
     if (_tableViewController.isOrderChangeMode) {
         return;
     }
-    //    [UIView animateWithDuration:.5f animations:^{
-    //        _searchFriendsToolTip.alpha = 1.0f;
-    //    }];
+//    [UIView animateWithDuration:.5f animations:^{
+//        _searchFriendsToolTip.alpha = 1.0f;
+//    }];
     _scrollMovedOffset = 0.0;
     [_timelineNavigationBar show];
     _isHidden = NO;
@@ -1522,7 +1483,7 @@ VLOTagEditViewDelegate, VLOFriendsListDelegate>
     }
     CGPoint currentOffset = tableView.contentOffset;
     _scrollMovedOffset += currentOffset.y-_lastScrollContentOffset.y;
-    
+
     if (tableView.contentOffset.y >= tableView.contentSize.height - tableView.frame.size.height + tableView.contentInset.top - 100) {
         [self showNavigationBar];
     }
@@ -1672,27 +1633,6 @@ VLOTagEditViewDelegate, VLOFriendsListDelegate>
     [self presentViewController:navigationViewController animated:YES completion:nil];
 }
 
-//add
-/*- (void)presentSummaryView
- {
- _isOpenView = YES;
- VLOShowSummaryViewController * summaryController = [[VLOShowSummaryViewController alloc] init];
- [self showSummary:summaryController.summary_view];
- 
- //  VLONavigationController *navigationViewController = [[VLONavigationController alloc] initWithRootViewController:summaryController];
- //[navigationViewController setNavigationBarHidden:YES animated:NO];
- 
- 
- [self presentViewController:summaryController animated:YES completion:nil];
- [self showNavigationBar];
- 
- 
- //[_summaryView initialize];
- //   [self showSummary:_summaryView.summaryView];
- 
- 
- }*/
-
 
 #pragma mark - Travel list add view controller delegate
 
@@ -1791,16 +1731,26 @@ VLOTagEditViewDelegate, VLOFriendsListDelegate>
     [_travelListViewController travelListSync];
 }
 
-#pragma mark - summary view delegate
--(void)summaryControllerDidClosed:(VLOSummaryViewController *)viewController {
+
+#pragma mark - summary viewcontroller delegate
+
+- (void)scrollToLog:(NSInteger)logIndex {
+    [_summaryViewController dismissViewControllerAnimated:YES completion:nil];
+    
+    VLOLog *log = [_tableViewController.logs objectAtIndex:logIndex];
+    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:[_tableViewController.logs indexOfObject:log] inSection:0];
+    [_tableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionMiddle animated:YES];
+    [self showNavigationBar];
+}
+
+-(void)summaryControllerClosed:(VLOSummaryViewController *)viewController {
     [self autoSync];
     [_travelListViewController travelListSync];
-    
 }
 
--(void)summarySheareDidSelected:(VLOSummaryViewController *)viewController {
-    _isSummary = YES;
+-(void)summaryShareSelected:(VLOSummaryViewController *)viewController {
+    //_isSummary = YES;
     [self showShareActionSheet];
 }
-
+    
 @end

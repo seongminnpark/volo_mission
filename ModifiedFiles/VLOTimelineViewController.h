@@ -13,6 +13,7 @@
 #import <SDWebImage/UIImageView+WebCache.h>
 
 
+
 @class VLOTravelListViewController;
 @class VLOTimelineTableViewController;
 @class VLOTimelineNavigationBar;
@@ -22,8 +23,8 @@
 @class VLOTimelineMenu;
 @class VLOTravel;
 @class VLOTravelListCell;
-@class VLOSummaryView;
 @class VLOSummaryViewController;
+
 
 @interface VLOTimelineViewController : UIViewController
 
@@ -42,7 +43,7 @@
 @property (nonatomic, strong) VLOTravel *shortcutTravel;
 @property (nonatomic, weak) VLOTravel *travel;
 @property (nonatomic, weak) VLOTravelListViewController *travelListViewController;
-
+@property (nonatomic, strong) VLOSummaryViewController *summaryViewController;
 
 - (void)coverOpen;
 - (void)coverClose;
@@ -60,9 +61,6 @@
 - (void)timelineMenuDidSelectTextButtonWithAnimated:(BOOL)animated;
 - (void)timelineMenuDidSelectPhotoButtonWithAnimated:(BOOL)animated;
 - (void)timelineMenuDidSelectLocationButtonWithAnimated:(BOOL)animated;
-
-//add
-- (void)showSummary;
 
 
 @end
