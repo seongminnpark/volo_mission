@@ -10,7 +10,7 @@
 #import "VLOLocalStorage.h"
 #import "VLOPoi.h"
 
-@interface VLOSummaryViewController ()
+@interface VLOSummaryViewController() <VLOSummaryNavigationbarDelegate>
 
 @property (strong, nonatomic) VLOTravel *travel;
 @property (strong, nonatomic) NSArray *logList;
@@ -21,11 +21,13 @@
 
 @property (strong, nonatomic) NSArray *poiIcons;
 @property (strong, nonatomic) NSString *lastCountryCode;
+@property (strong, nonatomic) VLOSummaryNavigationbar *navigationBar;
 
-@property () CGFloat actualWidth;
 @property () CGFloat summaryWidth;
 
+
 @end
+
 
 @implementation VLOSummaryViewController
 
@@ -40,34 +42,81 @@
     
     _poiIcons = [VLOLocalStorage getPoiList];
 
-    _summaryWidth = self.view.bounds.size.width;
-    _actualWidth = _summaryWidth - (SEGMENT_ICON_SIZE * 2);
-    
+    _summaryWidth = [VLOUtilities screenWidth];
+
     [self parseLogList:logList];
     [self setMarkerCoordinates];
-    //[self initializeDrawables];
-    
+ 
     return self;
 }
 
-// 테스트용 버튼.
-- (void) dismiss {
-    [self dismissViewControllerAnimated:YES completion:nil];
+- (void) makeAutoLayoutConstraints
+{
+    
+    [_navigationBar mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.right.and.top.equalTo(@.0f);
+        make.height.equalTo(@([VLOUtilities customizedNavigationBarHeight]));
+    }];
+  
 }
 
-- (void)viewDidAppear {
+- (void) viewDidLoad {
     [super viewDidLoad];
+    
+    _navigationBar = [[VLOSummaryNavigationbar alloc] initSummaryNavigationbar];
+    _navigationBar.delegate = self;
+    
+    [self.view addSubview:_navigationBar];
+    
+    [self makeAutoLayoutConstraints];
+    
+    [self.view setBackgroundColor:[UIColor whiteColor]];
+    
     [self drawSummary];
 }
 
 - (void) drawSummary {
-
-    [[self.view subviews] makeObjectsPerformSelector:@selector(removeFromSuperview)];
+    
+    [UIApplication sharedApplication].statusBarHidden = NO;
+    [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleLightContent;
     
     [self initializeDrawables];
     
     for (UIView *drawable in _drawables) {
         [self.view addSubview:drawable];
+    }
+}
+
+-(void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+}
+
+- (void) initializeBackgroundView {
+    UIImage *backgroundImage = [UIImage imageNamed:@"background-1"];
+    UIImageView *backgroundImageView = [[UIImageView alloc] initWithImage:backgroundImage];
+    backgroundImageView.frame = CGRectMake(0, 0, BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
+    [_drawables addObject:backgroundImageView];
+}
+
+- (void) initializeDrawables {
+    
+    [self initializeBackgroundView];
+    
+    for (VLOSummarySegment *segment in _segments) {
+        [_drawables addObject:[segment getDrawableView]];
+        //        [_drawables addObject:[segment getSegmentView]];
+        //        [_drawables addObject:[segment getSegmentIconView]];
+    }
+    
+    BOOL respondsToScroll = [_delegate respondsToSelector:@selector(scrollToLog:)];
+    
+    for (VLOSummaryMarker *marker in _markers) {
+        UIButton *markerDrawable = [marker getDrawableView];
+        markerDrawable.tag = marker.logIndex;
+        [_drawables addObject:markerDrawable];
+        //if (respondsToScroll) {
+        [markerDrawable addTarget:self action:@selector(didClickMarker:) forControlEvents:UIControlEventTouchUpInside];
+        //}
     }
 }
 
@@ -171,7 +220,6 @@
         [_segments addObject:segment];
         
     }
-    
     return YES;
 }
 
@@ -234,38 +282,6 @@
         if (i > 0) [[_segments objectAtIndex:i-1] updateMarkerPositions];
     }
 }
-
-- (void) initializeBackgroundView {
-    UIImage *backgroundImage = [UIImage imageNamed:@"background-1"];
-    UIImageView *backgroundImageView = [[UIImageView alloc] initWithImage:backgroundImage];
-    backgroundImageView.frame = CGRectMake(0, 0, BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
-    [_drawables addObject:backgroundImageView];
-}
-
-- (void) initializeDrawables {
-    
-    [self initializeBackgroundView];
-    
-    for (VLOSummarySegment *segment in _segments) {
-        [_drawables addObject:[segment getDrawableView]];
-//        [_drawables addObject:[segment getSegmentView]];
-//        [_drawables addObject:[segment getSegmentIconView]];
-    }
-    
-    for (VLOSummaryMarker *marker in _markers) {
-        UIButton *markerDrawable = [marker getDrawableView];
-        markerDrawable.tag = marker.logIndex;
-        [_drawables addObject:markerDrawable];
-        if ([_delegate respondsToSelector:@selector(scrollToLog:)]) {
-            [markerDrawable addTarget:self action:@selector(callScrollToLog:) forControlEvents:UIControlEventTouchUpInside];
-        }
-    }
-}
-
-- (void) callScrollToLog:(id)sender {
-    [_delegate scrollToLog:((UIButton *)sender).tag];
-}
-
 
 - (void) setMarkerImage:(VLOPlace *)currPlace :(VLOPlace *)prevPlace :(NSInteger)markerIndex {
     
@@ -341,5 +357,23 @@
 }
 
 
+- (void) didClickMarker:(id)sender {
+    [_delegate scrollToLog:((UIButton *)sender).tag];
+}
 
+- (void) navigationbarDidSelectBackButton:(VLOSummaryNavigationbar *)bar {
+    if ([_delegate respondsToSelector:@selector(summaryControllerClosed:)]) {
+        [_delegate summaryControllerClosed:self];
+    }
+    [self dismissViewControllerAnimated:YES completion:nil];
+
+}
+    
+- (void) navigationbarDidSelectShareButton:(VLOSummaryNavigationbar *)bar {
+    if([_delegate respondsToSelector:@selector(summaryShareSelected:)]) {
+        [_delegate summaryShareSelected:self];
+    }
+
+}
+    
 @end
