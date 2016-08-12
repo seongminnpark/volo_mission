@@ -10,7 +10,7 @@
 #import "VLOLocalStorage.h"
 #import "VLOPoi.h"
 
-@interface VLOSummaryViewController() <VLOSummaryNavigationbarDelegate>
+@interface VLOSummaryViewController() <VLOSummaryNavigationbarDelegate, UIScrollViewDelegate>
 
 @property (strong, nonatomic) VLOTravel *travel;
 @property (strong, nonatomic) NSArray *logList;
@@ -23,7 +23,7 @@
 @property (strong, nonatomic) NSString *lastCountryCode;
 @property (strong, nonatomic) VLOSummaryNavigationbar *navigationBar;
 
-@property () UIView *summaryView;
+@property () UIScrollView *summaryView;
 
 
 @end
@@ -51,7 +51,8 @@
     _navigationBar = [[VLOSummaryNavigationbar alloc] initSummaryNavigationbar];
     _navigationBar.delegate = self;
     
-    _summaryView  = [[UIView alloc] initWithFrame:CGRectMake(0, 0, [VLOUtilities screenWidth], [VLOUtilities screenHeight])];
+    _summaryView  = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, [VLOUtilities screenWidth], [VLOUtilities screenHeight])];
+    _summaryView.delegate = self;
     
     [self.view addSubview:_navigationBar];
     [self.view addSubview:_summaryView];
@@ -96,6 +97,11 @@
     
     for (UIView *drawable in _drawables) {
         [_summaryView addSubview:drawable];
+
+        if (drawable == [_drawables lastObject]) {
+            CGFloat contentHeight = drawable.frame.origin.y + drawable.frame.size.height + CONTENT_SIZE_PAD;
+            _summaryView.contentSize = CGSizeMake([VLOUtilities screenWidth], contentHeight);
+        }
     }
 }
 
@@ -270,6 +276,7 @@
     return segment;
 }
 
+// 마커의 coordinate은 validity check를 통과한 로그가 몇개인지 안 후에야 정할 수 있다.
 - (void) setMarkerCoordinates {
     
     CGFloat columnWidth = LONG_SEGMENT;
@@ -403,6 +410,17 @@
         [_delegate summaryShareSelected:self];
     }
 
+}
+
+
+# pragma mark - UIScrollView delegate
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
+    if (scrollView.contentOffset.y < 0) {
+        [scrollView setScrollEnabled:NO];
+        [scrollView setContentOffset:CGPointMake(0, 0) animated:NO];
+        [scrollView setScrollEnabled:YES];
+    }
 }
     
 @end

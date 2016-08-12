@@ -11,6 +11,7 @@
 #import "VLOLog.h"
 #import "VLOPlace.h"
 #import "VLOUtilities.h"
+#import "UIColor+VLOExtension.h"
 
 #define MARKER_SIZE          5.0 * [VLOUtilities screenRatioWith6]
 #define MARKER_IMAGE_SIZE   20.0 * [VLOUtilities screenRatioWith6]
@@ -18,7 +19,7 @@
 #define MARKER_FLAG_SIZE    18.0 * [VLOUtilities screenRatioWith6]
 
 #define MARKER_ICON_WIDTH   60.0 * [VLOUtilities screenRatioWith6]
-#define MARKER_ICON_HEIGHT  70.0 * [VLOUtilities screenRatioWith6]
+#define MARKER_ICON_HEIGHT  67.0 * [VLOUtilities screenRatioWith6]
 
 #define MARKER_LABEL_HEIGHT 10.0 * [VLOUtilities screenRatioWith6]
 
@@ -42,6 +43,8 @@
 #define TITLE_HEIGHT        30.0 * [VLOUtilities screenRatioWith6]
 
 #define PROXIMITY_RADIUS     0.1
+
+#define CONTENT_SIZE_PAD   100.0 * [VLOUtilities screenRatioWith6]
 
 #define VOLO_COLOR          [UIColor colorWithRed:200/255.0 green:240/255.0 blue:235/255.0 alpha:1]
 #define LINE_COLOR          [UIColor colorWithRed:211/255.0 green:213/255.0 blue:212/255.0 alpha:1]
