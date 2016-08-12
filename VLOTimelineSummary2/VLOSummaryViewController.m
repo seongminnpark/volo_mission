@@ -143,13 +143,14 @@
         UIButton *markerDrawable = [marker getDrawableView];
         markerDrawable.tag = marker.logIndex;
         [_drawables addObject:markerDrawable];
+        
         if (respondsToScroll) {
 
-        [markerDrawable addTarget:self action:@selector(didClickMarker:) forControlEvents:UIControlEventTouchUpInside];
-        [markerDrawable addTarget:self action:@selector(willClickMarker:) forControlEvents:UIControlEventTouchDown];
-    }
+            [markerDrawable addTarget:self action:@selector(didClickMarker:) forControlEvents:UIControlEventTouchUpInside];
+            [markerDrawable addTarget:self action:@selector(willClickMarker:) forControlEvents:UIControlEventTouchDown];
+        }
         
-//  레이어 별로 그리고 싶을 때:
+//  레이어 별로 그리고 싶을 때: (현재 구조엔 레이어별로 그리는 메리트가 없음 + for loop 더 많이 돌려야 함 + 새로운 UI버튼으로 묶어야 함.)
 //        UIView *markerDrawable = [marker getMarkerView];
 //        UIView *markerIconDrawable = [marker getMarkerIconView];
 //        UIView *markerLabelDrawable = [marker getMarkerLabel];
