@@ -130,9 +130,11 @@
     [self initializeTitleView];
     
     for (VLOSummarySegment *segment in _segments) {
-        //[_drawables addObject:[segment getDrawableView]];
-        [_drawables addObject:[segment getSegmentView]];
-        [_drawables addObject:[segment getSegmentIconView]];
+        [_drawables addObject:[segment getDrawableView]];
+        
+        //  레이어 별로 그리고 싶을 때:
+        //[_drawables addObject:[segment getSegmentView]];
+        //[_drawables addObject:[segment getSegmentIconView]];
     }
     
     BOOL respondsToScroll = [_delegate respondsToSelector:@selector(scrollToLog:)];
@@ -141,11 +143,20 @@
         UIButton *markerDrawable = [marker getDrawableView];
         markerDrawable.tag = marker.logIndex;
         [_drawables addObject:markerDrawable];
-        //if (respondsToScroll) {
+        if (respondsToScroll) {
 
         [markerDrawable addTarget:self action:@selector(didClickMarker:) forControlEvents:UIControlEventTouchUpInside];
         [markerDrawable addTarget:self action:@selector(willClickMarker:) forControlEvents:UIControlEventTouchDown];
-        //}
+    }
+        
+//  레이어 별로 그리고 싶을 때:
+//        UIView *markerDrawable = [marker getMarkerView];
+//        UIView *markerIconDrawable = [marker getMarkerIconView];
+//        UIView *markerLabelDrawable = [marker getMarkerLabel];
+//        
+//        [_drawables addObject:markerIconDrawable];
+//        [_drawables addObject:markerLabelDrawable];
+//        [_drawables addObject:markerDrawable];
     }
 }
 
