@@ -64,7 +64,12 @@
 - (id) initWithLog:(VLOLog *)log andPlace:(VLOPlace *)place;
 - (void) setMarkerImage:(NSString *)markerImageName isDay:(BOOL)isDay isFlag:(BOOL)isFlag;
 - (void) setMarkerIconImage:(NSString *)iconImageName;
+
 - (UIButton *) getDrawableView;
+- (UIView *) getMarkerView;
+- (UIView *) getMarkerIconView;
+- (UIView *) getMarkerLabel;
+
 - (VLOPlace *) getPlace;
 
 @end

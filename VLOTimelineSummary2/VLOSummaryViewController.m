@@ -130,9 +130,16 @@
     [self initializeTitleView];
     
     for (VLOSummarySegment *segment in _segments) {
-        //[_drawables addObject:[segment getDrawableView]];
+        [_drawables addObject:[segment getDrawableView]];
+        
+        /*
+         
+         레이어별로 그리고 싶을 때.
+
         [_drawables addObject:[segment getSegmentView]];
         [_drawables addObject:[segment getSegmentIconView]];
+         
+        */
     }
     
     BOOL respondsToScroll = [_delegate respondsToSelector:@selector(scrollToLog:)];
@@ -141,11 +148,29 @@
         UIButton *markerDrawable = [marker getDrawableView];
         markerDrawable.tag = marker.logIndex;
         [_drawables addObject:markerDrawable];
-        //if (respondsToScroll) {
+        
+        if (respondsToScroll) {
 
-        [markerDrawable addTarget:self action:@selector(didClickMarker:) forControlEvents:UIControlEventTouchUpInside];
-        [markerDrawable addTarget:self action:@selector(willClickMarker:) forControlEvents:UIControlEventTouchDown];
-        //}
+            [markerDrawable addTarget:self action:@selector(didClickMarker:) forControlEvents:UIControlEventTouchUpInside];
+            [markerDrawable addTarget:self action:@selector(willClickMarker:) forControlEvents:UIControlEventTouchDown];
+        }
+        
+        /*
+         
+        레이어별로 그리고 싶을 때.
+         
+        (현재 구조에선 교통수단 아이콘과 마커가 겹치지 않아서, 마커가 마커 아이콘 위에 오기만 하면 레이어별로 그리는 메리트가 없음
+         + 레이어별로 그리면 for loop 더 많이 돌려야 함 + 마커와 관련된 요소만 새로운 UI버튼으로 묶어야 함.)
+
+        UIView *markerDrawable = [marker getMarkerView];
+        UIView *markerIconDrawable = [marker getMarkerIconView];
+        UIView *markerLabelDrawable = [marker getMarkerLabel];
+        
+        [_drawables addObject:markerIconDrawable];
+        [_drawables addObject:markerLabelDrawable];
+        [_drawables addObject:markerDrawable];
+         
+        */
     }
 }
 

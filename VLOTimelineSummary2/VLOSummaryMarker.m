@@ -58,13 +58,17 @@
     _iconImageName = iconImageName;
 }
 
-- (UIView *) getDrawableView {
-    
+- (void) calculateReferenceFrame {
     // 모든 컴포넌트에 공유되는 Frame 변수들.
     _drawableLeft   = _x - MARKER_ICON_WIDTH/2.0;
     _drawableTop    = _y + SEGMENT_OFFSET - MARKER_ICON_HEIGHT;
     _drawableWidth  = MARKER_ICON_WIDTH;
     _drawableHeight = MARKER_ICON_HEIGHT + MARKER_LABEL_HEIGHT;
+}
+
+- (UIView *) getDrawableView {
+    
+    [self calculateReferenceFrame];
 
     // 마커와 마커 장식 묶음이 담길 뷰 생성.
     UIButton *drawableView = [[UIButton alloc] initWithFrame:CGRectMake(_drawableLeft, _drawableTop, _drawableWidth, _drawableHeight)];
@@ -75,7 +79,7 @@
     
     // 마커 아이콘.
     if (_hasMarkerIcon) {
-        [self initializeMarkericonView];
+        [self initializeMarkerIconView];
         [drawableView addSubview:_markerIconView];
     }
     
@@ -88,6 +92,45 @@
     }
 
     return drawableView;
+}
+
+- (UIView *) getMarkerView {
+    [self calculateReferenceFrame];
+    [self initializeMarkerView];
+    
+    CGFloat left = _markerView.frame.origin.x + _drawableLeft;
+    CGFloat top = _markerView.frame.origin.y + _drawableTop;
+    CGFloat width = _markerView.frame.size.width;
+    CGFloat height = _markerView.frame.size.height;
+    _markerView.frame = CGRectMake(left, top, width, height);
+    
+    return _markerView;
+}
+
+- (UIView *) getMarkerIconView {
+    [self calculateReferenceFrame];
+    [self initializeMarkerIconView];
+    
+    CGFloat left = _markerIconView.frame.origin.x + _drawableLeft;
+    CGFloat top = _markerIconView.frame.origin.y + _drawableTop;
+    CGFloat width = _markerIconView.frame.size.width;
+    CGFloat height = _markerIconView.frame.size.height;
+    _markerIconView.frame = CGRectMake(left, top, width, height);
+    
+    return _markerIconView;
+}
+
+- (UIView *) getMarkerLabel {
+    [self calculateReferenceFrame];
+    [self initializeMarkerLabel];
+    
+    CGFloat left = _markerLabel.frame.origin.x + _drawableLeft;
+    CGFloat top = _markerLabel.frame.origin.y + _drawableTop;
+    CGFloat width = _markerLabel.frame.size.width;
+    CGFloat height = _markerLabel.frame.size.height;
+    _markerLabel.frame = CGRectMake(left, top, width, height);
+    
+    return _markerLabel;
 }
 
 - (void) initializeMarkerView {
@@ -165,7 +208,7 @@
     }
 }
 
-- (void) initializeMarkericonView {
+- (void) initializeMarkerIconView {
 
     CGFloat imageViewLeft, imageViewTop;
     
@@ -197,7 +240,5 @@
 - (VLOPlace *) getPlace {
     return _place;
 }
-
-
 
 @end
