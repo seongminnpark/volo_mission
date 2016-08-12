@@ -20,7 +20,6 @@
 #import "VLOCountry.h"
 #import "VLOLocationCoordinate.h"
 #import "VLOUtilities.h"
-#import "VLOSummaryNavigationbar.h"
 #import "VLOActivityIndicator.h"
 
 @class VLOSummaryViewController;
