@@ -11,7 +11,7 @@
 #import "VLOLocalStorage.h"
 #import "VLOPoi.h"
 
-@interface VLOSummaryViewController()
+@interface VLOSummaryViewController() <UIScrollViewDelegate>
 
 @property (strong, nonatomic) VLOTravel *travel;
 @property (strong, nonatomic) NSArray *logList;
@@ -52,7 +52,9 @@
     _navigationBar = [[VLOTimelineNavigationBar alloc] initWithIsViewMode:YES isFromUserHome:NO];
     [_navigationBar.backButton addTarget:self action:@selector(navigationbarDidSelectBackButton:) forControlEvents:UIControlEventTouchUpInside];
     [_navigationBar.shareButton addTarget:self action:@selector(navigationbarDidSelectShareButton:) forControlEvents:UIControlEventTouchUpInside];
+    
     _summaryView  = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, [VLOUtilities screenWidth], [VLOUtilities screenHeight])];
+    _summaryView.delegate = self;
 
     [self.view addSubview:_navigationBar];
     [self.view addSubview:_summaryView];
@@ -398,7 +400,6 @@
     }
     
     if (newCity && hasIcon) [currMarker setMarkerIconImage:markerIconImage];
-    //if (newCity && hasIcon) [currMarker setMarkerIconImage:@"icon_marker_seoul-1.white-stuffed"];
 }
 
 // 현재 정해진 도시 좌표에서 반경으로 테스트함. 추후에 폴리곤 로직 추가 해야함.
