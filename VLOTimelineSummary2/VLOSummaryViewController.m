@@ -422,6 +422,9 @@
     //((UIButton *)sender) ;
 }
 
+
+#pragma mark - Navigationbar buttons
+
 - (void) navigationbarDidSelectBackButton:(UIView *)bar {
     if ([_delegate respondsToSelector:@selector(summaryControllerClosed:)]) {
         [_delegate summaryControllerClosed:self];
