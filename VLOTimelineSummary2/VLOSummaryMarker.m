@@ -137,7 +137,21 @@
     
     CGFloat markerTop, markerLeft, markerWidth, markerImageWidth, markerImageHeight;
     
-    if (_markerUsesCustomImage) {
+    
+    if (_markerImageIsDay) {
+        
+        // "몇 일차" 레이블
+        UILabel *dayLabel = [[UILabel alloc] initWithFrame:_markerIconView.frame];
+        dayLabel.text = [NSString stringWithFormat:@"%@일차", _day];
+        dayLabel.textColor = [UIColor whiteColor];
+        dayLabel.textAlignment = NSTextAlignmentCenter;
+        // 0.8은 글씨가 레이블 속에 꽉 차지 않도록 임의로 정한 숫자입니다.
+        [dayLabel setFont:[UIFont systemFontOfSize:MARKER_LABEL_HEIGHT*0.8]];
+        
+        [_markerView addSubview: dayLabel];
+        
+        
+    } else if (_markerUsesCustomImage) {
         
         markerLeft  = _markerImageIsDay? _drawableWidth/2.0 - MARKER_DAY_WIDTH/2.0 : _drawableWidth/2.0 - MARKER_IMAGE_SIZE/2.0;
         markerTop   = _drawableHeight - MARKER_LABEL_HEIGHT - MARKER_IMAGE_SIZE;
@@ -157,19 +171,7 @@
         
         [_markerView addSubview:markerImageView];
         
-        if (_markerImageIsDay) {
-            
-            // "몇 일차" 레이블
-            UILabel *dayLabel = [[UILabel alloc] initWithFrame:markerImageView.frame];
-            dayLabel.text = [NSString stringWithFormat:@"%@일차", _day];
-            dayLabel.textColor = [UIColor whiteColor];
-            dayLabel.textAlignment = NSTextAlignmentCenter;
-            // 0.8은 글씨가 레이블 속에 꽉 차지 않도록 임의로 정한 숫자입니다.
-            [dayLabel setFont:[UIFont systemFontOfSize:MARKER_LABEL_HEIGHT*0.8]];
-            
-            [_markerView addSubview: dayLabel];
-            
-        } else if (_markerImageIsFlag) {
+        if (_markerImageIsFlag) {
             
             // 마커 테두리.
             UIBezierPath *rimPath = [UIBezierPath bezierPathWithOvalInRect:
@@ -177,7 +179,7 @@
             CAShapeLayer *rimLayer = [CAShapeLayer layer];
             [rimLayer setFillColor:[UIColor clearColor].CGColor];
             [rimLayer setPath:rimPath.CGPath];
-            [rimLayer setLineWidth:1]; // PL님이 1포인트로 하자고 하셨습니다.
+            [rimLayer setLineWidth:1.5]; // PL님이 1포인트로 하자고 하셨습니다.
             [rimLayer setStrokeColor:[UIColor blackColor].CGColor];
             [_markerView.layer addSublayer:rimLayer];
         }
