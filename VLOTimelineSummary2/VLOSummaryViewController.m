@@ -6,11 +6,12 @@
 //  Copyright © 2016 SK Planet. All rights reserved.
 //
 
+#import "VLOTimelineNavigationBar.h"
 #import "VLOSummaryViewController.h"
 #import "VLOLocalStorage.h"
 #import "VLOPoi.h"
 
-@interface VLOSummaryViewController() <VLOSummaryNavigationbarDelegate, UIScrollViewDelegate>
+@interface VLOSummaryViewController()
 
 @property (strong, nonatomic) VLOTravel *travel;
 @property (strong, nonatomic) NSArray *logList;
@@ -21,7 +22,7 @@
 
 @property (strong, nonatomic) NSArray *poiIcons;
 @property (strong, nonatomic) NSString *lastCountryCode;
-@property (strong, nonatomic) VLOSummaryNavigationbar *navigationBar;
+@property (strong, nonatomic) VLOTimelineNavigationBar *navigationBar;
 
 @property () UIScrollView *summaryView;
 
@@ -48,19 +49,17 @@
 - (void) viewDidLoad {
     [super viewDidLoad];
     
-    _navigationBar = [[VLOSummaryNavigationbar alloc] initSummaryNavigationbar];
-    _navigationBar.delegate = self;
-    
+    _navigationBar = [[VLOTimelineNavigationBar alloc] initWithIsViewMode:YES isFromUserHome:NO];
+    [_navigationBar.backButton addTarget:self action:@selector(navigationbarDidSelectBackButton:) forControlEvents:UIControlEventTouchUpInside];
+    [_navigationBar.shareButton addTarget:self action:@selector(navigationbarDidSelectShareButton:) forControlEvents:UIControlEventTouchUpInside];
     _summaryView  = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, [VLOUtilities screenWidth], [VLOUtilities screenHeight])];
-    _summaryView.delegate = self;
-    
+
     [self.view addSubview:_navigationBar];
     [self.view addSubview:_summaryView];
-    
     [self makeAutoLayoutConstraints];
-    
+    [_navigationBar show];
+
     [self drawSummary];
-    
     [self.view setBackgroundColor:[UIColor whiteColor]];
 }
 
@@ -88,7 +87,7 @@
 - (void) drawSummary {
     
     [UIApplication sharedApplication].statusBarHidden = NO;
-    [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleLightContent;
+    [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleDefault;
     
     [self parseLogList:_logList];
     [self setMarkerCoordinates];
@@ -422,7 +421,7 @@
     //((UIButton *)sender) ;
 }
 
-- (void) navigationbarDidSelectBackButton:(VLOSummaryNavigationbar *)bar {
+- (void) navigationbarDidSelectBackButton:(UIView *)bar {
     if ([_delegate respondsToSelector:@selector(summaryControllerClosed:)]) {
         [_delegate summaryControllerClosed:self];
     }
@@ -430,7 +429,7 @@
 
 }
     
-- (void) navigationbarDidSelectShareButton:(VLOSummaryNavigationbar *)bar {
+- (void) navigationbarDidSelectShareButton:(UIView *)bar {
     if([_delegate respondsToSelector:@selector(summaryShareSelected:)]) {
         [_delegate summaryShareSelected:self];
     }
