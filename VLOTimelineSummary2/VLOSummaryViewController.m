@@ -23,7 +23,7 @@
 @property (strong, nonatomic) NSString *lastCountryCode;
 @property (strong, nonatomic) VLOSummaryNavigationbar *navigationBar;
 
-@property () CGFloat summaryWidth;
+@property () UIView *summaryView;
 
 
 @end
@@ -41,23 +41,8 @@
     _drawables = [NSMutableArray array]; // 이미지 리소스 캐싱.
     
     _poiIcons = [VLOLocalStorage getPoiList];
-
-    _summaryWidth = [VLOUtilities screenWidth];
-
-    [self parseLogList:logList];
-    [self setMarkerCoordinates];
  
     return self;
-}
-
-- (void) makeAutoLayoutConstraints
-{
-    
-    [_navigationBar mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.left.right.and.top.equalTo(@.0f);
-        make.height.equalTo(@([VLOUtilities customizedNavigationBarHeight]));
-    }];
-  
 }
 
 - (void) viewDidLoad {
@@ -66,46 +51,82 @@
     _navigationBar = [[VLOSummaryNavigationbar alloc] initSummaryNavigationbar];
     _navigationBar.delegate = self;
     
+    _summaryView  = [[UIView alloc] initWithFrame:CGRectMake(0, 0, [VLOUtilities screenWidth], [VLOUtilities screenHeight])];
+    
     [self.view addSubview:_navigationBar];
+    [self.view addSubview:_summaryView];
     
     [self makeAutoLayoutConstraints];
     
-    [self.view setBackgroundColor:[UIColor whiteColor]];
-    
     [self drawSummary];
+    
+    [self.view setBackgroundColor:[UIColor whiteColor]];
 }
 
+- (void) makeAutoLayoutConstraints
+{
+    
+    [_navigationBar mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.right.and.top.equalTo(@0.0f);
+        make.height.equalTo(@([VLOUtilities customizedNavigationBarHeight]));
+    }];
+    
+    [_summaryView mas_makeConstraints:^(MASConstraintMaker *make) {
+        CGFloat width  = [VLOUtilities screenWidth];
+        CGFloat height = [VLOUtilities screenHeight];
+        
+        make.left.equalTo(@(0.0f));
+        make.top.equalTo(_navigationBar.mas_bottom);
+        make.width.equalTo(@(width));
+        make.height.equalTo(@(height));
+    }];
+    
+}
+
+// 필요시 이 함수만 부를 수 있도록 분리함.
 - (void) drawSummary {
     
     [UIApplication sharedApplication].statusBarHidden = NO;
     [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleLightContent;
     
+    [self parseLogList:_logList];
+    [self setMarkerCoordinates];
+    
     [self initializeDrawables];
     
     for (UIView *drawable in _drawables) {
-        [self.view addSubview:drawable];
+        [_summaryView addSubview:drawable];
     }
 }
 
--(void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
-}
-
 - (void) initializeBackgroundView {
-    UIImage *backgroundImage = [UIImage imageNamed:@"background-1"];
+    UIImage *backgroundImage = [UIImage imageNamed:@"background"];
     UIImageView *backgroundImageView = [[UIImageView alloc] initWithImage:backgroundImage];
     backgroundImageView.frame = CGRectMake(0, 0, BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
     [_drawables addObject:backgroundImageView];
 }
 
+- (void) initializeTitleView {
+    CGFloat titleWidth = _summaryView.frame.size.width;
+    CGFloat titleTop  = BACKGROUND_HEIGHT/2.0 - TITLE_HEIGHT;
+    UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, titleTop, titleWidth, TITLE_HEIGHT)];
+    titleLabel.text = _travel.title;
+    titleLabel.textAlignment = NSTextAlignmentCenter;
+    titleLabel.textColor = [UIColor whiteColor];
+    [titleLabel setFont:[UIFont systemFontOfSize:TITLE_HEIGHT]];
+    
+    [_drawables addObject:titleLabel];
+}
+
 - (void) initializeDrawables {
     
     [self initializeBackgroundView];
+    [self initializeTitleView];
     
     for (VLOSummarySegment *segment in _segments) {
-        [_drawables addObject:[segment getDrawableView]];
-        //        [_drawables addObject:[segment getSegmentView]];
-        //        [_drawables addObject:[segment getSegmentIconView]];
+        //[_drawables addObject:[segment getDrawableView]];
+        [_drawables addObject:[segment getSegmentView]];
+        [_drawables addObject:[segment getSegmentIconView]];
     }
     
     BOOL respondsToScroll = [_delegate respondsToSelector:@selector(scrollToLog:)];
@@ -115,7 +136,9 @@
         markerDrawable.tag = marker.logIndex;
         [_drawables addObject:markerDrawable];
         //if (respondsToScroll) {
+
         [markerDrawable addTarget:self action:@selector(didClickMarker:) forControlEvents:UIControlEventTouchUpInside];
+        [markerDrawable addTarget:self action:@selector(willClickMarker:) forControlEvents:UIControlEventTouchDown];
         //}
     }
 }
@@ -253,10 +276,11 @@
     CGFloat rowChangeXdiff = MIDDLE_SEGMENT - SHORT_SEGMENT;
     CGFloat firstMarkerY = BACKGROUND_HEIGHT;
     CGFloat firstMarkerX;
+    CGFloat summaryWidth = _summaryView.frame.size.width;
     
     switch (_markers.count) {
-        case (1): firstMarkerX = _summaryWidth / 2.0;                     break;
-        case (2): firstMarkerX = _summaryWidth / 2.0 - columnWidth / 2.0; break;
+        case (1): firstMarkerX = summaryWidth / 2.0;                     break;
+        case (2): firstMarkerX = summaryWidth / 2.0 - columnWidth / 2.0; break;
         default : firstMarkerX = CURVE_WIDTH + SHORT_SEGMENT + 5;         break;
     }
     
@@ -360,6 +384,10 @@
 
 - (void) didClickMarker:(id)sender {
     [_delegate scrollToLog:((UIButton *)sender).tag];
+}
+
+- (void) willClickMarker:(id)sender {
+    //((UIButton *)sender) ;
 }
 
 - (void) navigationbarDidSelectBackButton:(VLOSummaryNavigationbar *)bar {

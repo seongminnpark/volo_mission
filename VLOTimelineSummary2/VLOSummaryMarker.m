@@ -91,8 +91,6 @@
 }
 
 - (void) initializeMarkerView {
-    //if (_markerView) return;
-    
     
     CGFloat markerTop, markerLeft, markerWidth, markerImageWidth, markerImageHeight;
     
@@ -103,6 +101,7 @@
         markerWidth = _markerImageIsDay? MARKER_DAY_WIDTH : MARKER_IMAGE_SIZE;
         
         _markerView = [[UIView alloc] initWithFrame:CGRectMake(markerLeft, markerTop, markerWidth, MARKER_IMAGE_SIZE)];
+        _markerView.userInteractionEnabled = NO;
         
         // 마커 그림
         markerImageWidth = _markerImageIsDay? MARKER_DAY_WIDTH : _markerImageIsFlag?  MARKER_FLAG_SIZE : MARKER_IMAGE_SIZE;
@@ -166,8 +165,7 @@
 }
 
 - (void) initializeMarkericonView {
-    //if (_markerIconView) return;
-        
+
     CGFloat imageViewLeft, imageViewTop;
     
     UIImage *iconImage = [UIImage imageNamed:_iconImageName];
@@ -179,6 +177,7 @@
     iconImageView.frame = CGRectMake(imageViewLeft, imageViewTop, MARKER_ICON_WIDTH, MARKER_ICON_HEIGHT);
 
     _markerIconView = iconImageView;
+    _markerIconView.userInteractionEnabled = NO;
 }
 
 - (void) initializeMarkerLabel {
