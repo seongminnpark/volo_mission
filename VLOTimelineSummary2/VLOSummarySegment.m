@@ -131,7 +131,6 @@
 }
 
 - (void) initializeSegmentView {
-    //if (_segmentView) return;
     
     CGFloat curveRadius = fabs(_toMarker.y - _fromMarker.y) / 2.0;
     CGFloat segmentLeft   = 0;
@@ -187,7 +186,7 @@
             _segmentView.frame = CGRectMake(segmentLeft, segmentTop, segmentWidth, segmentHeight);
         }
     
-    } else { // 디폴트 세그먼트 그릴 때.
+    } else { // 삽입된 이미지 없이 직접 디폴트 세그먼트 그릴 때.
         
         _segmentView = [[UIView alloc] initWithFrame:CGRectMake(segmentLeft, segmentTop, segmentWidth, segmentHeight)];
         UIBezierPath *segmentPath = [UIBezierPath bezierPath];
@@ -218,7 +217,6 @@
 }
 
 - (void) initializeSegmentIconView {
-    //if (_segmentIconView) return;
     
     // Segment Icon의 frame을 구하는 로직.
     CGFloat iconLeft;

@@ -73,7 +73,7 @@
     [self initializeMarkerLabel];
     [drawableView addSubview:_markerLabel];
     
-    // 마커 그림.
+    // 마커 아이콘.
     if (_hasMarkerIcon) {
         [self initializeMarkericonView];
         [drawableView addSubview:_markerIconView];
@@ -121,6 +121,7 @@
             dayLabel.text = [NSString stringWithFormat:@"%@일차", _day];
             dayLabel.textColor = [UIColor whiteColor];
             dayLabel.textAlignment = NSTextAlignmentCenter;
+            // 0.8은 글씨가 레이블 속에 꽉 차지 않도록 임의로 정한 숫자입니다.
             [dayLabel setFont:[UIFont systemFontOfSize:MARKER_LABEL_HEIGHT*0.8]];
             
             [_markerView addSubview: dayLabel];
@@ -133,7 +134,7 @@
             CAShapeLayer *rimLayer = [CAShapeLayer layer];
             [rimLayer setFillColor:[UIColor clearColor].CGColor];
             [rimLayer setPath:rimPath.CGPath];
-            [rimLayer setLineWidth:2];
+            [rimLayer setLineWidth:1]; // PL님이 1포인트로 하자고 하셨습니다.
             [rimLayer setStrokeColor:[UIColor blackColor].CGColor];
             [_markerView.layer addSublayer:rimLayer];
         }
@@ -181,12 +182,15 @@
 }
 
 - (void) initializeMarkerLabel {
-    if (_markerLabel) return;
-    _markerLabel = [[UILabel alloc] initWithFrame:
-                    CGRectMake(-_drawableWidth/2.0, _drawableHeight - MARKER_LABEL_HEIGHT, _drawableWidth*2, MARKER_LABEL_HEIGHT)];
+  
+    CGFloat labelWidth = _drawableWidth * 1.5; // 1.5는 옆 마커를 침범하지 않는 적당한 수치 같아 임의로 정한 숫자입니다.
+    CGFloat labelLeft  = _drawableWidth/2.0 - labelWidth/2.0;
+    CGFloat labelTop   = _drawableHeight - MARKER_LABEL_HEIGHT + 2; // PL님이 레이블 2포인트 내리자고 하셨습니다.
+    
+    _markerLabel = [[UILabel alloc] initWithFrame: CGRectMake(labelLeft, labelTop, labelWidth, MARKER_LABEL_HEIGHT)];
     _markerLabel.text = _place.name;
     _markerLabel.textAlignment = NSTextAlignmentCenter;
-    _markerLabel.textColor = [UIColor grayColor];
+    _markerLabel.textColor = [UIColor vlo_darkGrayColor];
     [_markerLabel setFont:[UIFont systemFontOfSize:MARKER_LABEL_HEIGHT]];
 }
 
