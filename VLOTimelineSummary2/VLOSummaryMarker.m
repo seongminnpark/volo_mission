@@ -91,8 +91,6 @@
 }
 
 - (void) initializeMarkerView {
-    //if (_markerView) return;
-    
     
     CGFloat markerTop, markerLeft, markerWidth, markerImageWidth, markerImageHeight;
     
@@ -167,8 +165,7 @@
 }
 
 - (void) initializeMarkericonView {
-    //if (_markerIconView) return;
-        
+
     CGFloat imageViewLeft, imageViewTop;
     
     UIImage *iconImage = [UIImage imageNamed:_iconImageName];

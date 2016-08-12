@@ -76,7 +76,7 @@
     _iconImageName = iconImageName;
 }
 
-- (UIView *) getDrawableView {
+- (void) calculateReferenceFrame {
     
     CGFloat curveRadius = fabs(_toMarker.y - _fromMarker.y)/2.0;
     
@@ -85,6 +85,38 @@
     _drawableTop    = _curved? _fromMarker.y - curveRadius: _fromMarker.y - SEGMENT_HEIGHT + SEGMENT_OFFSET;
     _drawableWidth  = _curved? CURVE_WIDTH + MIDDLE_SEGMENT : LONG_SEGMENT;
     _drawableHeight = _curved? LINE_GAP + SEGMENT_HEIGHT : SEGMENT_HEIGHT;
+}
+
+- (UIView *) getSegmentView {
+    
+    [self calculateReferenceFrame];
+    [self initializeSegmentView];
+    
+    CGFloat left = _segmentView.frame.origin.x + _drawableLeft;
+    CGFloat top = _segmentView.frame.origin.y + _drawableTop;
+    CGFloat width = _segmentView.frame.size.width;
+    CGFloat height = _segmentView.frame.size.height;
+    _segmentView.frame = CGRectMake(left, top, width, height);
+    
+    return _segmentView;
+}
+
+- (UIView *) getSegmentIconView {
+    [self calculateReferenceFrame];
+    [self initializeSegmentIconView];
+    
+    CGFloat left = _segmentIconView.frame.origin.x + _drawableLeft;
+    CGFloat top = _segmentIconView.frame.origin.y + _drawableTop;
+    CGFloat width = _segmentIconView.frame.size.width;
+    CGFloat height = _segmentIconView.frame.size.height;
+    _segmentIconView.frame = CGRectMake(left, top, width, height);
+    
+    return _segmentIconView;
+}
+
+- (UIView *) getDrawableView {
+    
+    [self calculateReferenceFrame];
     
     // 선과 선 장식 생성.
     [self initializeSegmentView];
@@ -212,21 +244,6 @@
     _segmentIconView.frame = CGRectMake(iconLeft, iconTop, SEGMENT_ICON_SIZE, SEGMENT_ICON_SIZE);
     
     [_segmentIconView setBackgroundColor:[UIColor clearColor]];
-}
-
-- (UIView *) getSegmentView {
-    [self initializeSegmentView];
-    CGFloat left = _segmentIconView.frame.origin.x + _drawableLeft;
-    CGFloat top = _segmentIconView.frame.origin.y + _drawableTop;
-    CGFloat width = _segmentIconView.frame.size.width;
-    CGFloat height = _segmentIconView.frame.size.height;
-    _segmentIconView.frame = CGRectMake(left, top, width, height);
-    return _segmentView;
-}
-
-- (UIView *) getSegmentIconView {
-    [self initializeSegmentIconView];
-    return _segmentIconView;
 }
 
 @end

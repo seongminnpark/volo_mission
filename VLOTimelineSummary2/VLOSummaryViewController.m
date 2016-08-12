@@ -124,9 +124,9 @@
     [self initializeTitleView];
     
     for (VLOSummarySegment *segment in _segments) {
-        [_drawables addObject:[segment getDrawableView]];
-        //        [_drawables addObject:[segment getSegmentView]];
-        //        [_drawables addObject:[segment getSegmentIconView]];
+        //[_drawables addObject:[segment getDrawableView]];
+        [_drawables addObject:[segment getSegmentView]];
+        [_drawables addObject:[segment getSegmentIconView]];
     }
     
     BOOL respondsToScroll = [_delegate respondsToSelector:@selector(scrollToLog:)];
