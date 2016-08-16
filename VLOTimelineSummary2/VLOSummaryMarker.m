@@ -140,28 +140,45 @@
     
     if (_markerImageIsDay) {
         
+        NSString *dayText = [NSString stringWithFormat:@"%@일차", _day];
+        UIFont *font = [UIFont systemFontOfSize:MARKER_LABEL_HEIGHT*0.8];
+        
+        CGSize dayTextSize = [dayText sizeWithAttributes:@{ NSFontAttributeName : font }];
+        
+        CGFloat dayLabelWidth = dayTextSize.width + DAY_LABEL_PADDING*2;
+        
+        markerLeft  = _drawableWidth/2.0 - dayLabelWidth/2.0;
+        markerTop   = _drawableHeight - MARKER_LABEL_HEIGHT - MARKER_IMAGE_SIZE;
+        markerWidth = dayLabelWidth;
+        
+        // 레이블이 담길 검정색 상자
+        _markerView = [[UIView alloc] initWithFrame:CGRectMake(markerLeft, markerTop, markerWidth, MARKER_LABEL_HEIGHT)];
+        _markerView.layer.backgroundColor = [UIColor blackColor].CGColor;
+        _markerView.layer.cornerRadius = 3.0;
+        
         // "몇 일차" 레이블
-        UILabel *dayLabel = [[UILabel alloc] initWithFrame:_markerIconView.frame];
-        dayLabel.text = [NSString stringWithFormat:@"%@일차", _day];
+        UILabel *dayLabel = [[UILabel alloc] initWithFrame:
+                             CGRectMake(0, 0, _markerView.frame.size.width, _markerView.frame.size.height)];
+        dayLabel.text = dayText;
         dayLabel.textColor = [UIColor whiteColor];
         dayLabel.textAlignment = NSTextAlignmentCenter;
         // 0.8은 글씨가 레이블 속에 꽉 차지 않도록 임의로 정한 숫자입니다.
-        [dayLabel setFont:[UIFont systemFontOfSize:MARKER_LABEL_HEIGHT*0.8]];
+        [dayLabel setFont:font];
         
         [_markerView addSubview: dayLabel];
         
         
     } else if (_markerUsesCustomImage) {
         
-        markerLeft  = _markerImageIsDay? _drawableWidth/2.0 - MARKER_DAY_WIDTH/2.0 : _drawableWidth/2.0 - MARKER_IMAGE_SIZE/2.0;
+        markerLeft  = _drawableWidth/2.0 - MARKER_IMAGE_SIZE/2.0;
         markerTop   = _drawableHeight - MARKER_LABEL_HEIGHT - MARKER_IMAGE_SIZE;
-        markerWidth = _markerImageIsDay? MARKER_DAY_WIDTH : MARKER_IMAGE_SIZE;
+        markerWidth = MARKER_IMAGE_SIZE;
         
         _markerView = [[UIView alloc] initWithFrame:CGRectMake(markerLeft, markerTop, markerWidth, MARKER_IMAGE_SIZE)];
         _markerView.userInteractionEnabled = NO;
         
         // 마커 그림
-        markerImageWidth = _markerImageIsDay? MARKER_DAY_WIDTH : _markerImageIsFlag?  MARKER_FLAG_SIZE : MARKER_IMAGE_SIZE;
+        markerImageWidth = _markerImageIsFlag?  MARKER_FLAG_SIZE : MARKER_IMAGE_SIZE;
         UIImage *markerImage = [UIImage imageNamed:_markerImageName];
         UIImageView *markerImageView = [[UIImageView alloc] initWithImage:markerImage];
         markerImageHeight = _markerImageIsDay? markerImage.size.height : markerImageWidth;
