@@ -16,7 +16,8 @@
 #define MARKER_SIZE          5.0 * [VLOUtilities screenRatioWith6]
 #define MARKER_IMAGE_SIZE   20.0 * [VLOUtilities screenRatioWith6]
 #define MARKER_FLAG_SIZE    18.0 * [VLOUtilities screenRatioWith6]
-#define DAY_LABEL_PADDING   5.0 * [VLOUtilities screenRatioWith6]
+#define DAY_LABEL_HEIGHT    12.0 * [VLOUtilities screenRatioWith6]
+#define DAY_LABEL_PADDING    5.0 * [VLOUtilities screenRatioWith6]
 
 #define MARKER_ICON_WIDTH   60.0 * [VLOUtilities screenRatioWith6]
 #define MARKER_ICON_HEIGHT  67.0 * [VLOUtilities screenRatioWith6]

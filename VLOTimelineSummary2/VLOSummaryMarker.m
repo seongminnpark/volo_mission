@@ -141,18 +141,17 @@
     if (_markerImageIsDay) {
         
         NSString *dayText = [NSString stringWithFormat:@"%@일차", _day];
-        UIFont *font = [UIFont systemFontOfSize:MARKER_LABEL_HEIGHT*0.8];
+        UIFont *font = [UIFont systemFontOfSize:DAY_LABEL_HEIGHT*0.8];
         
         CGSize dayTextSize = [dayText sizeWithAttributes:@{ NSFontAttributeName : font }];
-        
         CGFloat dayLabelWidth = dayTextSize.width + DAY_LABEL_PADDING*2;
         
         markerLeft  = _drawableWidth/2.0 - dayLabelWidth/2.0;
-        markerTop   = _drawableHeight - MARKER_LABEL_HEIGHT - MARKER_IMAGE_SIZE;
+        markerTop   = _drawableHeight - MARKER_LABEL_HEIGHT - MARKER_IMAGE_SIZE/2.0 - DAY_LABEL_HEIGHT/2.0;
         markerWidth = dayLabelWidth;
         
         // 레이블이 담길 검정색 상자
-        _markerView = [[UIView alloc] initWithFrame:CGRectMake(markerLeft, markerTop, markerWidth, MARKER_LABEL_HEIGHT)];
+        _markerView = [[UIView alloc] initWithFrame:CGRectMake(markerLeft, markerTop, markerWidth, DAY_LABEL_HEIGHT)];
         _markerView.layer.backgroundColor = [UIColor blackColor].CGColor;
         _markerView.layer.cornerRadius = 3.0;
         
