@@ -6,7 +6,6 @@
 //  Copyright © 2016 SK Planet. All rights reserved.
 //
 
-#import "VLOTimelineNavigationBar.h"
 #import "VLOSummaryViewController.h"
 #import "VLOLocalStorage.h"
 #import "VLOPoi.h"
@@ -15,6 +14,8 @@
 
 @property (strong, nonatomic) VLOTravel *travel;
 @property (strong, nonatomic) NSArray *logList;
+
+@property (strong, nonatomic) VLOSummaryTheme *theme;
 
 @property (strong, nonatomic) NSMutableArray *markers;
 @property (strong, nonatomic) NSMutableArray *segments;
@@ -26,6 +27,7 @@
 @property () UIScrollView *summaryView;
 @property () UIView *dimView;
 
+@property () UIView   *menuBar;
 @property () UIButton *backButton;
 @property () UIButton *shareButton;
 
@@ -61,30 +63,32 @@
     // 서머리가 담길 뷰.
     _summaryView  = [[UIScrollView alloc] init];
     _summaryView.delegate = self;
-    _summaryView.transform = CGAffineTransformMakeScale(0.9, 0.9);
+    _summaryView.transform = CGAffineTransformMakeScale(SHRINK_RATIO, SHRINK_RATIO);
     _summaryView.layer.cornerRadius = 10;
     _summaryView.layer.masksToBounds = YES;
     [_summaryView setBackgroundColor:[UIColor whiteColor]];
     
-    // 닫기, 쉐어 버튼.
+    // 닫기, 쉐어 버튼이 담긴 상단의 메뉴 바. share시 summaryView만 캡쳐하기 위해 버튼을 메뉴 바로 분리함.
+    _menuBar = [[UIView alloc] init];
+    _menuBar.transform = CGAffineTransformMakeScale(SHRINK_RATIO, SHRINK_RATIO);
+    
     _backButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    [_backButton setImage:[UIImage imageNamed:@"TimelineBackButton"] forState:UIControlStateNormal];
+    [_backButton setImage:[UIImage imageNamed:@"TimePickerCancel"] forState:UIControlStateNormal];
     [_backButton addTarget:self action:@selector(didSelectBackButton) forControlEvents:UIControlEventTouchUpInside];
-    _backButton.frame = CGRectMake(0, 0, BUTTON_SIZE, BUTTON_SIZE);
     
     _shareButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
     [_shareButton setImage:[UIImage imageNamed:@"TimelineShareButton"] forState:UIControlStateNormal];
-    [_shareButton addTarget:self action:@selector(didSelectBackButton) forControlEvents:UIControlEventTouchUpInside];
-    _shareButton.frame = CGRectMake([VLOUtilities screenWidth] - BUTTON_SIZE, 0, BUTTON_SIZE, BUTTON_SIZE);
+    [_shareButton addTarget:self action:@selector(didSelectShareButton) forControlEvents:UIControlEventTouchUpInside];
     
+    [_menuBar addSubview:_backButton];
+    [_menuBar addSubview:_shareButton];
+
     [self.view addSubview:_dimView];
     [self.view addSubview:_summaryView];
+    [self.view addSubview:_menuBar];
     [self makeAutoLayoutConstraints];
     
     [self drawSummary];
-    
-    [_summaryView addSubview:_backButton];
-    [_summaryView addSubview:_shareButton];
     
     [self.view setBackgroundColor:[UIColor clearColor]];
 }
@@ -101,6 +105,35 @@
         make.width.equalTo(@(width));
         make.height.equalTo(@(height));
     }];
+    
+    [_menuBar mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.equalTo(_summaryView);
+        make.top.equalTo(@([VLOUtilities screenHeight]* (1-SHRINK_RATIO)/2.0));
+        make.width.equalTo(_summaryView);
+        make.height.equalTo(@(BUTTON_SIZE));
+    }];
+    
+    [_backButton mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.equalTo(@(0.0f));
+        make.top.equalTo(@(0.0f));
+        make.width.equalTo(@(BUTTON_SIZE));
+        make.height.equalTo(@(BUTTON_SIZE));
+    }];
+    
+    [_shareButton mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.equalTo(@([VLOUtilities screenWidth] - BUTTON_SIZE));
+        make.top.equalTo(@(0.0f));
+        make.width.equalTo(@(BUTTON_SIZE));
+        make.height.equalTo(@(BUTTON_SIZE));
+    }];
+}
+
+- (void) makeMenuBar {
+    
+}
+
+- (void) setTheme:(VLOSummaryTheme *)theme {
+    _theme = theme;
 }
 
 // 필요시 이 함수만 부를 수 있도록 분리함.
@@ -129,6 +162,8 @@
     
     NSInteger GMTOffset = [_travel.timezone getNSTimezone].secondsFromGMT;
     NSInteger logIndex = 0;
+    [_theme shuffleIndex:logList.count];
+    
     VLOPlace *currPlace, *prevPlace;
     
     for (VLOLog *log in logList) {
@@ -205,7 +240,13 @@
         
         // 세그먼트 생성.
         VLOSummarySegment *segment = [self createSegmentFromNthMarker:_markers.count-2];
-        [segment setSegmentImageLong:@"line_a_01" middle:@"line_b_01" shortt:@"line_c_01" curve:@"line_round_left_01"];
+ 
+        NSString *longSeg  = [_theme getLongSeg:logIndex-1];
+        NSString *medSeg   = [_theme getMedSeg:logIndex-1];
+        NSString *shortSeg = [_theme getShortSeg:logIndex-1];
+        NSString *curveSeg = [_theme getCurveSeg:logIndex-1];
+        
+        [segment setSegmentImageLong:longSeg middle:medSeg shortt:shortSeg curve:curveSeg];
         if (log.type == VLOLogTypeRoute) {
             
             NSString *suffix, *transport, *segmentImageName;
@@ -315,7 +356,7 @@
         markerImage = [NSString stringWithFormat:@"42_%@", currPlace.country.isoCountryCode];
         _lastCountryCode = currPlace.country.isoCountryCode;
     }
-    else markerImage = @"icon_poi_marker";
+    else markerImage = _theme.markerImage;
     
     [currMarker setMarkerImage:markerImage isDay:isDay isFlag:isFlag];
 }
@@ -411,7 +452,7 @@
 
 - (void) initializeBackgroundView {
     
-    UIImage *backgroundImage = [UIImage imageNamed:@"background"];
+    UIImage *backgroundImage = [UIImage imageNamed:_theme.backgroundImage];
     UIImageView *backgroundImageView = [[UIImageView alloc] initWithImage:backgroundImage];
     
     backgroundImageView.frame = CGRectMake(0, 0, BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
@@ -435,16 +476,18 @@
 #pragma mark - 타임라인 스크롤
 
 - (void) didClickMarker:(id)sender {
-    
-    BOOL respondsToScroll = [_delegate respondsToSelector:@selector(scrollToLog:)];
-    
-    if (respondsToScroll) [_delegate scrollToLog:((UIButton *)sender).tag];
+
+    if ([_delegate respondsToSelector:@selector(scrollToLog:)]) {
+        [_delegate scrollToLog:((UIButton *)sender).tag];
+    }
 }
 
+// 버튼 딤처리.
 - (void) willClickMarker:(id)sender {
     
-    BOOL respondsToScroll = [_delegate respondsToSelector:@selector(scrollToLog:)];
-    //((UIButton *)sender) ;
+    if ([_delegate respondsToSelector:@selector(scrollToLog:)]) {
+        
+    }
 }
 
 
@@ -474,12 +517,10 @@
     }
     
     
-    CGFloat backButtonLeft = _backButton.frame.origin.x;
-    CGFloat shareButtonLeft = _shareButton.frame.origin.x;
-    CGFloat buttonTop = scrollView.contentOffset.y;
+    CGFloat menuBarLeft = _menuBar.frame.origin.x;
+    CGFloat menuBarTop = scrollView.contentOffset.y;
     
-    _backButton.frame = CGRectMake(backButtonLeft, buttonTop, BUTTON_SIZE, BUTTON_SIZE);
-    _shareButton.frame = CGRectMake(shareButtonLeft, buttonTop, BUTTON_SIZE, BUTTON_SIZE);
+    //_menuBar.frame = CGRectMake(menuBarLeft, menuBarTop, BUTTON_SIZE, BUTTON_SIZE);
     
 }
     

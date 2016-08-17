@@ -39,7 +39,7 @@
 #define LINE_GAP            80.0 * [VLOUtilities screenRatioWith6]
 
 #define BACKGROUND_WIDTH   375.0 * [VLOUtilities screenRatioWith6]
-#define BACKGROUND_HEIGHT  130.0 * [VLOUtilities screenRatioWith6]
+#define BACKGROUND_HEIGHT  150.0 * [VLOUtilities screenRatioWith6]
 
 #define TITLE_HEIGHT        30.0 * [VLOUtilities screenRatioWith6]
 
@@ -50,6 +50,8 @@
 #define VOLO_COLOR          [UIColor colorWithRed:200/255.0 green:240/255.0 blue:235/255.0 alpha:1]
 #define LINE_COLOR          [UIColor colorWithRed:211/255.0 green:213/255.0 blue:212/255.0 alpha:1]
 
+
+#define SHRINK_RATIO         0.9
 #define BUTTON_SIZE         30.0 * [VLOUtilities screenRatioWith6]
 
 

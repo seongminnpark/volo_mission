@@ -21,6 +21,7 @@
 #import "VLOLocationCoordinate.h"
 #import "VLOUtilities.h"
 #import "VLOActivityIndicator.h"
+#import "VLOSummaryTheme.h"
 
 @class VLOSummaryViewController;
 
@@ -38,6 +39,7 @@
 
 - (id) initWithTravel:(VLOTravel *)travel andLogList:(NSArray *)logList;
 - (void) drawSummary;
+- (void) setTheme:(VLOSummaryTheme *)theme;
 
 @end
 
