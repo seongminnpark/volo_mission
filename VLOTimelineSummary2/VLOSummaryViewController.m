@@ -448,13 +448,12 @@
 }
 
 
-#pragma mark - Navigationbar buttons
+#pragma mark - buttons up top
 
 - (void) didSelectBackButton {
     if ([_delegate respondsToSelector:@selector(summaryControllerClosed:)]) {
         [_delegate summaryControllerClosed:self];
     }
-    [self dismissViewControllerAnimated:YES completion:nil];
 }
     
 - (void) didSelectShareButton {
