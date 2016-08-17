@@ -98,85 +98,11 @@
     
     for (UIView *drawable in _drawables) {
         [_summaryView addSubview:drawable];
-
-        if (drawable == [_drawables lastObject]) {
-            CGFloat contentHeight = drawable.frame.origin.y + drawable.frame.size.height + CONTENT_SIZE_PAD;
-            _summaryView.contentSize = CGSizeMake([VLOUtilities screenWidth], contentHeight);
-        }
-    }
-}
-
-- (void) initializeBackgroundView {
-    UIImage *backgroundImage = [UIImage imageNamed:@"background"];
-    UIImageView *backgroundImageView = [[UIImageView alloc] initWithImage:backgroundImage];
-    backgroundImageView.frame = CGRectMake(0, 0, BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
-    [_drawables addObject:backgroundImageView];
-}
-
-- (void) initializeTitleView {
-    CGFloat titleWidth = _summaryView.frame.size.width;
-    CGFloat titleTop  = BACKGROUND_HEIGHT/2.0 - TITLE_HEIGHT;
-    UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, titleTop, titleWidth, TITLE_HEIGHT)];
-    titleLabel.text = _travel.title;
-    titleLabel.textAlignment = NSTextAlignmentCenter;
-    titleLabel.textColor = [UIColor whiteColor];
-    [titleLabel setFont:[UIFont systemFontOfSize:TITLE_HEIGHT]];
-    
-    [_drawables addObject:titleLabel];
-}
-
-- (void) initializeDrawables {
-    
-    [self initializeBackgroundView];
-    [self initializeTitleView];
-    
-    for (VLOSummarySegment *segment in _segments) {
-        [_drawables addObject:[segment getDrawableView]];
-        
-        /*
-         
-         레이어별로 그리고 싶을 때.
-
-        [_drawables addObject:[segment getSegmentView]];
-        [_drawables addObject:[segment getSegmentIconView]];
-         
-        */
-    }
-    
-    BOOL respondsToScroll = [_delegate respondsToSelector:@selector(scrollToLog:)];
-    
-    for (VLOSummaryMarker *marker in _markers) {
-        UIButton *markerDrawable = [marker getDrawableView];
-        markerDrawable.tag = marker.logIndex;
-        [_drawables addObject:markerDrawable];
-        
-        if (respondsToScroll) {
-
-            [markerDrawable addTarget:self action:@selector(didClickMarker:) forControlEvents:UIControlEventTouchUpInside];
-            [markerDrawable addTarget:self action:@selector(willClickMarker:) forControlEvents:UIControlEventTouchDown];
-        }
-        
-        /*
-         
-        레이어별로 그리고 싶을 때.
-         
-        (현재 구조에선 교통수단 아이콘과 마커가 겹치지 않아서, 마커가 마커 아이콘 위에 오기만 하면 레이어별로 그리는 메리트가 없음
-         + 레이어별로 그리면 for loop 더 많이 돌려야 함 + 마커와 관련된 요소만 새로운 UI버튼으로 묶어야 함.)
-
-        UIView *markerDrawable = [marker getMarkerView];
-        UIView *markerIconDrawable = [marker getMarkerIconView];
-        UIView *markerLabelDrawable = [marker getMarkerLabel];
-        
-        [_drawables addObject:markerIconDrawable];
-        [_drawables addObject:markerLabelDrawable];
-        [_drawables addObject:markerDrawable];
-         
-        */
     }
 }
 
 - (void) parseLogList: (NSArray *)logList {
-
+    
     NSInteger GMTOffset = [_travel.timezone getNSTimezone].secondsFromGMT;
     NSInteger logIndex = 0;
     VLOPlace *currPlace, *prevPlace;
@@ -193,20 +119,20 @@
         currPlace = log.place;
         
         if (log.type == VLOLogTypeMap) {
-    
+            
             if ([self createMarkerAndSegemnt:log
-                                   logIndex:logIndex
+                                    logIndex:logIndex
                                          day:day
                                    currPlace:currPlace
                                    prevPlace:prevPlace
                                transportType:VLOTransportTypeUnknown]) {
-            
+                
                 prevPlace = currPlace;
             }
         }
         
         else if (log.type == VLOLogTypeRoute) {
-         
+            
             for (VLORouteNode *node in ((VLORouteLog *)log).nodes) {
                 
                 currPlace = node.place;
@@ -335,9 +261,24 @@
         
         marker.x = newX;
         marker.y = newY;
-       
+        
         if (i > 0) [[_segments objectAtIndex:i-1] updateMarkerPositions];
     }
+    
+    /* 마커의 좌표가 정해지면, summaryView의 contentSize이 정해진다.
+     summaryView의 contentSize가 정의 되어야 다이나믹한 배경 이미지를 넣을 수 있다. */
+    
+    VLOSummaryMarker *lastMarker = [_markers lastObject];
+    CGFloat contentHeight;
+    
+    if (lastMarker) {
+        contentHeight = MAX(lastMarker.y + CONTENT_SIZE_PAD, BACKGROUND_HEIGHT);
+    } else {
+        contentHeight = BACKGROUND_HEIGHT;
+    }
+    
+    _summaryView.contentSize = CGSizeMake([VLOUtilities screenWidth], contentHeight);
+    
 }
 
 - (void) setMarkerImage:(VLOPlace *)currPlace :(VLOPlace *)prevPlace :(NSInteger)markerIndex {
@@ -362,8 +303,8 @@
     
     if      (isDay)  markerImage = @"marker_day";
     else if (isFlag) {
-       markerImage = [NSString stringWithFormat:@"42_%@", currPlace.country.isoCountryCode];
-       _lastCountryCode = currPlace.country.isoCountryCode;
+        markerImage = [NSString stringWithFormat:@"42_%@", currPlace.country.isoCountryCode];
+        _lastCountryCode = currPlace.country.isoCountryCode;
     }
     else markerImage = @"icon_poi_marker";
     
@@ -406,9 +347,9 @@
 - (BOOL) samePOI:(VLOLocationCoordinate *)coord1 :(VLOLocationCoordinate *)coord2 {
     
     BOOL withinLongitude = (coord1.longitude.floatValue >= coord2.longitude.floatValue - PROXIMITY_RADIUS) &&
-                           (coord1.longitude.floatValue <= coord2.longitude.floatValue + PROXIMITY_RADIUS);
+    (coord1.longitude.floatValue <= coord2.longitude.floatValue + PROXIMITY_RADIUS);
     BOOL withinLatitude  = (coord1.latitude.floatValue  >= coord2.latitude.floatValue  - PROXIMITY_RADIUS) &&
-                           (coord1.latitude.floatValue  <= coord2.latitude.floatValue  + PROXIMITY_RADIUS);
+    (coord1.latitude.floatValue  <= coord2.latitude.floatValue  + PROXIMITY_RADIUS);
     
     return withinLongitude && withinLatitude;
 }
@@ -422,6 +363,84 @@
     //((UIButton *)sender) ;
 }
 
+
+- (void) initializeDrawables {
+    
+    [self initializeBackgroundView];
+    [self initializeTitleView];
+    
+    for (VLOSummarySegment *segment in _segments) {
+        [_drawables addObject:[segment getDrawableView]];
+        
+        /*
+         
+         레이어별로 그리고 싶을 때.
+
+        [_drawables addObject:[segment getSegmentView]];
+        [_drawables addObject:[segment getSegmentIconView]];
+         
+        */
+    }
+    
+    BOOL respondsToScroll = [_delegate respondsToSelector:@selector(scrollToLog:)];
+    
+    for (VLOSummaryMarker *marker in _markers) {
+        UIButton *markerDrawable = [marker getDrawableView];
+        markerDrawable.tag = marker.logIndex;
+        [_drawables addObject:markerDrawable];
+        
+        if (respondsToScroll) {
+
+            [markerDrawable addTarget:self action:@selector(didClickMarker:) forControlEvents:UIControlEventTouchUpInside];
+            [markerDrawable addTarget:self action:@selector(willClickMarker:) forControlEvents:UIControlEventTouchDown];
+        }
+        
+        /*
+         
+        레이어별로 그리고 싶을 때.
+         
+        (현재 구조에선 교통수단 아이콘과 마커가 겹치지 않아서, 마커가 마커 아이콘 위에 오기만 하면 레이어별로 그리는 메리트가 없음
+         + 레이어별로 그리면 for loop 더 많이 돌려야 함 + 마커와 관련된 요소만 새로운 UI버튼으로 묶어야 함.)
+
+        UIView *markerDrawable = [marker getMarkerView];
+        UIView *markerIconDrawable = [marker getMarkerIconView];
+        UIView *markerLabelDrawable = [marker getMarkerLabel];
+        
+        [_drawables addObject:markerIconDrawable];
+        [_drawables addObject:markerLabelDrawable];
+        [_drawables addObject:markerDrawable];
+         
+        */
+    }
+}
+
+- (void) initializeBackgroundView {
+    
+    NSInteger backgroundCount = ceil( _summaryView.contentSize.height / BACKGROUND_HEIGHT);
+    
+    for (NSInteger i = 0; i < backgroundCount; i++) {
+        
+        UIImage *backgroundImage = [UIImage imageNamed:@"background"];
+        UIImageView *backgroundImageView = [[UIImageView alloc] initWithImage:backgroundImage];
+        
+        backgroundImageView.frame = CGRectMake(0, i * BACKGROUND_HEIGHT, BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
+        [_drawables addObject:backgroundImageView];
+        
+    }
+    
+}
+
+- (void) initializeTitleView {
+    CGFloat titleWidth = _summaryView.frame.size.width;
+    CGFloat titleTop  = BACKGROUND_HEIGHT/2.0 - TITLE_HEIGHT;
+    UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, titleTop, titleWidth, TITLE_HEIGHT)];
+    titleLabel.text = _travel.title;
+    titleLabel.textAlignment = NSTextAlignmentCenter;
+    titleLabel.textColor = [UIColor whiteColor];
+    [titleLabel setFont:[UIFont systemFontOfSize:TITLE_HEIGHT]];
+    
+    [_drawables addObject:titleLabel];
+}
 
 #pragma mark - Navigationbar buttons
 
@@ -449,6 +468,7 @@
         [scrollView setContentOffset:CGPointMake(0, 0) animated:NO];
         [scrollView setScrollEnabled:YES];
     }
+    
 }
     
 @end
