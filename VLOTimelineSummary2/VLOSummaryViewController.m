@@ -22,9 +22,12 @@
 
 @property (strong, nonatomic) NSArray *poiIcons;
 @property (strong, nonatomic) NSString *lastCountryCode;
-@property (strong, nonatomic) VLOTimelineNavigationBar *navigationBar;
 
 @property () UIScrollView *summaryView;
+@property () UIView *dimView;
+
+@property () UIButton *backButton;
+@property () UIButton *shareButton;
 
 
 @end
@@ -47,42 +50,57 @@
 }
 
 - (void) viewDidLoad {
+    
     [super viewDidLoad];
     
-    _navigationBar = [[VLOTimelineNavigationBar alloc] initWithIsViewMode:YES isFromUserHome:NO];
-    [_navigationBar.backButton addTarget:self action:@selector(navigationbarDidSelectBackButton:) forControlEvents:UIControlEventTouchUpInside];
-    [_navigationBar.shareButton addTarget:self action:@selector(navigationbarDidSelectShareButton:) forControlEvents:UIControlEventTouchUpInside];
+    // 타임라인 딤 처리하는 뷰.
+    _dimView = [[UIView alloc] initWithFrame:self.view.bounds];
+    _dimView.alpha = 0.3;
+    [_dimView setBackgroundColor:[UIColor vlo_darkGrayColor]];
     
-    _summaryView  = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, [VLOUtilities screenWidth], [VLOUtilities screenHeight])];
+    // 서머리가 담길 뷰.
+    _summaryView  = [[UIScrollView alloc] init];
     _summaryView.delegate = self;
-
-    [self.view addSubview:_navigationBar];
+    _summaryView.transform = CGAffineTransformMakeScale(0.9, 0.9);
+    _summaryView.layer.cornerRadius = 10;
+    _summaryView.layer.masksToBounds = YES;
+    [_summaryView setBackgroundColor:[UIColor whiteColor]];
+    
+    // 닫기, 쉐어 버튼.
+    _backButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    [_backButton setImage:[UIImage imageNamed:@"TimelineBackButton"] forState:UIControlStateNormal];
+    [_backButton addTarget:self action:@selector(didSelectBackButton) forControlEvents:UIControlEventTouchUpInside];
+    _backButton.frame = CGRectMake(0, 0, BUTTON_SIZE, BUTTON_SIZE);
+    
+    _shareButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    [_shareButton setImage:[UIImage imageNamed:@"TimelineShareButton"] forState:UIControlStateNormal];
+    [_shareButton addTarget:self action:@selector(didSelectBackButton) forControlEvents:UIControlEventTouchUpInside];
+    _shareButton.frame = CGRectMake([VLOUtilities screenWidth] - BUTTON_SIZE, 0, BUTTON_SIZE, BUTTON_SIZE);
+    
+    [self.view addSubview:_dimView];
     [self.view addSubview:_summaryView];
     [self makeAutoLayoutConstraints];
-    [_navigationBar show];
-
+    
     [self drawSummary];
-    [self.view setBackgroundColor:[UIColor whiteColor]];
+    
+    [_summaryView addSubview:_backButton];
+    [_summaryView addSubview:_shareButton];
+    
+    [self.view setBackgroundColor:[UIColor clearColor]];
 }
 
 - (void) makeAutoLayoutConstraints
 {
-    
-    [_navigationBar mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.left.right.and.top.equalTo(@0.0f);
-        make.height.equalTo(@([VLOUtilities customizedNavigationBarHeight]));
-    }];
     
     [_summaryView mas_makeConstraints:^(MASConstraintMaker *make) {
         CGFloat width  = [VLOUtilities screenWidth];
         CGFloat height = [VLOUtilities screenHeight];
         
         make.left.equalTo(@(0.0f));
-        make.top.equalTo(_navigationBar.mas_bottom);
+        make.top.equalTo(@(0.0f));
         make.width.equalTo(@(width));
         make.height.equalTo(@(height));
     }];
-    
 }
 
 // 필요시 이 함수만 부를 수 있도록 분리함.
@@ -98,6 +116,12 @@
     
     for (UIView *drawable in _drawables) {
         [_summaryView addSubview:drawable];
+        
+        if (drawable == [_drawables lastObject]) {
+            CGFloat contentHeight =
+                drawable.frame.origin.y + drawable.frame.size.height + CONTENT_SIZE_PAD;
+            _summaryView.contentSize = CGSizeMake([VLOUtilities screenWidth], contentHeight);
+        }
     }
 }
 
@@ -240,7 +264,7 @@
     switch (_markers.count) {
         case (1): firstMarkerX = summaryWidth / 2.0;                     break;
         case (2): firstMarkerX = summaryWidth / 2.0 - columnWidth / 2.0; break;
-        default : firstMarkerX = CURVE_WIDTH + SHORT_SEGMENT + 5;         break;
+        default : firstMarkerX = CURVE_WIDTH + SHORT_SEGMENT + 5;        break;
     }
     
     for (NSInteger i = 0; i < _markers.count; i++) {
@@ -264,21 +288,6 @@
         
         if (i > 0) [[_segments objectAtIndex:i-1] updateMarkerPositions];
     }
-    
-    /* 마커의 좌표가 정해지면, summaryView의 contentSize이 정해진다.
-     summaryView의 contentSize가 정의 되어야 다이나믹한 배경 이미지를 넣을 수 있다. */
-    
-    VLOSummaryMarker *lastMarker = [_markers lastObject];
-    CGFloat contentHeight;
-    
-    if (lastMarker) {
-        contentHeight = MAX(lastMarker.y + CONTENT_SIZE_PAD, BACKGROUND_HEIGHT);
-    } else {
-        contentHeight = BACKGROUND_HEIGHT;
-    }
-    
-    _summaryView.contentSize = CGSizeMake([VLOUtilities screenWidth], contentHeight);
-    
 }
 
 - (void) setMarkerImage:(VLOPlace *)currPlace :(VLOPlace *)prevPlace :(NSInteger)markerIndex {
@@ -355,15 +364,6 @@
 }
 
 
-- (void) didClickMarker:(id)sender {
-    [_delegate scrollToLog:((UIButton *)sender).tag];
-}
-
-- (void) willClickMarker:(id)sender {
-    //((UIButton *)sender) ;
-}
-
-
 - (void) initializeDrawables {
     
     [self initializeBackgroundView];
@@ -382,18 +382,13 @@
         */
     }
     
-    BOOL respondsToScroll = [_delegate respondsToSelector:@selector(scrollToLog:)];
-    
     for (VLOSummaryMarker *marker in _markers) {
         UIButton *markerDrawable = [marker getDrawableView];
         markerDrawable.tag = marker.logIndex;
         [_drawables addObject:markerDrawable];
         
-        if (respondsToScroll) {
-
-            [markerDrawable addTarget:self action:@selector(didClickMarker:) forControlEvents:UIControlEventTouchUpInside];
-            [markerDrawable addTarget:self action:@selector(willClickMarker:) forControlEvents:UIControlEventTouchDown];
-        }
+        [markerDrawable addTarget:self action:@selector(didClickMarker:) forControlEvents:UIControlEventTouchUpInside];
+        [markerDrawable addTarget:self action:@selector(willClickMarker:) forControlEvents:UIControlEventTouchDown];
         
         /*
          
@@ -416,22 +411,16 @@
 
 - (void) initializeBackgroundView {
     
-    NSInteger backgroundCount = ceil( _summaryView.contentSize.height / BACKGROUND_HEIGHT);
+    UIImage *backgroundImage = [UIImage imageNamed:@"background"];
+    UIImageView *backgroundImageView = [[UIImageView alloc] initWithImage:backgroundImage];
     
-    for (NSInteger i = 0; i < backgroundCount; i++) {
-        
-        UIImage *backgroundImage = [UIImage imageNamed:@"background"];
-        UIImageView *backgroundImageView = [[UIImageView alloc] initWithImage:backgroundImage];
-        
-        backgroundImageView.frame = CGRectMake(0, i * BACKGROUND_HEIGHT, BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
-        [_drawables addObject:backgroundImageView];
-        
-    }
+    backgroundImageView.frame = CGRectMake(0, 0, BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
+    [_drawables addObject:backgroundImageView];
     
 }
 
 - (void) initializeTitleView {
-    CGFloat titleWidth = _summaryView.frame.size.width;
+    CGFloat titleWidth = BACKGROUND_WIDTH;
     CGFloat titleTop  = BACKGROUND_HEIGHT/2.0 - TITLE_HEIGHT;
     UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, titleTop, titleWidth, TITLE_HEIGHT)];
     titleLabel.text = _travel.title;
@@ -442,17 +431,33 @@
     [_drawables addObject:titleLabel];
 }
 
+
+#pragma mark - 타임라인 스크롤
+
+- (void) didClickMarker:(id)sender {
+    
+    BOOL respondsToScroll = [_delegate respondsToSelector:@selector(scrollToLog:)];
+    
+    if (respondsToScroll) [_delegate scrollToLog:((UIButton *)sender).tag];
+}
+
+- (void) willClickMarker:(id)sender {
+    
+    BOOL respondsToScroll = [_delegate respondsToSelector:@selector(scrollToLog:)];
+    //((UIButton *)sender) ;
+}
+
+
 #pragma mark - Navigationbar buttons
 
-- (void) navigationbarDidSelectBackButton:(UIView *)bar {
+- (void) didSelectBackButton {
     if ([_delegate respondsToSelector:@selector(summaryControllerClosed:)]) {
         [_delegate summaryControllerClosed:self];
     }
     [self dismissViewControllerAnimated:YES completion:nil];
-
 }
     
-- (void) navigationbarDidSelectShareButton:(UIView *)bar {
+- (void) didSelectShareButton {
     if([_delegate respondsToSelector:@selector(summaryShareSelected:)]) {
         [_delegate summaryShareSelected:self];
     }
@@ -468,6 +473,14 @@
         [scrollView setContentOffset:CGPointMake(0, 0) animated:NO];
         [scrollView setScrollEnabled:YES];
     }
+    
+    
+    CGFloat backButtonLeft = _backButton.frame.origin.x;
+    CGFloat shareButtonLeft = _shareButton.frame.origin.x;
+    CGFloat buttonTop = scrollView.contentOffset.y;
+    
+    _backButton.frame = CGRectMake(backButtonLeft, buttonTop, BUTTON_SIZE, BUTTON_SIZE);
+    _shareButton.frame = CGRectMake(shareButtonLeft, buttonTop, BUTTON_SIZE, BUTTON_SIZE);
     
 }
     

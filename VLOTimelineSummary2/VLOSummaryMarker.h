@@ -50,6 +50,8 @@
 #define VOLO_COLOR          [UIColor colorWithRed:200/255.0 green:240/255.0 blue:235/255.0 alpha:1]
 #define LINE_COLOR          [UIColor colorWithRed:211/255.0 green:213/255.0 blue:212/255.0 alpha:1]
 
+#define BUTTON_SIZE         30.0 * [VLOUtilities screenRatioWith6]
+
 
 
 @interface VLOSummaryMarker : NSObject
