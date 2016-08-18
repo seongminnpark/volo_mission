@@ -46,7 +46,7 @@
 #define BACKGROUND_HEIGHT  150.0 * [VLOUtilities screenRatioWith6] // 배경 최소 세로 길이. 이 높이에서 첫 번째 마커가 시작된다.
 #define TITLE_HEIGHT        26.0 * [VLOUtilities screenRatioWith6] // 여행기 제목 텍스트 세로 높이.
 
-#define CONTENT_SIZE_PAD   100.0 * [VLOUtilities screenRatioWith6] // 스크롤뷰(_summaryView) 최하단 마커의 레이블 밑에 더해주는 패딩.
+#define CONTENT_SIZE_PAD    30.0 * [VLOUtilities screenRatioWith6] // 스크롤뷰(_summaryView) 최하단 마커의 레이블 밑에 더해주는 패딩.
 #define SHRINK_RATIO         0.9                                   // _summaryView가 화면을 채우면 모달 느낌이 나지 않기 때문에 shrink 하는 비율.
 #define BUTTON_SIZE         30.0 * [VLOUtilities screenRatioWith6] // 상단 메뉴 버튼(close, share) 사이즈.
 

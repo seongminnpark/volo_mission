@@ -9,8 +9,10 @@
 #import "VLOSummaryViewController.h"
 #import "VLOLocalStorage.h"
 #import "VLOPoi.h"
+#import "NSDate+VLOExtension.h"
+#import "VLOFriendsView.h"
 
-@interface VLOSummaryViewController() <UIScrollViewDelegate>
+@interface VLOSummaryViewController() <UIScrollViewDelegate, VLOFriendsViewDelegate>
 
 @property (strong, nonatomic) VLOTravel *travel;
 @property (strong, nonatomic) NSArray *logList;
@@ -408,7 +410,7 @@
 - (void) initializeDrawables {
     
     [self initializeBackgroundView];
-    [self initializeTitleView];
+    [self initializeHeaderView];
     
     for (VLOSummarySegment *segment in _segments) {
         [_drawables addObject:[segment getDrawableView]];
@@ -460,37 +462,70 @@
     
 }
 
-- (void) initializeTitleView {
-    CGFloat titleWidth = BACKGROUND_WIDTH;
-    CGFloat titleTop  = BACKGROUND_HEIGHT/2.0 - TITLE_HEIGHT;
-    UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, titleTop, titleWidth, TITLE_HEIGHT)];
+- (void) initializeHeaderView {
+    
+    CGFloat headerHeight = TITLE_HEIGHT + 12 + 12;
+    CGFloat headerTop = BACKGROUND_HEIGHT/2.0 - headerHeight/2.0;
+    UIView *headerView = [[UIView alloc] initWithFrame:CGRectMake(0, headerTop, BACKGROUND_WIDTH, headerHeight)];
+    
+    UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, BACKGROUND_WIDTH, TITLE_HEIGHT)];
     titleLabel.text = _travel.title;
     titleLabel.textAlignment = NSTextAlignmentCenter;
     titleLabel.textColor = [UIColor whiteColor];
     [titleLabel setFont:[UIFont systemFontOfSize:TITLE_HEIGHT]];
     
-    [_drawables addObject:titleLabel];
+    UILabel *dateLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, TITLE_HEIGHT, BACKGROUND_WIDTH, 12)];
+    NSTimeZone *travelTimezone = [_travel.timezone getNSTimezone];
+    if (_travel.startDate && _travel.endDate) {
+        // 시작하는 날과 끝나는 날의 차이를 dateComponents에 저장
+        NSDateComponents *dateComponents = [[NSCalendar currentCalendar] components:NSCalendarUnitDay fromDate:_travel.startDate toDate:_travel.endDate options:0];
+        
+        if (![dateComponents day])  // 차이가 0이면
+            dateLabel.text = [_travel.startDate localeDateStringWithTimeZone:travelTimezone];
+        else
+            dateLabel.text = [NSString stringWithFormat:@"%@ - %@", [_travel.startDate localeDateStringWithTimeZone:travelTimezone], [_travel.endDate localeDateStringWithTimeZone:travelTimezone]];
+    } else if (_travel.startDate)
+        dateLabel.text = [_travel.startDate localeDateStringWithTimeZone:travelTimezone];
+    else if (_travel.endDate)
+        dateLabel.text = [NSString stringWithFormat:@"~ %@", [_travel.endDate localeDateStringWithTimeZone:travelTimezone]];
+    else
+        dateLabel.text = @"";
+    dateLabel.textAlignment = NSTextAlignmentCenter;
+    dateLabel.textColor = [UIColor whiteColor];
+    [dateLabel setFont:[UIFont systemFontOfSize:12]];
+//    
+//    VLOFriendsView *friendsView = [[VLOFriendsView alloc] initWithFriends: _travel.users andType:VLOFriendsViewTypeCommon];
+//    friendsView.delegate = self;
+//    [friendsView.collectionView reloadData];
+//    NSInteger line = [friendsView calculateLineWithFriends:_travel.users];
+//    friendsView.frame = CGRectMake(0, TITLE_HEIGHT + 12, BACKGROUND_WIDTH, 12 * line);
+    
+    [headerView addSubview:titleLabel];
+    [headerView addSubview:dateLabel];
+    //[headerView addSubview:friendsView];
+    
+    [_drawables addObject:headerView];
 }
 
 - (UIImage *)captureScrollView:(UIScrollView *)scrollView {
     
     UIImage* image = nil;
     
+    CGPoint originalContentOffset = scrollView.contentOffset;
+    CGRect originalFrame = scrollView.frame;
+    
+    scrollView.contentOffset = CGPointZero;
+    scrollView.frame = CGRectMake(0, 0, scrollView.contentSize.width, scrollView.contentSize.height);
+    
     UIGraphicsBeginImageContextWithOptions(scrollView.contentSize, NO, 0.0);
     {
-        CGPoint originalContentOffset = scrollView.contentOffset;
-        CGRect originalFrame = scrollView.frame;
-        
-        scrollView.contentOffset = CGPointZero;
-        scrollView.frame = CGRectMake(0, 0, scrollView.contentSize.width, scrollView.contentSize.height);
-        
         [scrollView.layer renderInContext: UIGraphicsGetCurrentContext()];
         image = UIGraphicsGetImageFromCurrentImageContext();
-        
-        scrollView.contentOffset = originalContentOffset;
-        scrollView.frame = originalFrame;
     }
     UIGraphicsEndImageContext();
+    
+    scrollView.contentOffset = originalContentOffset;
+    scrollView.frame = originalFrame;
     
     return image;
 }
@@ -529,6 +564,14 @@
     UIImage *img = [self captureScrollView:_summaryView];
     
     UIImageWriteToSavedPhotosAlbum(img, nil, nil, nil);
+    
+    
+    UIAlertView *saved = [[UIAlertView alloc] initWithTitle:@"Saved"
+                                                       message:@"Summary saved in photo album."
+                                                      delegate:self
+                                             cancelButtonTitle:@"OK"
+                                             otherButtonTitles:nil];
+    [saved show];
 
 }
 
@@ -542,6 +585,13 @@
         [scrollView setScrollEnabled:YES];
     }
     
+}
+
+
+#pragma mark - FriendsViewDelegate
+
+- (void)friendsViewDidSelectFriendsDetailButton:(VLOFriendsView *)friendsView {
+
 }
     
 @end
