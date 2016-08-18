@@ -47,19 +47,23 @@
 }
 
 - (NSString *)getLongSeg:(NSInteger)index {
-    return [_longSegments objectAtIndex:[[_shuffledLong objectAtIndex:index] intValue]];
+    return @"line_a_01";
+    //return [_longSegments objectAtIndex:[[_shuffledLong objectAtIndex:index] intValue]];
 }
 
 - (NSString *)getMedSeg:(NSInteger)index {
-    return [_mediumSegments objectAtIndex:[[_shuffledMedium objectAtIndex:index] intValue]];
+    return @"line_b_01";
+    //return [_mediumSegments objectAtIndex:[[_shuffledMedium objectAtIndex:index] intValue]];
 }
 
 - (NSString *)getShortSeg:(NSInteger)index {
-    return [_shortSegments objectAtIndex:[[_shuffledShort objectAtIndex:index] intValue]];
+    return @"line_c_01";
+    //return [_shortSegments objectAtIndex:[[_shuffledShort objectAtIndex:index] intValue]];
 }
 
 - (NSString *)getCurveSeg:(NSInteger)index {
-    return [_curveSegments objectAtIndex:[[_shuffledCurve objectAtIndex:index] intValue]];
+    return @"line_round_left_01";
+    //return [_curveSegments objectAtIndex:[[_shuffledCurve objectAtIndex:index] intValue]];
 }
 
 @end

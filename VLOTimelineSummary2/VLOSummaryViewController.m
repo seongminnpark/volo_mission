@@ -73,7 +73,7 @@
     _menuBar.transform = CGAffineTransformMakeScale(SHRINK_RATIO, SHRINK_RATIO);
     
     _backButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    [_backButton setImage:[UIImage imageNamed:@"TimePickerCancel"] forState:UIControlStateNormal];
+    [_backButton setImage:[UIImage imageNamed:@"TitleEditorCancelButton"] forState:UIControlStateNormal];
     [_backButton addTarget:self action:@selector(didSelectBackButton) forControlEvents:UIControlEventTouchUpInside];
     
     _shareButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
@@ -472,6 +472,28 @@
     [_drawables addObject:titleLabel];
 }
 
+- (UIImage *)captureView:(UIScrollView *)view {
+    
+    UIImage* image = nil;
+    
+    UIGraphicsBeginImageContextWithOptions(view.contentSize, NO, 0.0);
+    {
+        CGPoint savedContentOffset = view.contentOffset;
+        CGRect savedFrame = view.frame;
+        
+        view.contentOffset = CGPointZero;
+        view.frame = CGRectMake(0, 0, view.contentSize.width, view.contentSize.height);
+        
+        [view.layer renderInContext: UIGraphicsGetCurrentContext()];
+        image = UIGraphicsGetImageFromCurrentImageContext();
+        
+        view.contentOffset = savedContentOffset;
+        view.frame = savedFrame;
+    }
+    UIGraphicsEndImageContext();
+    
+    return image;
+}
 
 #pragma mark - 타임라인 스크롤
 
@@ -503,6 +525,10 @@
     if([_delegate respondsToSelector:@selector(summaryShareSelected:)]) {
         [_delegate summaryShareSelected:self];
     }
+    
+    UIImage *img = [self captureView:_summaryView];
+    
+    UIImageWriteToSavedPhotosAlbum(img, nil, nil, nil);
 
 }
 
@@ -515,12 +541,6 @@
         [scrollView setContentOffset:CGPointMake(0, 0) animated:NO];
         [scrollView setScrollEnabled:YES];
     }
-    
-    
-    CGFloat menuBarLeft = _menuBar.frame.origin.x;
-    CGFloat menuBarTop = scrollView.contentOffset.y;
-    
-    //_menuBar.frame = CGRectMake(menuBarLeft, menuBarTop, BUTTON_SIZE, BUTTON_SIZE);
     
 }
     
