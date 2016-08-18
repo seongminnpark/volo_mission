@@ -46,33 +46,29 @@
 
 - (void) shuffleIndex:(NSInteger)segmentCount {
     
-    // 난수화 해야함!!!!!!!
+    // 난수화 해야함!!!!!!! _segments의 길이가 0인 경우는 생각 안 함. (추후에 예외처리)
     
     for (NSInteger i = 0; i < segmentCount; i ++) {
-        [_shuffledLong addObject:@(i % (_longSegments.count - 1))];
-        [_shuffledMedium addObject:@(i % (_mediumSegments.count - 1))];
-        [_shuffledShort addObject:@(i % (_shortSegments.count - 1))];
-        [_shuffledCurve addObject:@(i % (_curveSegments.count - 1))];
+        [_shuffledLong addObject:@((_longSegments.count == 1) ? 0 : i % (_longSegments.count - 1))];
+        [_shuffledMedium addObject:@((_mediumSegments.count == 1) ? 0 : i % (_mediumSegments.count - 1))];
+        [_shuffledShort addObject:@((_shortSegments.count == 1) ? 0 : i % (_shortSegments.count - 1))];
+        [_shuffledCurve addObject:@((_curveSegments.count == 1) ? 0 : i % (_curveSegments.count - 1))];
     }
 }
 
 - (NSString *)getLongSeg:(NSInteger)index {
-//    return @"line_a_01";
     return [_longSegments objectAtIndex:[[_shuffledLong objectAtIndex:index] intValue]];
 }
 
 - (NSString *)getMedSeg:(NSInteger)index {
-//    return @"line_b_01";
     return [_mediumSegments objectAtIndex:[[_shuffledMedium objectAtIndex:index] intValue]];
 }
 
 - (NSString *)getShortSeg:(NSInteger)index {
-//    return @"line_c_01";
     return [_shortSegments objectAtIndex:[[_shuffledShort objectAtIndex:index] intValue]];
 }
 
 - (NSString *)getCurveSeg:(NSInteger)index {
-//    return @"line_round_left_01";
     return [_curveSegments objectAtIndex:[[_shuffledCurve objectAtIndex:index] intValue]];
 }
 
