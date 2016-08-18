@@ -10,10 +10,12 @@
 
 @interface VLOSummaryTheme ()
 
-@property () NSArray *shuffledLong;
-@property () NSArray *shuffledMedium;
-@property () NSArray *shuffledShort;
-@property () NSArray *shuffledCurve;
+@property () NSMutableArray *shuffledLong;
+@property () NSMutableArray *shuffledMedium;
+@property () NSMutableArray *shuffledShort;
+@property () NSMutableArray *shuffledCurve;
+
+@property () NSInteger randomSeed;
 
 @end
 
@@ -21,11 +23,6 @@
 
 - (id) init {
     self = [super init];
-    
-    _longSegments = [NSMutableArray array];
-    _mediumSegments = [NSMutableArray array];
-    _shortSegments = [NSMutableArray array];
-    _curveSegments = [NSMutableArray array];
     
     _backgroundImage = @"img_bg_01";
     _markerImage = @"icon_poi_marker";
@@ -36,6 +33,14 @@
     _shortSegments  = @[@"line_c_01", @"line_c_02", @"line_c_03"];
     _curveSegments  = @[@"line_round_left_01", @"line_round_left_02", @"line_round_left_03"];
     
+    _randomSeed = _longSegments.count + _mediumSegments.count +
+                  _shortSegments.count + _curveSegments.count;
+    
+    _shuffledLong   = [NSMutableArray array];
+    _shuffledMedium = [NSMutableArray array];
+    _shuffledShort  = [NSMutableArray array];
+    _shuffledCurve  = [NSMutableArray array];
+    
     return self;
 }
 
@@ -43,30 +48,32 @@
     
     // 난수화 해야함!!!!!!!
     
-    _shuffledLong = @[@(0),@(1),@(3),@(2),@(3),@(1),@(0),@(3),@(2),@(1),@(0),@(2),@(1),@(0),@(3),@(1),@(2),@(0),@(1),@(2)];
-    _shuffledMedium = @[@(2),@(1),@(2),@(1),@(2),@(1),@(0),@(1),@(2),@(1),@(0),@(2),@(1),@(0),@(0),@(1),@(2),@(0),@(1), @(2)];
-    _shuffledShort =  @[@(2),@(1),@(2),@(1),@(2),@(1),@(0),@(1),@(2),@(1),@(0),@(2),@(1),@(0),@(0),@(1),@(2),@(0),@(1), @(0)];
-    _shuffledCurve = @[@(0),@(2),@(1),@(0),@(2),@(0),@(1),@(0),@(2),@(0),@(2),@(1),@(2),@(0),@(1),@(0),@(1),@(2),@(0),@(1)];
+    for (NSInteger i = 0; i < segmentCount; i ++) {
+        [_shuffledLong addObject:@(i % (_longSegments.count - 1))];
+        [_shuffledMedium addObject:@(i % (_mediumSegments.count - 1))];
+        [_shuffledShort addObject:@(i % (_shortSegments.count - 1))];
+        [_shuffledCurve addObject:@(i % (_curveSegments.count - 1))];
+    }
 }
 
 - (NSString *)getLongSeg:(NSInteger)index {
-    return @"line_a_01";
-    //return [_longSegments objectAtIndex:[[_shuffledLong objectAtIndex:index] intValue]];
+//    return @"line_a_01";
+    return [_longSegments objectAtIndex:[[_shuffledLong objectAtIndex:index] intValue]];
 }
 
 - (NSString *)getMedSeg:(NSInteger)index {
-    return @"line_b_01";
-    //return [_mediumSegments objectAtIndex:[[_shuffledMedium objectAtIndex:index] intValue]];
+//    return @"line_b_01";
+    return [_mediumSegments objectAtIndex:[[_shuffledMedium objectAtIndex:index] intValue]];
 }
 
 - (NSString *)getShortSeg:(NSInteger)index {
-    return @"line_c_01";
-    //return [_shortSegments objectAtIndex:[[_shuffledShort objectAtIndex:index] intValue]];
+//    return @"line_c_01";
+    return [_shortSegments objectAtIndex:[[_shuffledShort objectAtIndex:index] intValue]];
 }
 
 - (NSString *)getCurveSeg:(NSInteger)index {
-    return @"line_round_left_01";
-    //return [_curveSegments objectAtIndex:[[_shuffledCurve objectAtIndex:index] intValue]];
+//    return @"line_round_left_01";
+    return [_curveSegments objectAtIndex:[[_shuffledCurve objectAtIndex:index] intValue]];
 }
 
 @end

@@ -229,7 +229,7 @@
     
     VLOSummaryMarker *marker = [self createMarkerFromLog:log andPlace:currPlace];
     marker.day = @(day.integerValue + 1);
-    marker.logIndex= logIndex;
+    marker.logIndex = logIndex;
     [_markers addObject:marker];
     
     [self setMarkerImage:currPlace :prevPlace :_markers.count-1];

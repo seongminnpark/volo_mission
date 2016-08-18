@@ -17,7 +17,7 @@
 @property () BOOL hasSegmentIcon;
 
 @property () NSString *longImageName;
-@property () NSString *middleImageName;
+@property () NSString *mediumImageName;
 @property () NSString *shortImageName;
 @property () NSString *curveImageName;
 @property () NSString *iconImageName;
@@ -59,14 +59,14 @@
 }
 
 - (void) setSegmentImageLong:(NSString *)longImage
-                      middle:(NSString *)middleImage
+                      medium:(NSString *)mediumImage
                        shortt:(NSString *)shortImage
                        curve:(NSString *)curveImage {
     
     _segmentUsesCustomImage = YES;
     
     _longImageName = longImage;
-    _middleImageName = middleImage;
+    _mediumImageName = mediumImage;
     _shortImageName = shortImage;
     _curveImageName = curveImage;
 }
@@ -161,7 +161,7 @@
             CGFloat middleSegLeft = _leftToRight? CURVE_WIDTH : 0;
             UIImageView *middleSegImageView =
                 [[UIImageView alloc] initWithFrame:CGRectMake(middleSegLeft, 0, MIDDLE_SEGMENT, SEGMENT_HEIGHT)];
-            middleSegImageView.image = [UIImage imageNamed:_middleImageName];
+            middleSegImageView.image = [UIImage imageNamed:_mediumImageName];
             
             // 곡선 이미지뷰.
             CGFloat curveSegLeft = _leftToRight? 0 : MIDDLE_SEGMENT;
