@@ -68,6 +68,7 @@
     _summaryView.transform = CGAffineTransformMakeScale(SHRINK_RATIO, SHRINK_RATIO);
     _summaryView.layer.cornerRadius = 10;
     _summaryView.layer.masksToBounds = YES;
+    _summaryView.contentInset = UIEdgeInsetsZero;
     [_summaryView setBackgroundColor:[UIColor whiteColor]];
     
     // 닫기, 쉐어 버튼이 담긴 상단의 메뉴 바. share시 summaryView만 캡쳐하기 위해 버튼을 메뉴 바로 분리함.
@@ -102,8 +103,7 @@
         CGFloat width  = [VLOUtilities screenWidth];
         CGFloat height = [VLOUtilities screenHeight];
         
-        make.left.equalTo(@(0.0f));
-        make.top.equalTo(@(0.0f));
+        make.centerX.equalTo(self.view);
         make.width.equalTo(@(width));
         make.height.equalTo(@(height));
     }];
@@ -140,9 +140,6 @@
 
 // 필요시 이 함수만 부를 수 있도록 분리함.
 - (void) drawSummary {
-    
-    [UIApplication sharedApplication].statusBarHidden = NO;
-    [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleDefault;
     
     [self parseLogList:_logList];
     [self setMarkerCoordinates];
@@ -513,15 +510,18 @@
     
     CGPoint originalContentOffset = scrollView.contentOffset;
     CGRect originalFrame = scrollView.frame;
-    
-    scrollView.contentOffset = CGPointZero;
-    scrollView.frame = CGRectMake(0, 0, scrollView.contentSize.width, scrollView.contentSize.height);
+
+    CGSize captureSize =
+        CGSizeMake(scrollView.contentSize.width, scrollView.contentSize.height);
     
     UIGraphicsBeginImageContextWithOptions(scrollView.contentSize, NO, 0.0);
-    {
-        [scrollView.layer renderInContext: UIGraphicsGetCurrentContext()];
-        image = UIGraphicsGetImageFromCurrentImageContext();
-    }
+    
+    scrollView.contentOffset = CGPointZero;
+    scrollView.frame = CGRectMake(0, 0, captureSize.width, captureSize.height);
+    [scrollView.layer renderInContext: UIGraphicsGetCurrentContext()];
+    
+    image = UIGraphicsGetImageFromCurrentImageContext();
+    
     UIGraphicsEndImageContext();
     
     scrollView.contentOffset = originalContentOffset;
@@ -541,7 +541,7 @@
 
 // 버튼 딤처리.
 - (void) willClickMarker:(id)sender {
-    
+
     if ([_delegate respondsToSelector:@selector(scrollToLog:)]) {
         
     }
