@@ -245,7 +245,7 @@
         NSString *shortSeg = [_theme getShortSeg:logIndex-1];
         NSString *curveSeg = [_theme getCurveSeg:logIndex-1];
         
-        [segment setSegmentImageLong:longSeg middle:medSeg shortt:shortSeg curve:curveSeg];
+        [segment setSegmentImageLong:longSeg medium:medSeg shortt:shortSeg curve:curveSeg];
         if (log.type == VLOLogTypeRoute) {
             
             NSString *suffix, *transport, *segmentImageName;

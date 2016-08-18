@@ -20,7 +20,7 @@
 - (void) updateMarkerPositions;
 
 - (void) setSegmentImageLong:(NSString *)longImage
-                      middle:(NSString *)middleImage
+                      medium:(NSString *)mediumImage
                        shortt:(NSString *)shortImage
                        curve:(NSString *)curveImage;
 
