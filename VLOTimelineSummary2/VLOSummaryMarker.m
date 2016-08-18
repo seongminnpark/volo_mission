@@ -66,6 +66,7 @@
     _drawableHeight = MARKER_ICON_HEIGHT + MARKER_LABEL_HEIGHT;
 }
 
+// drawableView는 마커, 마커 아이콘, 마커 레이블을 포함한다.
 - (UIView *) getDrawableView {
     
     [self calculateReferenceFrame];

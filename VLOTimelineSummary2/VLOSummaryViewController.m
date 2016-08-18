@@ -472,23 +472,23 @@
     [_drawables addObject:titleLabel];
 }
 
-- (UIImage *)captureView:(UIScrollView *)view {
+- (UIImage *)captureScrollView:(UIScrollView *)scrollView {
     
     UIImage* image = nil;
     
-    UIGraphicsBeginImageContextWithOptions(view.contentSize, NO, 0.0);
+    UIGraphicsBeginImageContextWithOptions(scrollView.contentSize, NO, 0.0);
     {
-        CGPoint savedContentOffset = view.contentOffset;
-        CGRect savedFrame = view.frame;
+        CGPoint originalContentOffset = scrollView.contentOffset;
+        CGRect originalFrame = scrollView.frame;
         
-        view.contentOffset = CGPointZero;
-        view.frame = CGRectMake(0, 0, view.contentSize.width, view.contentSize.height);
+        scrollView.contentOffset = CGPointZero;
+        scrollView.frame = CGRectMake(0, 0, scrollView.contentSize.width, scrollView.contentSize.height);
         
-        [view.layer renderInContext: UIGraphicsGetCurrentContext()];
+        [scrollView.layer renderInContext: UIGraphicsGetCurrentContext()];
         image = UIGraphicsGetImageFromCurrentImageContext();
         
-        view.contentOffset = savedContentOffset;
-        view.frame = savedFrame;
+        scrollView.contentOffset = originalContentOffset;
+        scrollView.frame = originalFrame;
     }
     UIGraphicsEndImageContext();
     
@@ -526,7 +526,7 @@
         [_delegate summaryShareSelected:self];
     }
     
-    UIImage *img = [self captureView:_summaryView];
+    UIImage *img = [self captureScrollView:_summaryView];
     
     UIImageWriteToSavedPhotosAlbum(img, nil, nil, nil);
 

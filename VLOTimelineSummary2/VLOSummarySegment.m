@@ -114,15 +114,16 @@
     return _segmentIconView;
 }
 
+// drawableView는 선과 선 아이콘을 포함한다.
 - (UIView *) getDrawableView {
     
     [self calculateReferenceFrame];
     
-    // 선과 선 장식 생성.
+    // 선과 선 아이콘 생성.
     [self initializeSegmentView];
     if (_hasSegmentIcon) [self initializeSegmentIconView];
     
-    // 선과 선 장식 묶음이 담길 뷰 생성.
+    // 선과 선 아이콘 묶음이 담길 뷰 생성.
     UIView *drawableView = [[UIView alloc] initWithFrame:CGRectMake(_drawableLeft, _drawableTop, _drawableWidth, _drawableHeight)];
     [drawableView addSubview:_segmentView];
     if (_hasSegmentIcon) [drawableView addSubview:_segmentIconView];
